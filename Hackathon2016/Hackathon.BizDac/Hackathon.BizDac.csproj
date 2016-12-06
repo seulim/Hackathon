@@ -69,6 +69,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TextDetection\BooleanEdgeDetection.cs" />
+    <Compile Include="TextDetection\ImageFilteringWorkflow.cs" />
     <Compile Include="TextDetection\Matrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TextDetection\EdgeDetection.cs" />

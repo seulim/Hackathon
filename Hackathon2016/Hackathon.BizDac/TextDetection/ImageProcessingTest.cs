@@ -109,13 +109,13 @@ namespace Hackathon.BizDac
 		}
 
 		/// <summary>
-		/// 모서리효과
+		/// 모서리효과 (쓰지말것)
 		/// </summary>
 		/// <param name="sourceImage"></param>
 		/// <returns></returns>
 		public Bitmap FuzzyEdgeBlurFilter(Bitmap sourceImage)
 		{
-			return FuzzyEdgeBlurFilter(sourceImage, 3, (float)0.5, 2);
+			return FuzzyEdgeBlurFilter(sourceImage, 3, (float)0.5, 1);
 		}
 
 		public Bitmap FuzzyEdgeBlurFilter(Bitmap sourceBitmap,
@@ -126,8 +126,8 @@ namespace Hackathon.BizDac
 			Bitmap b = BooleanEdgeDetectionFilter(sourceBitmap, edgeFactor1);
 			Bitmap c = MeanFilter(b, filterSize);
 
-			return BooleanEdgeDetectionFilter(c, edgeFactor2);
-
+			//return BooleanEdgeDetectionFilter(c, edgeFactor2);
+			return b;
 			//return
 			//	BooleanEdgeDetectionFilter(sourceBitmap, edgeFactor1).
 			//	MeanFilter(filterSize).BooleanEdgeDetectionFilter(edgeFactor2);
@@ -170,9 +170,213 @@ namespace Hackathon.BizDac
 		/// <returns></returns>
 		public Bitmap GaussianBlur(Bitmap sourceImage)
 		{
-			return ImageBlurFilter(sourceImage, BlurType.Mean9x9);
+			return ImageBlurFilter(sourceImage, BlurType.GaussianBlur3x3);
 		}
 
+		/// <summary>
+		/// 블러
+		/// </summary>
+		/// <param name="sourceImage"></param>
+		/// <param name="blurtype"></param>
+		/// <returns></returns>
+		public Bitmap GaussianBlurByType(Bitmap sourceImage, BlurType blurtype)
+		{
+			return ImageBlurFilter(sourceImage, blurtype);
+		}
+
+		/// <summary>
+		/// 밝기 조절
+		/// </summary>
+		/// <param name="Image"></param>
+		/// <param name="Value"></param>
+		/// <returns></returns>
+		public  Bitmap AdjustBrightness(Bitmap Image, int Value)
+		{
+			System.Drawing.Bitmap TempBitmap = Image;
+			float FinalValue = (float)Value / 255.0f;
+			System.Drawing.Bitmap NewBitmap = new System.Drawing.Bitmap(TempBitmap.Width, TempBitmap.Height);
+			System.Drawing.Graphics NewGraphics = System.Drawing.Graphics.FromImage(NewBitmap);
+			float[][] FloatColorMatrix ={
+					new float[] {1, 0, 0, 0, 0},
+					new float[] {0, 1, 0, 0, 0},
+					new float[] {0, 0, 1, 0, 0},
+					new float[] {0, 0, 0, 1, 0},
+					new float[] {FinalValue, FinalValue, FinalValue, 1, 1}
+				};
+
+			System.Drawing.Imaging.ColorMatrix NewColorMatrix = new System.Drawing.Imaging.ColorMatrix(FloatColorMatrix);
+			System.Drawing.Imaging.ImageAttributes Attributes = new System.Drawing.Imaging.ImageAttributes();
+			Attributes.SetColorMatrix(NewColorMatrix);
+			NewGraphics.DrawImage(TempBitmap, new System.Drawing.Rectangle(0, 0, TempBitmap.Width, TempBitmap.Height), 0, 0, TempBitmap.Width, TempBitmap.Height, System.Drawing.GraphicsUnit.Pixel, Attributes);
+			Attributes.Dispose();
+			NewGraphics.Dispose();
+			return NewBitmap;
+		}
+
+		/// <summary>
+		/// Transparency
+		/// </summary>
+		/// <param name="sourceImage"></param>
+		/// <param name="alphaComponent"></param>
+		/// <returns></returns>
+		public  Bitmap CopyWithTransparency(Bitmap sourceImage, byte alphaComponent = 100)
+		{
+			Bitmap bmpNew = GetArgbCopy(sourceImage);
+			BitmapData bmpData = bmpNew.LockBits(new Rectangle(0, 0, sourceImage.Width, sourceImage.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+			IntPtr ptr = bmpData.Scan0;
+
+			byte[] byteBuffer = new byte[bmpData.Stride * bmpNew.Height];
+
+			Marshal.Copy(ptr, byteBuffer, 0, byteBuffer.Length);
+
+			for (int k = 3; k < byteBuffer.Length; k += 4)
+			{
+				byteBuffer[k] = alphaComponent;
+			}
+
+			Marshal.Copy(byteBuffer, 0, ptr, byteBuffer.Length);
+
+			bmpNew.UnlockBits(bmpData);
+
+			bmpData = null;
+			byteBuffer = null;
+
+			return bmpNew;
+		}
+
+		/// <summary>
+		/// MedianFilter
+		/// </summary>
+		/// <param name="sourceBitmap"></param>
+		/// <param name="matrixSize">filter강도를 결정</param>
+		/// <param name="bias"></param>
+		/// <param name="grayscale"></param>
+		/// <returns></returns>
+		public Bitmap MedianFilter(Bitmap sourceBitmap,
+											int matrixSize,
+											  int bias = 0,
+									bool grayscale = false)
+		{
+			BitmapData sourceData =
+					   sourceBitmap.LockBits(new Rectangle(0, 0,
+					   sourceBitmap.Width, sourceBitmap.Height),
+					   ImageLockMode.ReadOnly,
+					   PixelFormat.Format32bppArgb);
+
+
+			byte[] pixelBuffer = new byte[sourceData.Stride *
+										  sourceData.Height];
+
+
+			byte[] resultBuffer = new byte[sourceData.Stride *
+										   sourceData.Height];
+
+
+			Marshal.Copy(sourceData.Scan0, pixelBuffer, 0,
+									   pixelBuffer.Length);
+
+
+			sourceBitmap.UnlockBits(sourceData);
+
+
+			if (grayscale == true)
+			{
+				float rgb = 0;
+
+
+				for (int k = 0; k < pixelBuffer.Length; k += 4)
+				{
+					rgb = pixelBuffer[k] * 0.11f;
+					rgb += pixelBuffer[k + 1] * 0.59f;
+					rgb += pixelBuffer[k + 2] * 0.3f;
+
+
+					pixelBuffer[k] = (byte)rgb;
+					pixelBuffer[k + 1] = pixelBuffer[k];
+					pixelBuffer[k + 2] = pixelBuffer[k];
+					pixelBuffer[k + 3] = 255;
+				}
+			}
+
+
+			int filterOffset = (matrixSize - 1) / 2;
+			int calcOffset = 0;
+
+
+			int byteOffset = 0;
+
+			List<int> neighbourPixels = new List<int>();
+			byte[] middlePixel;
+
+
+			for (int offsetY = filterOffset; offsetY <
+				sourceBitmap.Height - filterOffset; offsetY++)
+			{
+				for (int offsetX = filterOffset; offsetX <
+					sourceBitmap.Width - filterOffset; offsetX++)
+				{
+					byteOffset = offsetY *
+								 sourceData.Stride +
+								 offsetX * 4;
+
+
+					neighbourPixels.Clear();
+
+
+					for (int filterY = -filterOffset;
+						filterY <= filterOffset; filterY++)
+					{
+						for (int filterX = -filterOffset;
+							filterX <= filterOffset; filterX++)
+						{
+
+
+							calcOffset = byteOffset +
+										 (filterX * 4) +
+								(filterY * sourceData.Stride);
+
+
+							neighbourPixels.Add(BitConverter.ToInt32(
+											 pixelBuffer, calcOffset));
+						}
+					}
+
+
+					neighbourPixels.Sort();
+
+					middlePixel = BitConverter.GetBytes(
+									   neighbourPixels[filterOffset]);
+
+
+					resultBuffer[byteOffset] = middlePixel[0];
+					resultBuffer[byteOffset + 1] = middlePixel[1];
+					resultBuffer[byteOffset + 2] = middlePixel[2];
+					resultBuffer[byteOffset + 3] = middlePixel[3];
+				}
+			}
+
+
+			Bitmap resultBitmap = new Bitmap(sourceBitmap.Width,
+											 sourceBitmap.Height);
+
+
+			BitmapData resultData =
+					   resultBitmap.LockBits(new Rectangle(0, 0,
+					   resultBitmap.Width, resultBitmap.Height),
+					   ImageLockMode.WriteOnly,
+					   PixelFormat.Format32bppArgb);
+
+
+			Marshal.Copy(resultBuffer, 0, resultData.Scan0,
+									   resultBuffer.Length);
+
+
+			resultBitmap.UnlockBits(resultData);
+
+
+			return resultBitmap;
+		}
 
 		#region helper
 		private Bitmap ImageBlurFilter(Bitmap sourceBitmap,
@@ -422,7 +626,7 @@ namespace Hackathon.BizDac
 			return resultBitmap;
 		}
 
-		private enum BlurType
+		public enum BlurType
 		{
 			Mean3x3,
 			Mean5x5,

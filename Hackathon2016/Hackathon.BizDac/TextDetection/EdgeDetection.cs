@@ -12,12 +12,13 @@ namespace Hackathon.BizDac
 {
 	public class EdgeDetection
 	{
+
 		/// <summary>
-		/// 너무 강함.
+		/// Sobel is 3x3,
 		/// </summary>
 		/// <param name="original"></param>
 		/// <returns></returns>
-		public Bitmap DoEdgeDetection(Bitmap original)
+		public Bitmap DoSobelEdgeDetection(Bitmap original)
 		{
 			Bitmap b = original;
 			Bitmap bb = original;

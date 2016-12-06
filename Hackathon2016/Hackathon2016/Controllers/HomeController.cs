@@ -23,10 +23,10 @@ namespace Hackathon2016.Controllers
 
 			if (response != null && response[0].TextAnnotations != null && response[0].TextAnnotations[0].Description != null)
 				retText = response[0].TextAnnotations[0].Description;
-
+			
 			return Json(retText);
 		}
-
+		
 		public ActionResult Index()
 		{
 			return View();
@@ -34,8 +34,10 @@ namespace Hackathon2016.Controllers
 
 		public ActionResult About()
 		{
-			ViewBag.Message = "Your application description page.";
-
+			//ImageDetect("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/test1.jpg");
+			//ImageDetect("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/test2.jpg");
+			//ImageDetect("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/test3.jpg");
+			
 			return View();
 		}
 

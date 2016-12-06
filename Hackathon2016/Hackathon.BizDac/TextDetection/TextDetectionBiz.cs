@@ -12,12 +12,13 @@ namespace Hackathon.BizDac
     public class TextDetectionBiz
     {
         const string usage = @"Usage:TextDetectionSample <path_to_image>";
-        /// <summary>
-        /// Creates an authorized Cloud Vision client service using Application 
-        /// Default Credentials.
-        /// </summary>
-        /// <returns>an authorized Cloud Vision client.</returns>
-        public VisionService CreateAuthorizedClient()
+		
+		/// <summary>
+		/// Creates an authorized Cloud Vision client service using Application 
+		/// Default Credentials.
+		/// </summary>
+		/// <returns>an authorized Cloud Vision client.</returns>
+		public VisionService CreateAuthorizedClient()
         {
             GoogleCredential credential =
                 GoogleCredential.GetApplicationDefaultAsync().Result;
@@ -50,7 +51,7 @@ namespace Hackathon.BizDac
 
 			MemoryStream stream = new MemoryStream();
 			Bitmap bitmap;
-			bitmap = ImageFiltering(imagePath);
+			bitmap = new ImageFilteringWorkflow().DoWorkFlow(imagePath);
 			bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
 
 			byte[] imageArray = stream.GetBuffer();
@@ -72,55 +73,6 @@ namespace Hackathon.BizDac
                 }).Execute();
             return responses.Responses;
         }
-
-		private Bitmap ImageFiltering(string imagePath)
-		{
-			
-			Bitmap bitmap;
-
-			//흑백
-			bitmap = new ImageProcessingTest().CopyAsGrayscale(imagePath);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/1.jpg");
-
-			
-			//반전
-			bitmap = new ImageProcessingTest().CopyAsNegative(bitmap);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/2.jpg");
-
-			//노이즈 제거
-			bitmap = new ImageProcessingTest().RemoveNoise(bitmap);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/3.jpg");
-
-			//블러
-			bitmap = new ImageProcessingTest().GaussianBlur(bitmap);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/4.jpg");
-
-			//노이즈 제거
-			bitmap = new ImageProcessingTest().RemoveNoise(bitmap);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/4_.jpg");
-
-			//블러
-			bitmap = new ImageProcessingTest().GaussianBlur(bitmap);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/5.jpg");
-
-			//노이즈 제거
-			bitmap = new ImageProcessingTest().RemoveNoise(bitmap);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/5_.jpg");
-
-			//블러
-			bitmap = new ImageProcessingTest().GaussianBlur(bitmap);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/6.jpg");
-
-			//노이즈 제거
-			bitmap = new ImageProcessingTest().RemoveNoise(bitmap);
-			bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/6_.jpg");
-			////모서리효과
-			//bitmap = new EdgeDetection().DoEdgeDetection(bitmap);
-			//bitmap.Save("C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/result/5.jpg");
-
-
-			return bitmap;
-
-		}
+		
     }
 }
