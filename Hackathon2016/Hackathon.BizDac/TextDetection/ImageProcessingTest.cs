@@ -65,7 +65,7 @@ namespace Hackathon.BizDac
 			bmpData = null;
 			byteBuffer = null;
 
-			bmpNew.Save("C:/Users/pjeon/Documents/hackathon/1_gray.png");
+			//bmpNew.Save("C:/Users/pjeon/Documents/hackathon/1_gray.png");
 			return bmpNew;
 		}
 
