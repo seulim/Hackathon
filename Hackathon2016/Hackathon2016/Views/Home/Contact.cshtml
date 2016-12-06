@@ -1,17 +1,40 @@
 ﻿@{
     ViewBag.Title = "Contact";
 }
-<h2>@ViewBag.Title.</h2>
-<h3>@ViewBag.Message</h3>
 
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
+<script type="text/javascript" language="javascript">
+	function GetFindFile(filename) {
+		$('#tb_aphoto').val($('#findfile').val())
+	}
 
-<address>
-    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+	function UploadImage() {
+		var params = [
+		{ name: 'filepath', value: "C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/test5.jpg" }
+
+		];
+		$.ajax({
+			type: 'POST',
+			dataType: "json",
+			url: "/Home/ImageDetectML",
+			data: params,
+			async: false,
+			success: function (result) {
+				alert(result);
+			},
+			error: function (error) {
+			}
+		});
+	}
+</script>
+
+
+<div class="file-upload-wrap">
+	<input type="text" class="text fileupload" id="tb_aphoto" name="" size="18" value="">
+	<div class="file-upload">
+		<span class="abtn m_wh"><em>Attachment</em></span>
+		<span class="file-btn">
+			<input type="file" class="file" id="findfile" name="findfile" onchange='javascript:GetFindFile()'>
+		</span>
+	</div>
+	<input type="button" id="btnUploadImage" name="btnUploadImage" size="18" value="Upload" onclick="UploadImage()" />
+</div>
