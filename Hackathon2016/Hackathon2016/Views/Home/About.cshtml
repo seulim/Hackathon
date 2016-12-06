@@ -1,0 +1,49 @@
+﻿@{
+	ViewBag.Title = "";
+}
+<h2>@ViewBag.Title.</h2>
+
+<script type="text/javascript" language="javascript">
+	function GetFindFile(filename) {
+		$('#tb_aphoto').val($('#findfile').val())
+	}
+
+	function UploadImage() {
+		var params = [
+						//{ name: 'file', value: $(':radio[name="rdoCustType"]:checked').val() }
+							//{ name: 'filepath', value: $('#tb_aphoto').val() }
+		{ name: 'filepath', value: "C:/git_repo/hackathon/Hackathon2016/Hackathon2016/TestImage/test4.jpg" }
+		//{ name: 'filepath', value: "C:/git_repo/hackathon/Hackathon2016/Hackathon2016/TestImage/test1.jpg" }
+	//{ name: 'filepath', value: "C:/git_repo/hackathon/Hackathon2016/Hackathon2016/TestImage/test1.jpg" }
+					  
+		];
+		$.ajax({
+			type: 'POST',
+			dataType: "json",
+			url: "/Home/ImageDetect",
+			data: params,
+			async: false,
+			success: function (result) {
+				alert(result);
+				//if (result.success)
+				//	alert(result.message);
+				//else
+				//	alert(result.message);
+			},
+			error: function (error) {
+			}
+		});
+	}
+</script>
+
+
+<div class="file-upload-wrap">
+	<input type="text" class="text fileupload" id="tb_aphoto" name="" size="18" value="">
+	<div class="file-upload">
+		<span class="abtn m_wh"><em>Attachment</em></span>
+		<span class="file-btn">
+			<input type="file" class="file" id="findfile" name="findfile" onchange='javascript:GetFindFile()'>
+		</span>
+	</div>
+	<input type="button" id="btnUploadImage" name="btnUploadImage" size="18" value="Upload" onclick="UploadImage()"/>
+</div>

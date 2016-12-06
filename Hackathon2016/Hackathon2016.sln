@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hackathon2016", "Hackathon2016\Hackathon2016.csproj", "{190FAA38-9EA0-4E92-B21F-18AE7D331699}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hackathon.BizDac", "Hackathon.BizDac\Hackathon.BizDac.csproj", "{B4837725-AB13-403B-89C3-94076529D23F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageFilterTest", "ImageFilterTest\ImageFilterTest.csproj", "{30AD4094-A36B-47E9-A37D-0DA855792320}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{190FAA38-9EA0-4E92-B21F-18AE7D331699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{190FAA38-9EA0-4E92-B21F-18AE7D331699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{190FAA38-9EA0-4E92-B21F-18AE7D331699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{190FAA38-9EA0-4E92-B21F-18AE7D331699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4837725-AB13-403B-89C3-94076529D23F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4837725-AB13-403B-89C3-94076529D23F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4837725-AB13-403B-89C3-94076529D23F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4837725-AB13-403B-89C3-94076529D23F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30AD4094-A36B-47E9-A37D-0DA855792320}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30AD4094-A36B-47E9-A37D-0DA855792320}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30AD4094-A36B-47E9-A37D-0DA855792320}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30AD4094-A36B-47E9-A37D-0DA855792320}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
