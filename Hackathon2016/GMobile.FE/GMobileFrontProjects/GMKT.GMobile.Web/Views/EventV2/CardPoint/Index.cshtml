@@ -1,0 +1,924 @@
+﻿@using GMKT.GMobile.Data.EventV2;
+@using GMKT.GMobile.Web.Models.EventV2;
+@model GMKT.GMobile.Web.Models.EventV2.CardPointModel
+
+
+<script type="text/javascript">
+	document.domain = 'gmarket.co.kr';
+	var isAsianaRe = '@Model.IsReregAsiana';
+	var justClickedAsiana = "N";
+	var isOcbRe = '@Model.IsReregOCB';
+	var justClickedOcb = "N";
+
+	var topBanerList = [];
+	@if(Model.PointAdd != null)
+	{
+		foreach(Banner2T i in Model.PointAdd)
+		{
+	<text>
+	topBanerList.push('<div class="topban_bx" title="@i.ImageAlt"><img src="@i.ImageUrl" alt="@i.ImageAlt" /><span class="art_infobx"><img src="@i.GuideImageUrl" alt="@i.GuideImageAlt" /></span></div>');
+	</text>
+		}
+	}
+
+	var topBanerList2 = [];
+	@if(Model.PointAdd != null)
+	{
+		foreach(Banner2T i in Model.PointBenefit)
+		{
+	<text>
+	topBanerList2.push('<div class="topban_bx"><img src="@i.ImageUrl" alt="@i.ImageAlt" /><span class="art_infobx"><img src="@i.GuideImageUrl" alt="@i.GuideImageAlt" /></span></div>');
+	</text>
+		}
+	}
+	
+	function swipeGmk(data, areaId, pageId, auto)
+	{
+		if(data.length != '1'){
+			var dots;
+			var tempSwipe = new SwipeView(areaId, { numberOfPages: data.length, autoSwipe:auto });
+			if(pageId != null && pageId != '')
+			{
+				$(areaId).siblings('.h_page').find('.pag').text(tempSwipe.pageIndex + 1);	
+				$(areaId).siblings('.h_page').find('.pag2').text(data.length);
+			}
+
+			for (var i=0; i<3; i++) 
+			{
+				var page = i==0 ? data.length-1 : data.length==1 ? 0 : i-1;
+				tempSwipe.masterPages[i].innerHTML = data[page];
+			}
+
+			tempSwipe.onFlip(function () {
+				var upcoming;
+
+				for (var i=0; i<3; i++) 
+				{
+					upcoming = tempSwipe.masterPages[i].dataset.upcomingPageIndex;
+
+					if (upcoming != tempSwipe.masterPages[i].dataset.pageIndex) {
+						tempSwipe.masterPages[i].innerHTML = data[upcoming];
+					}	
+				}
+				if(pageId != null && pageId != '')
+				{
+					$(areaId).siblings('.h_page').find('.pag').text(tempSwipe.pageIndex + 1);	
+				}
+
+                if (areaId == "#bnrList")
+                {
+                    if($("#bnrList .swipeview-active .topban_bx") !== undefined){ 
+                        if ($("#bnrList .swipeview-active .topban_bx").attr("title") == "해피포인트"){
+                            $("#txtPoint").text("본인인증하기");
+                        }else{
+                            if ($("#txtPoint") !== undefined){
+                                $("#txtPoint").text("등록/적립내역보기");
+                            }
+                        }
+                    }
+                }
+			});
+			
+			var index = 0;
+
+			if(auto)
+			{
+				tempSwipe.t = setTimeout(function() {tempSwipe.next();}, 3000);
+			} 
+
+			return tempSwipe;
+		}
+		else{
+			$(areaId).siblings('.h_page').hide();
+			$(areaId).append(data[0]);
+		}
+	}
+
+	function setDataArray(data, dispCnt) {
+		if (dispCnt > 1) {
+			var totDispCnt = data.length;
+			var totPage = Math.floor(data.length / dispCnt);
+			var tmpArr = new Array();
+			var tmpHtml = '';
+			for (var i = 0; i < totPage; i++) {
+				for (var j = 0; j < dispCnt; j++) {
+					tmpHtml += data[i * dispCnt + j];
+				}
+				tmpArr[i] = tmpHtml;
+				tmpHtml = '';
+			}
+			return tmpArr;
+		} else {
+			return data;
+		}
+	}
+
+	//래퍼 높이값 자동 조절
+	window.onload = function () { playResponse(); changeCtext('bnrList'); changeCtext('bnrList2'); $('#pt_cnt1').hide(); }
+	function changeCtext(id) {
+		var wrapObj = $('#' + id);
+		var bnrImg = wrapObj.find('.topban_bx');
+		var bnrImgHeight = bnrImg.height(); //이미지높이값
+		wrapObj.css('height', bnrImgHeight + 'px'); //래퍼높이값 조절
+
+		//ios7에서 높이값 잡지 못하는 버그	
+		wrapObj.find('#swipeview-slider').children().height(bnrImgHeight);
+	}
+
+	var responMain = {};
+	var flag_resp;
+	responMain.$resWrap = $('.resps_wraper'); //상단
+	responMain.$servGoWrap = $('.serv_wraper'); //하단
+	responMain.$reServWp = responMain.$resWrap.find('.resps_gow'); //상단의 빈div
+	responMain.$servGoHTML = responMain.$servGoWrap.html(); //하단 바로가기 컨텐츠
+
+	function playResponse() {
+		responMain.$winWidth = $(window).width();
+		responMain.$resFlag = responMain.$reServWp.html(); //상단의 빈div의 html
+		if (responMain.$winWidth >= 610) {
+			if (responMain.$resFlag == '') {
+				responMain.$servGoWrap.html('');
+				responMain.$reServWp.append(responMain.$servGoHTML);
+				responMain.$resWrap.addClass('res');
+			}
+		} else {
+			if (responMain.$resFlag != '') {
+				responMain.$reServWp.html('');
+				responMain.$servGoWrap.append(responMain.$servGoHTML);
+				responMain.$resWrap.removeClass('res');
+			}
+		}
+	}
+
+	function isLogin() {
+		@if( PageAttr.IsLogin )
+		{
+			@Html.Raw( "return true;" )
+		}
+		else
+		{
+			@Html.Raw( "return false;" )
+		}
+	}
+
+</script>	
+<div id="content" class="ctns">
+	<!-- GMARKET BEST -->
+		@Html.Partial("Event/_NavigationBar", @Model.NaviIcons, new ViewDataDictionary { { "selectTab", "카드포인트" } } )
+	<div class="banner_box">
+		@if( Model.TopBanner != null )
+		{
+		<a href="@Model.TopBanner.ImageLinkUrl">
+			<img src="@Model.TopBanner.ImageUrl"	alt="@Model.TopBanner.ImageAlt" />
+		</a>
+		}
+	</div>
+	<div class="box_dot_main">
+		
+		<div class="box_exhibit_main01">
+				
+			<div class="box_coupon card">
+				<div class="m_title">
+					<h3>이달의 카드 혜택</h3>
+				</div>
+				<div class="cp_box">
+					<div id="bnGrp3">
+						<ul>
+							@if( Model.ThisMonthCardBenefit != null )
+							{
+								for( int i = 0; i < Model.ThisMonthCardBenefit.Count; i++ )
+								{
+							<li>
+								<a href="@Model.ThisMonthCardBenefit[i].ImageLinkUrl" onclick='@(i < 3 ? "SnaUrlFooter('" + Convert.ToString(710200025 + i) + "'); return true;" : "return true;")'> 
+									<img src="@Model.ThisMonthCardBenefit[i].ImageUrl" alt="@Model.ThisMonthCardBenefit[i].ImageAlt" />
+								</a>
+							</li>
+								}
+							}
+						</ul>
+					</div>
+					<div id="bnIndex14" class="bn_eindex">
+						@if( Model.ThisMonthCardBenefit != null )
+						{
+							for( int i = 0; i < Model.ThisMonthCardBenefit.Count; i++ )
+							{
+						<p @(i == 0 ? "class=selected" : "")></p>
+							}
+						}
+					</div>
+				</div>
+				
+				<script type="text/javascript">
+
+					var gallery3,
+						el,
+						i,
+						page,
+						dots1 = document.querySelectorAll('#bnTurn3 button'),
+						dots14 = document.querySelectorAll('#bnIndex14 p');
+					/* HTML 파싱 */
+					var bnGrpList3 = $("#bnGrp3 li");
+
+					if (1 < bnGrpList3.length) {
+
+						var bnGrpListAtag3 = [];
+
+						// 시작포인트 랜덤
+						var index1 = 0;
+						var randomPage3 = Math.floor(Math.random() * (bnGrpList3.length));
+						for (var j = randomPage3; j < bnGrpList3.length; j++, index1++) {
+							bnGrpListAtag3[index1] = bnGrpList3[j].innerHTML;
+						}
+						if (randomPage3 > 0) {
+							for (var j = 0; j < randomPage3; j++, index1++) {
+								bnGrpListAtag3[index1] = bnGrpList3[j].innerHTML;
+							}
+						}
+
+						var globalBnGrpListAtag3 = bnGrpListAtag3.join(",");
+						/* //HTML 파싱 */
+
+						gallery3 = new SwipeView('#bnGrp3', {
+							numberOfPages: bnGrpListAtag3.length,
+							hastyPageFlip: true,
+							flickTime: 1000
+						});
+
+						// Load initial data
+						for (i = 0; i < 3; i++) {
+
+							if (1 == bnGrpListAtag3.length) {
+								page = i == 0 || 2 ? bnGrpListAtag3.length - 1 : i - 1;
+							}
+							else {
+								page = i == 0 ? bnGrpListAtag3.length - 1 : i - 1;
+							}
+							el = document.createElement('span');
+							el.innerHTML = bnGrpListAtag3[page];
+							gallery3.masterPages[i].appendChild(el)
+
+							el.width = bnGrpListAtag3[page].width;
+							el.height = bnGrpListAtag3[page].height;
+							el.onload = function () { this.className = ''; }
+						}
+
+						gallery3.onFlip(function () {
+							var el,
+								upcoming,
+								i;
+
+							for (i = 0; i < 3; i++) {
+								upcoming = gallery3.masterPages[i].dataset.upcomingPageIndex;
+
+								if (upcoming != gallery3.masterPages[i].dataset.pageIndex) {
+									el = gallery3.masterPages[i].querySelector('span');
+									el.innerHTML = bnGrpListAtag3[upcoming];
+								}
+							}
+							document.querySelector('#bnIndex14 .selected').className = '';
+							dots14[gallery3.pageIndex].className = 'selected';
+
+							setImgHeight(); //140307추가
+						});
+
+						flicking("bnGrp3");
+
+					} else if (1 == bnGrpList3.length) {
+
+						var bnGrpListAtag3 = [];
+
+						for (var j = 0; j < bnGrpList3.length; j++) {
+							bnGrpListAtag3[j] = bnGrpList3[j].innerHTML;
+						}
+						var globalBnGrpListAtag3 = bnGrpListAtag3.join(",");
+						/*140128*/
+						var elSpan = document.createElement('span');
+						elSpan.innerHTML = globalBnGrpListAtag3;
+						document.querySelector('#bnGrp3').appendChild(elSpan);
+						//$("#bnGrp").append(globalBnGrpListAtag3);
+						/* //140128*/
+
+						flicking("bnGrp3");
+					} 
+				</script>
+			</div>
+				
+			<div class="box_coupon card">
+				<div class="m_title">
+					<h3>이달의 무이자 할부</h3>
+				</div>
+				<div class="cp_box">
+					@if(Model.ThisMonthHalbu != null && Model.ThisMonthHalbu.Length > 0)
+					{
+						@Html.Raw( Model.ThisMonthHalbu )
+					}
+				</div>
+			</div>
+				
+			<div class="box_coupon card">
+				<div class="tab_box">
+					<ul>
+					<li class="on" id="pt_tab0"><a href="#" onclick="tabView(2,'pt_tab',0,'pt_cnt');SnaUrlFooter('710200030');return false;">제휴포인트 적립</a></li>
+					<li class="off" id="pt_tab1"><a href="#" onclick="tabView(2,'pt_tab',1,'pt_cnt');SnaUrlFooter('710200031');return false;">제휴포인트 할인</a></li>
+					</ul>
+				</div>
+				<div class="tab_cont pt_cont" id="pt_cnt0">
+					<p class="pt_txt">모바일 G마켓으로 쇼핑하면 Smile Point/스탬프에 제휴포인트 적립까지! </p>
+                    @if (Model.PointAdd != null && Model.PointAdd.Count > 0)
+                    {
+                        if (Model.PointAdd[0].ImageAlt == "해피포인트")
+                        {
+                    <a href="javascript:;" class="btn_more" onclick="popPointReg_History('pointinfo_current_page');return false;"><span id="txtPoint">본인인증하기</span></a>
+                        }
+                        else
+                        {
+					<a href="javascript:;" class="btn_more" onclick="popPointReg_History('pointinfo_current_page');return false;"><span id="txtPoint">등록/적립내역보기</span></a>
+                        }
+                    }
+                    else
+                    {
+                    <a href="javascript:;" class="btn_more" onclick="popPointReg_History('pointinfo_current_page');return false;"><span id="txtPoint">등록/적립내역보기</span></a>
+                    }
+					<div class="pt_infobx">
+						<div class="display_bnr">
+							<div class="bnr_w">
+								<div id="bnrList" class="lst"></div>
+								<div class="h_page">
+									<a href="javascript:;" id="hotPrev" class="prev" onclick="spcListScroller.prev();">이전</a>
+									<a href="javascript:;" id="hotNext" class="next" onclick="spcListScroller.next();">다음</a>
+									<div class="page"><span class="pag" id="pointinfo_current_page">1</span>/<span class="pag2">10</span></div>
+								</div>
+							</div>
+							<script>
+								topBanerList = setDataArray(topBanerList, 1);
+								spcListScroller = swipeGmk(topBanerList, "#bnrList", true);
+							</script>
+						</div>
+					</div>
+				</div>
+				<div class="tab_cont pt_cont" id="pt_cnt1">
+					<p class="pt_txt">모바일 G마켓에서는 모아둔 제휴포인트 마음껏 쓰고 무료쇼핑!</p>
+					<a href="#" class="btn_more" onclick="popBlockUI('layer_cardinfo');return false;"><span>혜택전체보기</span></a>
+					<div class="pt_infobx">
+						<div class="display_bnr">
+							<div class="bnr_w">
+								<div id="bnrList2" class="lst"></div>
+								<div class="h_page">
+									<a href="javascript:;" id="hotPrev2" class="prev" onclick="spcListScroller2.prev();">이전</a>
+									<a href="javascript:;" id="hotNext2" class="next" onclick="spcListScroller2.next();">다음</a>
+									<div class="page"><span class="pag">1</span>/<span class="pag2">10</span></div>
+								</div>
+							</div>
+							<script>
+								topBanerList2 = setDataArray(topBanerList2, 1);
+								spcListScroller2 = swipeGmk(topBanerList2, "#bnrList2", true);
+							</script>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+    @*2016-10-31 제거*@
+	@*  	@Html.Partial("Event/_PromotionList")*@
+	</div>
+		
+	<div class="add_homego add_homego2"><a href="javascript:popBlockUI('layer_sns');">공유하기</a></div>
+	<div class="share_sns" id="layer_sns">
+		<h4 class="tit">공유하기</h4>
+
+		<div class="sns">
+			<a href="javascript:CheckPc(MobileSnsUtil.snsType().KAKAOTALK);" class="cco" id="SnsKakaoTalk">카카오톡</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().FACEBOOK);" class="face">페이스북</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().TWITTER);" class="twt">트위터</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().KAKAOSTORY);" class="ccos">카카오스토리</a>
+		</div>
+		<a href="#" class="close_sns" onclick="popBlockUI('layer_sns');return false;">닫기</a>
+	</div>	
+
+	<!-- 쿠폰안내 레이어 추가-->
+	<div class="layer_allsv ly_benefit" id="layer_cpbenefit">
+		<div class="lay_wp">
+			<h3>등급별 쿠폰 &amp; 승급혜택</h3>
+			<ul class="benefit_tab">
+			<li class="on" id="find_tab0"><a href="#" onclick="tabView(2,'find_tab',0,'find_cnt');">등급별 쿠폰</a></li>
+			<li class="off" id="find_tab1"><a href="#" onclick="tabView(2,'find_tab',1,'find_cnt');">등급 기준 및 혜택</a></li>
+			</ul>
+			<div class="box_coupon" id="find_cnt0">
+				<dl>
+				<dt><span class="ico ico_svip">SVIP</span></dt>
+				<dd>
+					<ul>
+					<li><img src="@Urls.MobileImageShortUrl/mobile.gmarket/images/640/temp/@("@")img_coupon.jpg" width="88" height="40" alt="이미지 대체텍스트"></li>
+					<li><img src="@Urls.MobileImageShortUrl/mobile.gmarket/images/640/temp/@("@")img_coupon.jpg" width="88" height="40" alt="이미지 대체텍스트"></li>
+					<li>
+						<div class="txt_mile">
+							<p>SVIP승급시</p>
+							<strong>500</strong><span class="ico_mile">마일리지</span>
+						</div>
+					</li>
+					</ul>
+				</dd>
+				<dt><span class="ico ico_vip">VIP</span></dt>
+				<dd>
+					<ul>
+					<li><img src="@Urls.MobileImageShortUrl/mobile.gmarket/images/640/temp/@("@")img_coupon.jpg" width="88" height="40" alt="이미지 대체텍스트"></li>
+					<li><img src="@Urls.MobileImageShortUrl/mobile.gmarket/images/640/temp/@("@")img_coupon.jpg" width="88" height="40" alt="이미지 대체텍스트"></li>
+					<li>
+						<div class="txt_mile">
+							<p>VIP승급시</p>
+							<strong>300</strong><span class="ico_mile">마일리지</span>
+						</div>
+					</li>
+					</ul>
+				</dd>
+				<dt><span class="ico ico_gold">GOLD</span></dt>
+				<dd>
+					<ul>
+					<li><img src="@Urls.MobileImageShortUrl/mobile.gmarket/images/640/temp/@("@")img_coupon.jpg" width="88" height="40" alt="이미지 대체텍스트"></li>
+					<li>
+						<div class="txt_mile">
+							<p>GOLD승급시</p>
+							<strong>200</strong><span class="ico_mile">마일리지</span>
+						</div>
+					</li>
+					</ul>
+				</dd>
+				<dt><span class="ico ico_silver">SILVER</span></dt>
+				<dd>
+					<ul>
+					<li><img src="@Urls.MobileImageShortUrl/mobile.gmarket/images/640/temp/@("@")img_coupon.jpg" width="88" height="40" alt="이미지 대체텍스트"></li>
+					</ul>
+				</dd>
+				<dt><span class="ico ico_new">NEW</span></dt>
+				<dd>
+					<div class="cp_box">
+						<ul>
+						<li>
+							<span class="ico_ball">혜택 01</span>
+							<strong>쇼핑의 시작!<br>초강력 할인쿠폰 받기</strong>
+							<img src="@Urls.MobileImageShortUrl/mobile.gmarket/images/640/temp/@("@")img_grade2.jpg" width="122" height="50" alt="이미지 대체텍스트">
+						</li>
+						<li>
+							<span class="ico_ball">혜택 02</span>
+							<strong>쇼핑의 시작!<br>초강력 할인쿠폰 받기</strong>
+							<img src="@Urls.MobileImageShortUrl/mobile.gmarket/images/640/temp/@("@")img_grade.jpg" width="86" height="60" alt="이미지 대체텍스트">
+						</li>
+						</ul>
+					</div>
+				</dd>
+				</dl>
+			</div>
+			<a href="#" class="lay_clse" onclick="popBlockUI('layer_cpbenefit');return false;">닫기</a>
+		</div>
+	</div>
+	<!--쿠폰안내 레이어 추가-->
+	<div class="layer_allsv bef2" id="layer_cardinfo">
+		<img src="@Model.MobileGuidePopupImageUrl" alt="">
+		<!--[D] 대체텍스트 제공 -->
+		<div class="blind">
+			<h3>
+				제휴포인트 혜택 전체보기</h3>
+			<ul>
+				<li>추가적립 제휴포인트 : 아시아나 에어 결제금액 2천원당 1마일리지 적립,ok 캐쉬백 : 결제금액의 0.5% 적립</li>
+				<li>추가적립 제휴포인트 : ok 캐쉬백 결제금액 전액 사용가능, s-oil 최대 50만원까지 전액 사용가능</li>
+			</ul>
+			<p>
+				제휴 포인트별 세뷰 적립/사용 조건은 상세 페이지를 확인하세요.</p>
+		</div>
+		<a href="#" class="lay_clse  noBorder" onclick="popBlockUI('layer_cardinfo');return false;">닫기</a>
+	</div>
+	<!--//쿠폰안내 레이어 추가-->
+
+	<!--//S:9070 제휴 카드 등록/내역 -->
+	<div class="layer_allsv bef3" id="layer_mileage" style="display:none">
+			<div class="lay_wp">
+				<h3>마일리지 적립 및 내역보기</h3>
+				<div class="tab_box">
+					<ul>
+					<li class="on" id="bef_tab0"><a href="#" onclick="tabView(2,'bef_tab',0,'bef_cnt');return false;">등록하기</a></li>
+					<li class="off" id="bef_tab1"><a href="#" onclick="AsianaHistoryPaging(1);return false;">적립 내역보기</a></li>
+					</ul>
+				</div>
+				<div class="bef_wrap">
+					<div id="bef_cnt0" class="bef_area">
+						<p class="tx_bef">아시아니클럽 회원번호 입력(9자리 숫자)</p>
+						<div class="inp_area">
+							<label for="u_num">회원번호</label>
+							<input type="tel" id="asiana_card_no" class="inp_tx" maxlength="9" onkeypress="return onlyNumber(event);"/> 
+							<a href="javascript:confirmAsianaCard();" class="btn_reg">등록하기</a>
+						</div>
+						<div class="bx_agree">
+							<h4 class="tit_bef">[개인 정보 수집에 대한 동의]</h4>
+							<p>G마켓은 아시아나항공 마일리지 적립을 위해 고객님의 아시아나항공 회원번호를 수집하며, 아시아나항공 측에 마일리지 적립대상 일치여부를 확인합니다. 저장된 회원 번호는 회원탈퇴 시 일괄 파기 처리됩니다. <br>위 내용에 동의하시겠습니까? </p>
+							<input type="checkbox" id="checkAgree" class="inp_chk">
+							<label for="u_agree">동의함</label>
+						</div>
+						<h4 class="tit_bef">[아시아나항공 마일리지 적립안내]</h4>
+						<ul class="lst_bef">
+						<li>마일리지는 상품구매 후 상품평 작성을 완료하면, G마켓 결제금 2,000원당(배송비 제외) 아시아나 1마일리지가 적립됩니다. </li>
+						<li>마일리지 적립은 본인 회원번호만 가능하며, 본인의 실수로 타인 회원번호에 적립된 마일리지는 회수 및 재적립되지 않습니다. </li>
+						</ul>
+					</div>
+					<div id="bef_cnt1" class="bef_area" style="display:none">
+						<div class="thmb">
+							<img id="asiana_card_img" src="" />
+							
+						</div>
+						<p class="card_num">아시아나클럽 회원번호 <strong><span id="AsianaCardNo"></span></strong> <a href="#" onclick="DeleteJaehuCard('ASIANA');return false;">재등록</a></p>
+						<ul class="lst_mile">
+						<li>
+							<p>적립된 총 마일리지</p>
+							<em><span id="totAnianaMileage">0</span></em>
+						</li>
+						<li>
+							<p>적립된 총 마일리지</p>
+							<em><span  id="SNMAnianaMileage">0</span></em>
+						</li>
+						</ul>
+						<div class="tbl_mile">
+							<table cellspacing="0" border="1">
+							<caption>마일리지</caption>
+							<thead>
+							<tr>
+								<th scope="col">발생일</th>
+								<th scope="col">마일리지</th>
+								<th scope="col">적립현황</th>
+								<th scope="col">적립예정일</th>
+								<th scope="col">주문번호</th>
+							</tr>
+							</thead> 
+							<tbody id="AsianaMileageData"> 
+							<!--<tr>
+								<td>2015-01-09</td>
+								<td>110</td>
+								<td>신청중</td>
+								<td>2015-01-09</td>
+								<td>0123456789</td>
+							</tr>-->
+							</tbody> 
+							</table>
+						</div>
+						<div class="paginate" id="AsianaPaginate"></div>
+
+						<div class="bx_info">
+							<ul class="lst_bef">
+							<li>아시아나항공 마일리지 적립은 상품평 작성 후 익월 17일에 일괄 적립됩니다.</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<a href="#" class="lay_clse noBorder noBorder" onclick="popBlockUI('layer_mileage');return false;">닫기</a>
+			</div>
+		</div>
+		
+		<div class="layer_allsv bef3" id="layer_point" style="display:none">
+			<div class="lay_wp">
+				<h3>포인트 적립 및 내역보기</h3>
+				<div class="tab_box">
+					<ul>
+					<li class="on" id="bef_tab20"><a href="#" onclick="tabView(2,'bef_tab2',0,'bef_cnt2_');return false;">등록하기</a></li>
+					<li class="off" id="bef_tab21"><a href="#" onclick="OkcashbagHistoryPaging(1);return false;">적립 및 사용 내역보기</a></li>
+					</ul>
+				</div>
+				<div class="bef_wrap">
+					<div id="bef_cnt2_0" class="bef_area" style="display:block">
+						<ul class="card_reg">
+						<li>
+							<div class="inp_area">
+								<label for="u_num">카드번호</label>
+								<input type="text" id="card_no1" class="inp_tx" maxlength="4" onkeypress="return onlyNumber(event);">
+								<span class="tx">-</span>
+								<input type="password" id="card_no2" class="inp_tx" maxlength="4" onkeypress="return onlyNumber(event);">
+								<span class="tx">-</span>
+								<input type="password" id="card_no3" class="inp_tx" maxlength="4" onkeypress="return onlyNumber(event);">
+								<span class="tx">-</span>
+								<input type="text" id="card_no4" class="inp_tx" maxlength="4" onkeypress="return onlyNumber(event);">
+							</div>
+						</li>
+						<li>
+							<div class="inp_area">
+								<label for="u_num">비밀번호</label>
+								<input type="password" id="card_password" class="inp_tx">
+								<a href="#" onclick="confirmOkCashBagCard();return false;" class="btn_reg" status="ready" id="btnOkcashbag_search">조회하기</a>
+							</div>
+						</li>
+						</ul>
+						<div class="bx_info">
+							<ul class="lst_bef">
+							<li>OK캐쉬백 온라인 비밀번호는 6-12자리입니다. <br/>
+							(OK캐쉬백 상품권 카드의 경우, 숫자 4자리 비밀번호를 이용해주세요)</li>
+							<li>SK엔크린 롯데맴버스 카드의 경우, OK캐쉬백 적립/사용 정책에 의하여 SK주유소/충전소에서만 사용 가능하므로 G마켓에서는 사용이 불가능합니다.<br>
+							<span class="tx">OK캐쉬백 사용 및 적립 관련 문의는 OK캐쉬백 사이트나 행복센터 (tel: 1599-0512)를 통해서 가능합니다.</span></li>
+							</ul>
+						</div>
+					</div>
+					<div id="bef_cnt2_1" class="bef_area" style="display:none">
+						<div class="thmb">
+							<img src="" id="okcashbag_card_img">
+						</div>
+						<p class="card_num"><a href="#" onclick="DeleteJaehuCard('OKCASHBAG');return false;">재등록</a></p>
+						<div class="tbl_mile">
+							<table cellspacing="0" border="1">
+							<caption>마일리지</caption>
+							<thead>
+							<tr>
+							<th scope="col">일자</th>
+							<th scope="col">구분</th>
+							<th scope="col">포인트</th>
+							<th scope="col">상태</th>
+							<th scope="col">장바구니번호</th>
+							</tr>
+							</thead> 
+							<tbody id="OkcashbagPointData"> 
+							<!--<tr>
+								<td>2015-01-09</td>
+								<td>사용</td>
+								<td>20,100</td>
+								<td>사용취소</td>
+								<td>0123456789</td>
+							</tr>-->
+							</tbody> 
+							</table>
+						</div>
+						<div class="paginate" id="OKCashbagPaginate"></div>
+
+						<div class="bx_info">
+							<ul class="lst_bef">
+							<li>적립 및 사용 내역은 2013.07.03 이후의 내역만 조회됩니다.</li>
+							<li>OK캐쉬백 사용 및 적립 문의는 OK캐쉬백 사이트나 행복센터를  통해 확인 가능합니다.  </li>
+							<li>G마켓에서 상품평 작성 후 적립된 OK캐쉬백 포인트는 OK캐쉬백 사이트에서 조회하는 포인트와 상이할 수 있습니다. <br>
+							(OK캐쉬백 서비스 이용약관에 따라 실제 적립된 포인트의 10%에 해당하는 서비스 이용수수료가 차감됩니다. )</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<a href="#" class="lay_clse noBorder noBorder" onclick="popBlockUI('layer_point');return false;">닫기</a>
+			</div>
+			<form name="form_okcashbag_card" id="form_okcashbag_card" method="post" target="ifm_post_refer" action="@Urls.CoreRootUrl/payment/okcashbag/okcashbag_card_rslt_mobile.asp">
+			<!--<form name="form_okcashbag_card" id="form_okcashbag_card" method="post" target="ifm_post_refer" action="http://www.gmarket.co.kr/payment/okcashbag/okcashbag_card_rslt_mobile.asp">-->
+			<input type="hidden" name="okcashbag_card_no" id="okcashbag_card_no" />
+			<input type="hidden" name="enc_identity" id="enc_identity"  />
+			<input type="hidden" name="enc_passwd" id="enc_passwd"  />
+			<input type="hidden" name="from_type" value="_NET" />
+			</form>
+		</div>
+		<iframe id="ifm_post_refer" name="ifm_post_refer" style="display:none" src="javascript:true;" width="100%" height="50"></iframe>			
+	<!--//E:9070 제휴 카드 등록/내역 -->
+	<!-- ok캐시백  카드 재등록 레이어 -->
+	<div class="layer_card_re ocb" id="layer_ocb_re" style="display:none;top:301px;">
+		<div class="layer_wp">
+			<h3><span class="sp_card_re">OK cashbag 카드 재등록 레이어팝업</span></h3>
+			<p class="c_txt">최근 카드번호가 유효하지 않아  미적립 사례가 일부 확인되어, <br>정확한 포인트 적립을 위해 카드번호 재인증 요청 드립니다.</p>
+			<form id="formOcb" name="formOcb" action="http://devmember2.gmarket.co.kr/Popup/SaveOKCashBagCard" method="post">
+				<div class="inp_area">
+					<label for="#" class="c_num">카드번호</label>
+					<input type="text" class="inp_c_num" id="inp_ocb1" maxlength="4" size="4" onkeyup="inputOnlyNum('inp_ocb', 1);"><span class="inp_hp"></span>
+					<input type="password" class="inp_c_num" id="inp_ocb2" maxlength="4" size="4" onkeyup="inputOnlyNum('inp_ocb', 2);"><span class="inp_hp"></span>
+					<input type="password" class="inp_c_num" id="inp_ocb3" maxlength="4" size="4" onkeyup="inputOnlyNum('inp_ocb', 3);"><span class="inp_hp"></span>
+					<input type="text" class="inp_c_num" id="inp_ocb4" maxlength="4" size="4" onkeyup="inputOnlyNum('inp_ocb', 4);">
+				</div>
+				<div class="inp_area">
+					<label for="p_num">비밀번호</label>
+					<input type="password" id="inp_ocb_pw">
+				</div>
+				<a href="javascript:registOcb();" class="btn_reg">등록하기</a>
+			</form>
+			<ul class="lst_ocb">
+			<li>OK캐시백 비밀번호 분실하신 경우, OK캐시백 사이트를 통해 <br>비밀번호를 변경해 주시기 바랍니다.</li>
+			<li>OK캐시백 사용 및 적립관련 문의는 OK캐시백 사이트나 행복센터 <br>(1599-0512)를 통하여 확인 가능합니다.</li>
+			</ul>
+			<a href="javascript:;" class="btn_close sp_card_re" onclick="popBlockUI('layer_ocb_re');initInput('ocb');return false;">닫기</a>
+			<a href="javascript:;" class="btn_not_again" onclick="displayNotAgain('ocb')">다시 보지 않기 <span class="sp_card_re"></span></a>
+		</div>
+	</div>
+	<!--// ok캐시백  카드 재등록 레이어 -->
+	<!-- 아시아나항공 카드 재등록 레이어 -->
+	<div class="layer_card_re aal" id="layer_aal_re" style="display: none; top: 501px;">
+		<div class="layer_wp">
+			<h3><span class="sp_card_re">아시아나항공 카드 재등록 레이어팝업</span></h3>
+			<p class="c_txt">최근 카드번호가 유효하지 않아  미적립 사례가 일부 확인되어, <br>정확한 포인트 적립을 위해 카드번호 재인증 요청 드립니다.</p>
+			<form action="">
+				<div class="inp_area">
+					<label for="m_num">회원번호</label>
+					<input type="text" id="inp_asiana" maxlength="9" size="9">
+				</div>
+				<p class="aal_agr"><strong>[개인 정보 수집에 대한 동의]</strong> G마켓은 아시아나항공 마일리지 적립을 위해 고객님의 아시아나항공 회원번호를 수집하며, 아시아나항공 측에 마일리지 적립대상 일치여부를 확인합니다. 저장된 회원번호는 회원탈퇴 시 일괄 파기처리됩니다.</p>
+				<a href="javascript:registAsiana();" class="btn_reg">동의 후 등록하기</a>
+			</form>
+			<a href="javascript:;" class="btn_close sp_card_re" onclick="popBlockUI('layer_aal_re');initInput('asiana');return false;">닫기</a>
+			<a href="javascript:;" class="btn_not_again" onclick="displayNotAgain('asiana')">다시 보지 않기 <span class="sp_card_re"></span></a>
+		</div>
+	</div>
+	<!--// 아시아나항공 카드 재등록 레이어 -->
+
+</div>
+<script type="text/javascript">
+	var ShareTo = function (type) {
+		var dataName = "G마켓 카드/포인트";
+		switch (type) {
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "카드/포인트";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name": dataName,
+			"url": "http://mobile.gmarket.co.kr/CardPoint",
+			"title": ""
+		};
+		if (type == "kakaotalk") {
+			KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+		}
+		else {
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data))
+		}
+	}
+
+	$(document).ready(function () {
+		KakaoInit();
+		ShareTo("kakaotalk");
+	});
+
+	function inputOnlyNum(id, idx){	
+		var txt = $('#'+id+idx).val().trim();
+		if (checkOnlyNum(txt)) {
+			$('#'+id+idx).val('');
+			$('#'+id+idx).focus();
+			return false; 
+		}
+		
+		if (txt.length == 4){
+			
+			if (idx == 4){
+				$('#inp_ocb_pw').focus();
+			}else{
+				var nextIdx = idx + 1;
+				if ($('#' + id + nextIdx).length != 0){
+					$('#' + id + nextIdx).focus();
+				}
+			}
+		}
+	}
+
+	function checkOnlyNum(inText) {
+		var ret;
+		for (var i = 0; i < inText.length; i++) {
+			ret = inText.charCodeAt(i);
+			if (!((ret > 47) && (ret < 58))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	function registOcb(){
+		if (!isLogin())
+		{
+			goGMKTMobileLogin();
+		}
+		else
+		{
+			var ocbNo1 = $("#inp_ocb1").val().trim();
+			var ocbNo2 = $("#inp_ocb2").val().trim();
+			var ocbNo3 = $("#inp_ocb3").val().trim();
+			var ocbNo4 = $("#inp_ocb4").val().trim();
+
+			if (ocbNo1.length != 4 || checkOnlyNum(ocbNo1)) {
+				alert("카드번호를 입력해 주세요.");
+				$("#inp_ocb1").focus();
+				return;
+			} else if (ocbNo2.length != 4 || checkOnlyNum(ocbNo2)) {
+				alert("카드번호를 입력해 주세요.");
+				$("#inp_ocb2").focus();
+				return;
+			} else if (ocbNo3.length != 4 || checkOnlyNum(ocbNo3)) {
+				alert("카드번호를 입력해 주세요.");
+				$("#inp_ocb3").focus();
+				return;
+			} else if ((ocbNo4.length != 3 && ocbNo4.length != 4) || checkOnlyNum(ocbNo4)) {
+				alert("카드번호를 입력해 주세요.");
+				$("#inp_ocb4").focus();
+				return;
+			}
+
+			var ocbPw = $("#inp_ocb_pw").val().trim();
+			if (ocbPw == "") {
+				alert("카드 비밀번호를 입력해 주세요.");
+				$("#inp_ocb_pw").focus();
+				return;
+			}
+
+			var ocbNo = ocbNo1 + ocbNo2 + ocbNo3 + ocbNo4;
+			$.ajax({
+				type: 'POST',
+				dataType: 'json',
+				url: '/CardRegist/SaveOKCashbag',
+				data: {
+					"cardNo": ocbNo,
+					"cardPw": ocbPw
+				},
+				success: function (data) {
+					if(data.Code == 0){
+						alert(data.Msg);
+					}else{
+						alert(data.Msg);
+						if (data.Code == -3) {
+							initInput('ocb');
+						}
+					}
+				},
+				error: function (result) {
+					alert("등록 중 오류가 발생했습니다.");
+				}
+			});
+		}
+	}
+
+	function registAsiana(){
+		if (!isLogin())
+		{
+			goGMKTMobileLogin();
+		}
+		else
+		{
+			var asianaCardNo = $('#inp_asiana').val();
+
+			if (asianaCardNo.length != 9 || checkOnlyNum(asianaCardNo)) {
+				alert("카드번호를 정확히 입력해 주세요.");
+				$('#inp_asiana').focus();
+				return;
+			}
+
+			if (!checkForAsiana(asianaCardNo)) {
+				alert("입력하신 번호는 유효하지 않는 번호입니다. 다시 확인 후 등록하시기 바랍니다.");
+				$('#inp_asiana').focus();
+				return;
+			}
+
+			$.ajax({
+				url: "/CardRegist/SaveAsianaCard",
+				type: "POST",
+				data: {
+					asianaCardNo: asianaCardNo
+				},
+				success: function (result) {
+					if (result.Code == 0) {
+						alert(result.Msg);
+						goBackUsingBackData();
+					} else {
+						alert(result.Msg);
+					}
+				},
+				error: function (result) {
+					alert("등록 중 오류가 발생했습니다.");
+				},
+			});
+		}
+	}
+
+	function initInput(type){
+		if (type == 'asiana'){
+			$('#inp_asiana').val('');
+			$('#inp_asiana').focus();
+		}else if (type == 'ocb'){
+			$('#inp_ocb1').val('');
+			$('#inp_ocb2').val('');
+			$('#inp_ocb3').val('');
+			$('#inp_ocb4').val('');
+			$('#inp_ocb_pw').val('');
+			$('#inp_ocb1').focus();
+		}
+	}
+
+	function displayNotAgain(type){
+		if (type == 'asiana'){
+			setCookie('asianaDisp', 'N');
+			justClickedAsiana = "Y";
+			initInput('asiana');
+			popBlockUI('layer_aal_re');
+		}else if(type == 'ocb'){
+			setCookie('ocbDisp', 'N');
+			justClickedOcb = "Y";
+			initInput('ocb');
+			popBlockUI('layer_ocb_re');
+		}
+	}
+
+	function setCookie(name, value) {
+		document.cookie = name + '=' + encodeURIComponent(value) + ';domain=.gmarket.co.kr;path=/';
+	}
+</script>
+
+@section scriptfiles
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+
+<script language="javascript" type="text/javascript" src="https://flyasiana.com/CW/common/linkage/ozcd.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/jaehu_cardpoint.js?v=2"></script>
+}

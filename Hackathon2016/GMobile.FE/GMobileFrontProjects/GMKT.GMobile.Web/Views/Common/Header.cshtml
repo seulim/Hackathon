@@ -1,0 +1,397 @@
+﻿@using GMKT.Web.Membership
+@{
+    Layout = null;
+
+    string pCache = this.GetPCache();
+    string mwURL = Urls.MWWebUrl + "/mypage/myMain.do?pCache=" + pCache;
+
+    bool isDynamicHeader = ViewBag.IsDynamicHeader;
+    bool isNewAppHeaderVersion = PageAttr.IsApp && PageAttr.AppVersion.Digit1 >= 5 && PageAttr.AppVersion.Digit2 >= 8;
+    bool isNewSFCAppHeaderVersion = PageAttr.AppVersion.Digit1 >= 2 && PageAttr.AppVersion.Digit2 >= 0;
+    
+    string vipHeaderCssName = "mini";
+    string vipHeaderFcdCode = "717000017";
+    string vipHeaderAreaCode = "200000155";
+    string cartIconSelectorID = ViewBag.CartId;
+	string headerImageLogoCssName = "h_page";
+	
+    if (isDynamicHeader)
+    {
+        if (ViewBag.HeaderType == GMKT.GMobile.Data.GoodsHeaderType.Banner)
+        {
+			headerImageLogoCssName = "h_pp";
+			if(ViewBag.IsCornerHeader)
+			{
+				headerImageLogoCssName = "h_page-corner";
+			}
+            vipHeaderCssName = "smart";
+            vipHeaderFcdCode = "717000018";
+            vipHeaderAreaCode = "200000156";
+
+            if (ViewBag.Text == "슈퍼딜")
+            {
+                vipHeaderFcdCode = "717000009";
+                vipHeaderAreaCode = "200000147";
+            }
+            else if (ViewBag.Text == "스마트배송")
+            {
+                vipHeaderFcdCode = "717000019";
+                vipHeaderAreaCode = "200000157";
+            }
+
+        }
+    }
+}
+
+@helper RenderLeftDrawerButton()
+{
+	if( PageAttr.IsApp && PageAttr.AppVersion.Digit1 >= 5 )
+	{
+		<a href="gmarket://openmenu" class="left_mn"><span>메뉴보기</span></a>
+	}
+	else
+	{
+		<a href="@GlobalFunction.GetSnaUrl( PageAttr.IsMain, "717000001", Urls.MobileWebUrl + "/Home/LeftDrawer" )" onclick="javascript:pdsClickLog('200000139','utility',{});" class="left_mn"><span>메뉴보기</span></a>
+	}
+}
+
+@helper RenderProgressIcon()
+{
+	if( PageAttr.IsIphoneApp )
+	{
+		<div id="progress_icon" style="display:none"></div>
+	}
+	else
+	{
+		<div id="progress_icon" style="display:none"></div>
+	}
+}
+
+@helper RenderSearchInputBox()
+{
+	if( PageAttr.IsApp && PageAttr.AppVersion.Digit1 >= 5 )
+	{
+		<input id="scb_ip_app" type="search" name="topKeyword" readonly="readonly" value="" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" />
+	}
+	else
+	{
+		<input id="scb_ip" placeholder="검색어를 입력해 주세요" type="search" name="topKeyword" onkeyup="sendKeywordOnce();" value="" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off"/> 
+	}
+}
+
+@helper RenderClearSearchButton()
+{
+	if( PageAttr.IsApp && PageAttr.AppVersion.Digit1 >= 5 )
+	{
+		<button id="scb_del" type="button" class="del_btn" style="display: none;" onclick="$('#scb_ip_app').val(''); $(this).hide(); location.href='gmarket://opensearch';"><span>입력내용 삭제</span></button>
+	}
+	else
+	{
+		<button id="scb_del" type="button" class="del_btn" style="display: none;" onclick="clearTopSearch();"><span>입력내용 삭제</span></button>
+	}
+}
+
+@helper RenderGoSearchForSimpleHeader()
+{
+	var fcdCode = ViewBag.type == GMKT.GMobile.CommonData.HeaderTypeEnum.Vip ? "717000020" : "717000007";
+    	var areaCode = ViewBag.type == GMKT.GMobile.CommonData.HeaderTypeEnum.Vip ? "200000158" : "200000145";
+	if( PageAttr.IsApp && PageAttr.AppVersion.Digit1 >= 5 )
+	{
+		<a href="gmarket://opensearch" id="simple_header_go_search_app" class="btn_search sp_hd" onclick="SnaUrlFooter('@fcdCode');pdsClickLog('@areaCode','utility',{});">검색 페이지로 이동</a>
+    	}
+    	else
+    	{
+		<a href="#" id="simple_header_go_search" class="btn_search sp_hd" onclick="SnaUrlFooter('@fcdCode');pdsClickLog('@areaCode','utility',{});">검색 페이지로 이동</a> 
+    	}
+}
+
+@helper RenderGoSearchForVipHeader()
+{
+	if( PageAttr.IsApp && PageAttr.AppVersion.Digit1 >= 5 )
+	{
+		<a href="gmarket://opensearch" id="vip_header_go_search_app" class="search" onclick="javacript:SnaUrlFooter('716600005');"><span class="hp">검색</span></a>
+	}
+	else
+	{
+		<a href="#" id="vip_header_go_search" class="search" onclick="javacript:SnaUrlFooter('716600005');"><span class="hp">검색</span></a>
+	}
+}
+
+@helper RenderCartIcon(string cartClassID = "cartIcon")
+{
+    string fcdCode = "717000004";
+    string areaCode = "200000142";
+    if (ViewBag.type == GMKT.GMobile.CommonData.HeaderTypeEnum.Srp)
+    {
+        fcdCode = "717000014";
+        areaCode = "200000152";
+    }
+
+
+
+	<a href="@GlobalFunction.GetSnaUrl(true, fcdCode, Urls.MescrowUrl.Replace("https", "http") + "/ko/cart")" onclick="javascript:pdsClickLog('@areaCode','link',{});" class="cart"> 
+		<span class="hp">장바구니</span>
+		<span class="num" id="@cartClassID" style="display:none;"></span>
+	</a>
+}
+
+@helper RenderSimpleCart()
+    {
+    var fcdCode = ViewBag.type == GMKT.GMobile.CommonData.HeaderTypeEnum.Vip ? "717000021" : "717000008";
+    var areaCode = ViewBag.type == GMKT.GMobile.CommonData.HeaderTypeEnum.Vip ? "200000159" : "200000146";
+	<a href="@GlobalFunction.GetSnaUrl(true, fcdCode, Urls.MescrowUrl.Replace("https", "http") + "/ko/cart")" onclick="pdsClickLog('@areaCode','link',{});" class="btn_cart sp_hd">
+		장바구니<em class="cart_num" id="simple_cartIcon" style="display:none;" ></em>
+	</a>
+}
+
+@RenderProgressIcon()
+
+<iframe id="getCartCount" width="0" height="0" style="border: 0; display: none;"></iframe>
+<script type="text/javascript">
+    var __MOBILE_WEB_URL_SECURE = "@Urls.MobileWebUrlSecure";
+
+    var $getCartCountIframe = $("#getCartCount");
+    $(document).ready(function () {
+        $getCartCountIframe.load(function () {
+            var option = {
+                isLogin: "@PageAttr.IsLogin" == "True",
+			    isApp: "@PageAttr.IsApp" == "True",
+			    iframeSelector: "#getCartCount",
+			    iconSelector: "#" + "@cartIconSelectorID",
+				cartSelector: ".cart"
+			};
+		    cartCountController.setOptions(option);
+		    cartCountController.ready();
+		    cartCountController.syncCount();
+		});
+
+	    $getCartCountIframe.attr("src", "@Urls.MobileWebUrlSecure/Common/CartCount");
+	});
+</script>
+
+@if ((PageAttr.Exid == ExIdAppEnum.None && isNewAppHeaderVersion) || (PageAttr.Exid == ExIdAppEnum.SFC ))
+{
+
+<iframe id="appHeaderScheme" width="0" height="0" style="border: 0; display: none;"></iframe>
+<input id="ExIdAppEnum" type="hidden" value = "@PageAttr.Exid" />
+<input id="subTitle" type="hidden" value="@ViewBag.Text" />
+<input id="subType" type="hidden" value="@ViewBag.HeaderType" />
+<input id="subImageUrl" type="hidden" value="@ViewBag.ImageUrl" />
+<input id="subLandingUrl" type="hidden" value="@ViewBag.LandingUrl" />
+<input id="subHideIcons" type="hidden" value="@ViewBag.HideIcons" />
+}
+
+@if (PageAttr.Exid == ExIdAppEnum.None && (!isNewAppHeaderVersion || (isNewAppHeaderVersion && ViewBag.type == GMKT.GMobile.CommonData.HeaderTypeEnum.Srp)))
+{
+	<div id="bx_hd_blank"></div>
+	<div class="hd_wrap" id="header_st">
+		@RenderLeftDrawerButton()
+
+		<h1><a href="#" onclick="GMHeader.goHome('@(Urls.MobileWebUrl + "/?" + pCache)'); return false;">Gmarket</a></h1>
+
+		<!-- SEARCH -->
+		<div id="header_search_layer" class="scb_hd">
+			<div class="scb">
+				<form id="search" name="searchForm" action="@Urls.MobileWebUrl/Search/Search" method="get" onsubmit="doSubmit(); return false;" accept-charset="utf-8">
+					<fieldset>
+						<div class="scb_sub">
+							@RenderSearchInputBox()
+							<label for="scb_ip" class="hp">상품검색하기</label>
+						</div>
+						@RenderClearSearchButton()
+						<button id="search_button" type="button" class="sc_btn"><span>검색</span></button>
+						<div id="search_box" class="search_box focus" style="display:none;">
+							<div class="keyword_swipe" id="keyword_swipe" onscroll="searchBoxGD()">
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+		<!-- //SEARCH -->
+
+		<div class="dret_btn">
+			@RenderCartIcon()
+			<a href="#" onclick="pdsClickLog('200000143','link',{});GMHeader.goMmyg('@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "717000005", Urls.MMyGUrl + "/home")', '@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "717000005", mwURL)'); return false;" class="my">
+				<span class="hp">나의쇼핑정보</span>
+			</a>
+		</div>
+
+		<div id="cancel_search_layer" class="cancl_btn" style="display: none;">
+			<a id="cancel_search_button" href="#" class="btn_close"><span>취소</span></a>
+		</div>
+
+	
+	</div>
+
+	<div id="simple_header" style="display: none;"> 
+		<h1 class="logo"><a href="#" class="sp_hd" onclick="GMHeader.goHome('@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704100001", Urls.MobileWebUrl + "/?" + pCache)'); return false;">Gmarket</a></h1>
+		@if (ViewBag.HideIcons.IndexOf("search") == -1)
+		{
+		@RenderGoSearchForSimpleHeader()
+		}
+		@RenderSimpleCart()
+		<h2 class="@headerImageLogoCssName" id='simple_header_title'>
+			@if (isDynamicHeader)
+			{
+			<a class="@(ViewBag.HeaderType == GMKT.GMobile.Data.GoodsHeaderType.Shop ? "h_minishop sp_hd" : "")" onclick="javacript:SnaUrlFooter('@vipHeaderFcdCode');pdsClickLog('@vipHeaderAreaCode','link',{'seqno':'@ViewBag.Text'});" href="@ViewBag.LandingUrl" >
+				@if (ViewBag.HeaderType == GMKT.GMobile.Data.GoodsHeaderType.Banner)
+				{
+					<img src="@ViewBag.ImageUrl" alt="@ViewBag.Text" />
+				}
+				else
+				{
+					@ViewBag.Text
+				}
+			</a>
+			}
+		</h2>
+	</div>
+
+	<div id="simple_header_bar" class="ly_header_wrap" style="display: none;">
+		<h2 class="h_page" id="simple_header_bar_title">주문/결제</h2>
+		@if (!PageAttr.IsApp)
+  {
+		<a href="javascript:window.history.back();" onclick="SnaUrlFooter('717000022');pdsClickLog('200000160','utility',{});" class="ly_btn_close sp_hd">레이어 닫기</a>
+  }
+  else
+  {
+		<a href="gmarket://webview?action=goback" onclick="SnaUrlFooter('717000022');pdsClickLog('200000160','utility',{});" class="ly_btn_close sp_hd">레이어 닫기</a>	  
+  }
+	</div>
+	
+	
+<script type="text/x-handlebars-template" id="search_box_template">
+	<ul>
+	{{#each this}}
+		<li><span><button type="button" class="word" index="{{@@index}}">{{this}}</button><button type="button" class="del sp_hd">삭제</button></span></li>
+	{{/each}}
+		<li class="inp_blank search-box_text-field">검색</li>
+	</ul>
+</script>
+
+
+
+	@* 앱인 경우 web으로 구성된 추천검색어, 최근본상품&최근검색어 영역을 노출할 필요가 없다. *@
+  if (false == PageAttr.IsApp)
+  {
+		<iframe id="getRecentItems" width="0" height="0" style="border: 0; display: none;"></iframe>
+
+		<script type="text/javascript">
+			var $getRecentItemsIframe = $("#getRecentItems");
+
+			var headerExtendedLayerController, recentItemsController, recentKeywordsController;
+
+			$(document).ready(function () {
+				$getRecentItemsIframe.load(function () {
+					recentItemsController = new RecentItemsController(false, "#getRecentItems");
+					recentKeywordsController = new RecentKeywordsController(false, "#getRecentItems");
+
+					headerExtendedLayerController = new HeaderExtendedLayerController(recentItemsController, recentKeywordsController);
+				});
+				$getRecentItemsIframe.attr("src", "@Urls.MobileWebUrlSecure/Common/RecentThings");
+			});
+		</script>
+
+		<div class="section_srch" id="list_recent" style="display: none;">
+			<div class="other_wrap" id="header_extended_input_wrapper">
+			@if (false == PageAttr.IsApp && false == PageAttr.IsIphone)
+   {
+				<a href="#" class="btn_voice" id="header_btn_voice">음성인식</a>
+   }
+   else
+   {
+				<a href="#" class="btn_voice" id="header_btn_voice" style="display: none;">음성인식</a>
+   }
+				<a href="#" class="btn_qr" id="header_btn_qr">QR코드</a>
+				<a href="#" class="btn_barcode" id="header_btn_barcode">바코드</a>
+			</div>
+
+			@*최근검색어*@
+			<div id="header_recent_wrapper">
+				<div id="header_have_recent_keyword" style="display: none;">
+					<ul class="srch_lst" id="header_recent_keyword_wrapper">
+					</ul>
+
+					<div class="btn_wrap" id="header_view_more" style="display: none;"> 
+						<button type="button" id="viewAllRecentKeywords" class="btn_more">더보기</button>
+					</div>
+		
+					<div class="btn_wrap" id=""> 
+						<button type="button" class="btn_gray" id="offRecentKeywords">자동저장 OFF</button>
+						<button type="button" class="btn_gray" id="removeAllRecentKeywords">전체삭제</button>
+					</div>
+				</div>
+
+				<div class="empty_wrap" id="header_no_recent_keyword" style="display: none;">
+					<p class="empty_txt">최근에 검색하신 상품이 없습니다.</p>
+				</div>
+		
+				<div class="empty_wrap" id="header_off_recent_keyword" style="display: none;">
+					<p class="empty_txt">최근 검색어 자동저장 기능을 <br />사용하시면 편리해요.</p>
+					<a href="#" class="btn_gray" id="onRecentKeywords">자동저장 ON</a>
+				</div>
+			</div>
+			@*//최근 검색어*@
+
+			@* 추천검색어 영역 *@
+			<div id="scb_lyr" style="display: none;">
+				<ul class="relat_lst" id="relate_keyword"> @*연관검색어*@
+				</ul>
+				<ul class="srch_lst" id="recommend_keyword" style="display:none;"> @*추천검색어*@
+				</ul>
+			</div>
+			@* //추천검색어 영역 *@
+
+			@*최근 본 상품*@
+			<div class="scroll_wrap" id="list_recent_right">
+				<div class="scroll_inner" id="scroll_in">
+					<ul class="recent_lst" id="header_recent_item_wrapper">
+					</ul>
+				</div>
+			</div>
+		
+			<ul style="display:none;">
+				<li class="more" id="li_view_more_recent_item" style="display: none;">
+					<a href="@Urls.MMyGUrl/Favorite/RecentItems" class="btn_more">더보기</a>
+				</li>
+			</ul>
+
+			<div class="scroll_wrap" id="header_no_recent_item">
+				<p class="empty_txt">최근에 본 상품이 없습니다.</p>
+			</div>
+			@*//최근 본 상품*@
+			<div class="bot_btnwrap">
+				<button type="button" class="btn_close" id="closeRecent" >닫기</button>
+			</div>
+		</div>
+
+		@* //최근본상품&최근검색어 영역 *@
+
+
+		<script type="text/x-handlebars-template" id="headerRecentItem">
+			{{#each list}}
+				<li id="header_item_{{goodsCode}}">
+					<a href="@Urls.MItemWebURL/Item?goodscode={{goodsCode}}" class="recent_prd"><img src="{{imageUrl}}" alt="" /></a>
+					<a href="#" class="btn_del" onclick="headerExtendedLayerController.recentItemsLayer.removeRecentItem('{{goodsCode}}'); return false;"><span class="sp_srch">삭제</span></a>
+				</li>
+			{{/each}}
+		</script>
+
+		<script type="text/x-handlebars-template" id="headerRecentKeyword">
+			{{#each list}}
+				<li>
+					<a href="#" class="srch_txt" onclick="goSearch('{{keyword}}'); return false;"><span>{{keyword}}</span></a>
+					<a href="#" class="btn_del" onclick="headerExtendedLayerController.recentKeywordsLayer.removeRecentKeyword('{{keyword}}', this); return false;"><span class="sp_srch">삭제</span></a>
+				</li>
+			{{/each}}
+		</script>
+	
+  } @* //if (false == PageAttr.IsApp) *@
+}
+else
+{
+	<script type="text/javascript">
+		var __MOBILE_WEB_URL_SECURE = "@Urls.MobileWebUrlSecure";
+	</script>
+}

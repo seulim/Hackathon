@@ -1,0 +1,1594 @@
+﻿@using GMKT.GMobile.Web.Models;
+
+@model TokenGiftCountM
+	
+@{
+	ViewBag.Title = "G마켓 GIFT CARD";
+}
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrl/320/GiftCard/giftcard.css?v=7"/>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/giftcard.js?ver=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/front_v2.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+  <script type="text/javascript" language="javascript">
+  	function MakeCalender(type, stat) {
+  		if (document.GiftCardOrder.OrderType.value == "01")
+  			type = "HP";
+  		else
+  			type = "GD";
+
+  		displayLayer('box_calendar', 'block'); // return false;
+
+  		var date;
+  		var selectedDate = "";
+  		selectedDate = document.GiftCardOrder.UseDT.value;
+
+  		var spltUseDate = selectedDate.split('-');
+  		if (type == "HP") {
+  			if (document.GiftCardOrder.HPRSVYN.value == "Y") {
+  				var selectedDate = "";
+  				selectedDate = document.GiftCardOrder.hddHPReserveDT.value;
+  				var spltselectedDate = selectedDate.split('-');
+  				date = new Date(spltselectedDate[0], parseInt(spltselectedDate[1]) - 1, spltselectedDate[2], spltselectedDate[3], spltselectedDate[4]);
+  			}
+  			else {
+  				date = new Date();
+  			}
+  		}
+  		else {
+  			if (document.GiftCardOrder.GDRSVYN.value == "Y") {
+  				var selectedDate = "";
+  				selectedDate = document.GiftCardOrder.hddGDReserveDT.value;
+  				var spltselectedDate = selectedDate.split('-');
+  				date = new Date(spltselectedDate[0], parseInt(spltselectedDate[1]) - 1, spltselectedDate[2], spltselectedDate[3], spltselectedDate[4]);
+  			}
+  			else {
+  				date = new Date();
+  			}
+  		}
+  		var startdate = new Date(date.getFullYear(), date.getMonth(), 1);
+
+  		var now_Year = date.getFullYear(); //현재의 년
+  		var now_Month = date.getMonth() + 1; //현재의 월, 0부터 시작하므로 +1
+  		var now_Date = date.getDate(); //현재의 일
+  		var now_Day = startdate.getDay(); //현재의 요일, 0부터 시작
+  		var now_Hours = date.getHours(); // document.GiftCardOrder.RSVHour.value; 	//date.getHours(); //현재의 시
+  		if (document.GiftCardOrder.HPRSVYN.value == "Y" || document.GiftCardOrder.GDRSVYN.value == "Y")
+  			document.GiftCardOrder.RSVHour.	value = now_Hours;
+  		else
+  			document.GiftCardOrder.RSVHour.value = now_Hours + 1;
+  		var now_Minutes = date.getMinutes(); // document.GiftCardOrder.RSVMinute.value; // date.getMinutes(); //현재의 분
+  		document.GiftCardOrder.RSVMinute.value = now_Minutes;
+  		var now_Seconds = date.getSeconds(); //현재의 초
+
+  		if (stat == "N") {
+  			$("#calenderDayT tbody").text("");
+  		}
+  		else if (stat == "B") {
+  			now_Year = spltUseDate[0];
+  			var bmonth = parseInt(spltUseDate[1]);
+  			if (bmonth == 1) {
+  				bmonth = 12;
+  				now_Year = now_Year - 1;
+  			}
+  			else
+  				bmonth = bmonth - 1;
+  			now_Month = bmonth.toString();
+  			$("#calenderDayT tbody").text("");
+  			//before 적용시 현재달이면 현재날자로 다시 그림
+  			var nowmonthchk = new Date();
+  			var now_Year2 = nowmonthchk.getFullYear();
+  			var now_Month2 = nowmonthchk.getMonth() + 1;
+  			if (now_Year2 == now_Year && now_Month2 == now_Month) {
+//  				if (type == "HP") {
+//  					document.GiftCardOrder.UseDT.value = document.GiftCardOrder.hddHPReserveDT.value;
+//  					MakeCalender("HP", "N");
+//  				}
+//  				else {
+//  					document.GiftCardOrder.UseDT.value = document.GiftCardOrder.hddGDReserveDT.value;
+//  					MakeCalender("GD", "N");
+//  				}
+  			}
+  			else {  				
+  				var date2 = new Date(now_Year, now_Month - 1, 1);
+  				now_Day = date2.getDay();
+  				now_Date = date2.getDate();
+  			}
+  		}
+  		else if (stat == "A") {
+  			now_Year = spltUseDate[0];
+  			var bmonth = parseInt(spltUseDate[1]);
+  			if (bmonth == 12) {
+  				bmonth = 1;
+  				now_Year = parseInt(now_Year) + 1;
+  			}
+  			else {
+  				bmonth = bmonth + 1;
+  			}
+  			now_Month = bmonth.toString();
+
+  			$("#calenderDayT tbody").text("");
+  			var date2 = new Date(now_Year, now_Month - 1, 1);
+  			now_Day = date2.getDay();
+  			now_Date = date2.getDate();
+  		}
+  		else {
+  			now_Year = spltUseDate[0];
+  			var bmonth = parseInt(spltUseDate[1]);
+  			now_Month = spltUseDate[1];
+  			var date2 = new Date(now_Year, (parseInt(now_Month) - 1).toString(), 1);
+  			now_Day = date2.getDay();
+  			$("#calenderDayT tbody").text("");
+  			now_Date = stat;
+  		}
+
+
+  		var count = 0; // 이 변수는 현재 진행되고 있는 반복문의 요일을 계산한다.
+  		var startDay = 0;
+
+  		startDay = now_Day;
+
+  		var totalDate = getTotalDate(now_Year, now_Month); //당월의 총 일수이다.
+
+  		var html = "<tr>";
+  		//이 반복문은 날짜가 들어가기 전까지 공백 TD가 들어가도록 하는 반복문이다.
+  		var previousDate = getTotalDate(now_Year, now_Month - 1); //전 달의 총 일수이다.	
+  		var start_previousDate = parseInt(previousDate) - parseInt(startDay); //당월 달력에서 이전달의 일자가 시작하는 수를 구한다.
+  		for (var i = 0; i < startDay; i++)	//위에서 여기서 1을 더해준 이유는 당월에서 날짜가 시작하는 칸을 빼야하기 때문이다.
+  		{
+  			start_previousDate++;
+  			html = html + "<td><div></div></td>";
+  		} //for()------------------------------------------------------------
+
+  		//이 반복문은 실제 날짜가 들어가는 반복문이다.
+  		for (var i = 1; i <= totalDate; i++) {
+  			if (i == Number(now_Date))
+  				html = html + "<td><div><a href='javascript:void(0);' class='on' onclick='javascript:MakeCalender(\"" + type + "\"," + i + ");'>" + i.toString() + "</a></div></td>";
+  			else
+  				html = html + "<td><div><a href='javascript:void(0);' onclick='javascript:MakeCalender(\"" + type + "\"," + i + ");'>" + i.toString() + "</a></div></td>";
+  			startDay++;
+  			if (startDay > 6) //테이블의 새로운 행을 추가하도록 한다.
+  			{
+  				startDay = 0;
+  				html = html + "</tr><tr>";
+  			}
+  		} //for()------------------------------------------------------------
+
+  		//이 반복문은 당월의 날짜를 모두 출력하고 남은 공백에 다음달의 일자를 표시하도록 하는 반복문이다.
+  		for (var i = startDay; i <= 6; i++) {
+  			html = html + "<td><div></div></td>";
+  		} //for()------------------------------------------------------------
+  		html = html + "</tr>";
+  		jQuery("#calenderDayT tbody").append(html);
+
+  		$("#calYearMonth").text(now_Year + "년 " + now_Month + "월");
+
+  		var datersv = new Date(now_Year, now_Month - 1, now_Date, document.GiftCardOrder.RSVHour.value, parseInt(document.GiftCardOrder.RSVMinute.value) + 1);
+  		var datenow = new Date();
+			var datenew = new Date(datenow.getFullYear(), datenow.getMonth(), datenow.getDate(), (datenow.getHours() + 1), datenow.getMinutes());
+  		if (datersv < datenew) {
+  			alert("현재시각에서 1시간 이후 시각 보다 이전 시간은 예약할 수 없습니다.");
+  			if (type == "HP") {
+  				document.GiftCardOrder.UseDT.value = document.GiftCardOrder.hddHPReserveDT.value;
+  				MakeCalender("HP", "N");
+  			}
+  			else {
+  				document.GiftCardOrder.UseDT.value = document.GiftCardOrder.hddGDReserveDT.value;
+  				MakeCalender("GD", "N");
+  			}
+  		}
+  		else {
+  			document.GiftCardOrder.UseDT.value = now_Year + "-" + now_Month + "-" + now_Date + "-" + document.GiftCardOrder.RSVHour.value + "-" + document.GiftCardOrder.RSVMinute.value;
+  		}
+
+  	}
+  	function getTotalDate(year, month) {
+  		if (month == 4 || month == 6 || month == 9 || month == 11)
+  			return 30;
+  		else if (month == 2) //2월일때
+  		{
+  			if (year % 4 == 0) // 2월이면서 윤년일 때
+  				return 29;
+  			else			// 2월이면서 윤년이 아닐 때
+  				return 28
+  		}
+  		else
+  			return 31;
+  	}
+  	function HPnow() {
+  		//alert("예약?");
+  		if (document.GiftCardOrder.OrderType.value == "01") {
+  			document.GiftCardOrder.HPRSVYN.value = "N";
+  			//$("#HPRsvStat").text("- <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>설정</span></a>");
+  			document.getElementById("HPRsvStat").innerHTML = "- <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>설정</span></a>";
+  			document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>설정</span></a>";
+  			document.GiftCardOrder.hddHPReserveDT.value = "";
+  		}
+  		else {
+  			document.GiftCardOrder.GDRSVYN.value = "N";
+  			//$("#HPRsvStat").text("- <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>설정</span></a>");
+  			document.getElementById("GDRsvStat").innerHTML = "- <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"GD\",\"N\");'><span>설정</span></a>";
+  			document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>설정</span></a>";
+  			document.GiftCardOrder.hddGDReserveDT.value = "";
+  		}
+  		document.GiftCardOrder.RSVHour.value = "0";
+  		document.GiftCardOrder.RSVMinute.value = "0";
+  		displayLayer('box_calendar', 'none'); // return false;
+  	}
+  	function ReserveEditClick(type) {
+
+  		if (document.GiftCardOrder.OrderType.value == "01") {
+  			document.GiftCardOrder.HPRSVYN.value = "Y";
+  			var selectedDate = "";
+  			selectedDate = document.GiftCardOrder.UseDT.value;
+  			var spltselectedDate = selectedDate.split('-');
+
+  			document.GiftCardOrder.hddHPReserveDT.value = document.GiftCardOrder.UseDT.value;
+
+  			//$("#HPRsvStat").text(spltselectedDate[0] + "년 " + spltselectedDate[1] + "월 " + spltselectedDate[2] + "일 / " + spltselectedDate[3] + "시 " + spltselectedDate[4] + "분 <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>변경</span></a>");
+  			document.getElementById("HPRsvStat").innerHTML = spltselectedDate[0] + "년 " + spltselectedDate[1] + "월 " + spltselectedDate[2] + "일 / " + spltselectedDate[3] + "시 " + spltselectedDate[4] + "분 <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>변경</span></a>";
+  			document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>변경</span></a>";
+  		}
+  		else {
+  			document.GiftCardOrder.GDRSVYN.value = "Y";
+  			var selectedDate = "";
+  			selectedDate = document.GiftCardOrder.UseDT.value;
+  			var spltselectedDate = selectedDate.split('-');
+
+  			document.GiftCardOrder.hddGDReserveDT.value = document.GiftCardOrder.UseDT.value;
+
+  			//$("#HPRsvStat").text(spltselectedDate[0] + "년 " + spltselectedDate[1] + "월 " + spltselectedDate[2] + "일 / " + spltselectedDate[3] + "시 " + spltselectedDate[4] + "분 <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>변경</span></a>");
+  			document.getElementById("GDRsvStat").innerHTML = spltselectedDate[0] + "년 " + spltselectedDate[1] + "월 " + spltselectedDate[2] + "일 / " + spltselectedDate[3] + "시 " + spltselectedDate[4] + "분 <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"GD\",\"N\");'><span>변경</span></a>";
+  			document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>변경</span></a>";
+  		}
+  		displayLayer('box_calendar', 'none');
+  	}
+  	function ReserveDelClick(type) {
+  		if (document.GiftCardOrder.OrderType.value == "01") {
+  			document.GiftCardOrder.HPRSVYN.value = "N";
+  			//$("#HPRsvStat").text("- <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>설정</span></a>");
+  			document.getElementById("HPRsvStat").innerHTML = "- <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>설정</span></a>";
+  			document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>설정</span></a>";
+  		}
+  		else {
+  			document.GiftCardOrder.GDRSVYN.value = "N";
+  			//$("#HPRsvStat").text("- <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"HP\",\"N\");'><span>설정</span></a>");
+  			document.getElementById("GDRsvStat").innerHTML = "- <a class='gc_btn02 type02' href='javascript:void(0);' onclick='javascript:MakeCalender(\"GD\",\"N\");'><span>설정</span></a>";
+  			document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>설정</span></a>";
+  		}
+  		document.GiftCardOrder.RSVHour.value = "0";
+  		document.GiftCardOrder.RSVMinute.value = "0";
+  		displayLayer('box_calendar', 'none');
+  	}
+  	function makeStartDate(month, now_Month, now_Day) {
+  		var temp_Month = now_Month; // 전역변수의 값을 변경하지 않도록 다른변수에 값을 옮겨 넣는다.
+  		var startDay = now_Day; //시작요일을 저장하는 변수이다. 먼저 기본값으로 현재 요일을 저장한다.
+  		if (now_Month == month) //만약 시작일의 기준이 되는 달이 현재 달일 경우이다.
+  		{
+  			for (; temp_Month >= 0; temp_Month--) //시작값:현지 일자, 끝깞 : 0: 
+  			{
+  				startDay--; // -1씩 감소
+  				if (startDay < 0) //요일은 0부터 6까지 있기 때문에 0미만으로 내려가면 한바퀴, 즉 6으로 되돌아가도록 한다.
+  				{
+  					startDay = 6;
+  				}
+  				//이 반복문에서는 현재 진행중인 일 수 만큼 반복문이 진행해야 한다. 
+  				//그리고 현재 일자가 1일일 경우에는 반복문 수행 필요없이 바로 요일을 구한다.
+  			}
+  			return startDay;
+  		}
+  		alert("입력받은 월이 당월이 아닙니다.");
+  	}
+  	function setOrderChoice(no, gt) {
+  		if ("@{@PageAttr.IsLogin}" == "True") {
+  			$(".gc_guide_info .b_nomarin").hide();
+  			//선물형태 레이어
+  			$(".gc_list_sel .gc01").removeClass('on');
+  			$(".gc_list_sel .gc02").removeClass('on');
+  			$(".gc_list_sel .gc03").removeClass('on');
+  			$(".gc_list_sel .gc04").removeClass('on');
+  			$(".gc_list_sel .gc" + no).addClass('on');
+
+  			document.GiftCardOrder.OrderType.value = no;
+  			document.GiftCardOrder.GiftType.value = gt;
+
+  			if (no == "03") {
+  				document.GiftCardOrder.seller_cust_no.value = "111777345";
+  			}
+  			else {
+  				document.GiftCardOrder.seller_cust_no.value = "110570630";
+  			}
+
+
+  			//주문레이어 
+  			$("#OrderLayer01").hide();
+  			$("#OrderLayer02").hide();
+  			$("#OrderLayer03").hide();
+  			$("#OrderLayer04").hide();
+  			$("#OrderLayer" + no).show();
+
+  			displayLayer('box_calendar', 'none');
+
+  			AllAmtUpdate();
+  			setGoodsCodes();
+  			//SetParam();
+  			$("#PCText").hide();
+  			$("#kakaoOrder").hide();
+  			$("#normalOrder").hide();
+  			if (no == "03") {
+  				$("#PCText").show();
+  			}
+  			if (no == "02") {
+  				$("#kakaoOrder").show();
+  			}
+  			else {
+  				$("#normalOrder").show();
+  			}
+
+  			if (no == "01") {
+  				if (document.GiftCardOrder.HPRSVYN.value == "Y")
+  					document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>변경</span></a>";
+  				else
+  					document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>설정</span></a>";
+  			}
+  			else if (no == "04") {
+  				if (document.GiftCardOrder.GDRSVYN.value == "Y")
+  					document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>변경</span></a>";
+  				else
+  					document.getElementById("btnRservediv").innerHTML = "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:ReserveDelClick(\"HP\");'><span>취소</span></a> <a class='gc_btn03' href='javascript:void(0);' onclick='javascript:ReserveEditClick(\"HP\");'><span>설정</span></a>";
+  			}
+
+  		}
+  		else {
+  			document.location.href = "@Urls.LoginUrl";
+  		}
+  	}
+  	function setGoodsCodes() {
+  		var orderprice = document.GiftCardOrder.order_price.value;
+  		if (document.GiftCardOrder.OrderType.value == "03") {
+  			document.GiftCardOrder.goods_type.value = "offline_token";
+
+					//실서버용
+					if (orderprice == "10000") {
+						document.GiftCardOrder.goodscode.value = "522977152"; //?
+						document.GiftCardOrder.gd_nm.value = "10000원 G마켓 오프라인 선물권";
+					}
+					else if (orderprice == "30000") {
+						document.GiftCardOrder.goodscode.value = "488791597";
+						document.GiftCardOrder.gd_nm.value = "30000원 G마켓 오프라인 선물권";
+					}
+					else if (orderprice == "50000") {
+						document.GiftCardOrder.goodscode.value = "488791917";
+						document.GiftCardOrder.gd_nm.value = "50000원 G마켓 오프라인 선물권";
+					}
+					else if (orderprice == "100000") {
+						document.GiftCardOrder.goodscode.value = "488792128";
+						document.GiftCardOrder.gd_nm.value = "100000원 G마켓 오프라인 선물권";
+					}
+					else if (orderprice == "200000") {
+						document.GiftCardOrder.goodscode.value = "488792380";
+						document.GiftCardOrder.gd_nm.value = "200000원 G마켓 오프라인 선물권";
+					}
+  		}
+  		else {
+  			document.GiftCardOrder.goods_type.value = "gmarket_token";
+		
+					//실서버용
+					if (orderprice == "5000") {
+						document.GiftCardOrder.goodscode.value = "523514766"; //?
+						document.GiftCardOrder.gd_nm.value = "5000원 G마켓 온라인 선물권";
+					}
+					else if (orderprice == "10000") {
+						document.GiftCardOrder.goodscode.value = "523514613"; //?
+						document.GiftCardOrder.gd_nm.value = "10000원 G마켓 온라인 선물권";
+					}
+					else if (orderprice == "30000") {
+						document.GiftCardOrder.goodscode.value = "523514312";
+						document.GiftCardOrder.gd_nm.value = "30000원 G마켓 온라인 선물권";
+					}
+					else if (orderprice == "50000") {
+						document.GiftCardOrder.goodscode.value = "523514193";
+						document.GiftCardOrder.gd_nm.value = "50000원 G마켓 온라인 선물권";
+					}
+					else if (orderprice == "100000") {
+						document.GiftCardOrder.goodscode.value = "523513995";
+						document.GiftCardOrder.gd_nm.value = "100000원 G마켓 온라인 선물권";
+					}
+					else if (orderprice == "200000") {
+						document.GiftCardOrder.goodscode.value = "488714948";
+						document.GiftCardOrder.gd_nm.value = "200000원 G마켓 온라인 선물권";
+					}
+				
+  		}
+  	}
+  	function openPhoneAddress(id) {
+  		location.href = "gmarket://msgAppPresent?kind=address&id=" + id;
+  	}
+
+  	function setPhoneNumber(phoneNum, id) {
+  		document.getElementById('phoneNumber' + id).value = phoneNum;
+  	}
+
+  	function btn_ID_Search() {
+  		//alert('아이디 찾기');
+  		var id = document.GiftCardOrder.searchid.value;
+  		var name = document.GiftCardOrder.searchname.value;
+  		var param = "{ 'ID':'" + $.trim(id) + "',";
+  		param += "'NAME':'" + $.trim(name) + "'}";
+
+  		$.ajax({
+  			type: 'POST',
+  			url: "/GiftCard/GetSearchID",
+  			contentType: "application/json;charset=utf-8",
+  			data: param,
+  			async: false,
+  			success: function (data) {
+  				if (data.Ret_Code == "D") {
+  					alert("일일 조회 실패 건수 최대 20회를 초과하셨습니다.");
+  				}
+  				else if (data.Ret_Code == "M") {
+  					alert("월별 조회 실패 건수 최대 50회를 초과하셨습니다.");
+  				}
+  				else if (data.Ret_Code == "N") {
+  					alert("검색 조건과 일치하는 정보가 없습니다.");
+  				}
+  				else if (data.Ret_Code == "Y") {
+  					var gdid = document.getElementById(document.GiftCardOrder.idsearch.value);
+  					gdid.value = data.LoginID;
+  					popPositMid('gc_id_chk');
+  					document.GiftCardOrder.searchid.value = "";
+  					document.GiftCardOrder.searchname.value = "";
+  				}
+  			},
+  			error: function (error) {
+  				alert("Database 오류!");
+  				return;
+  			}
+  		});
+
+  	}
+  	function HourCheck(obj) {
+  		if (document.GiftCardOrder.OrderType.value == "01") {
+  			var selectedDate = "";
+  			selectedDate = document.GiftCardOrder.UseDT.value;
+  			var spltselectedDate = selectedDate.split('-');
+
+  			var datenow = new Date();
+  			var datenew = new Date(datenow.getFullYear(), datenow.getMonth(), datenow.getDate(), (datenow.getHours() + 1), datenow.getMinutes());
+  			var datersv = new Date(spltselectedDate[0], (parseInt(spltselectedDate[1]) - 1), spltselectedDate[2], obj.value.toString(), spltselectedDate[4]);
+  			if (datenew > datersv) {
+  				alert("현재시각에서 1시간 이후 시각 보다 이전 시간은 예약할 수 없습니다.");
+  				obj.value = spltselectedDate[3];
+  				//document.GiftCardOrder.UseDT.value = spltselectedDate[0] + "-" + spltselectedDate[1] + "-" + spltselectedDate[2] + "-" + spltselectedDate[3] + "-" + spltselectedDate[4];
+  				//spltselectedDate[3] = obj.value;
+  				//document.GiftCardOrder.UseDT.value = spltselectedDate[0] + "-" + spltselectedDate[1] + "-" + spltselectedDate[2] + "-" + spltselectedDate[3] + "-" + spltselectedDate[4];
+  			}
+  			else {
+  				spltselectedDate[3] = obj.value;
+  				document.GiftCardOrder.UseDT.value = spltselectedDate[0] + "-" + spltselectedDate[1] + "-" + spltselectedDate[2] + "-" + spltselectedDate[3] + "-" + spltselectedDate[4];
+  			}
+  		}
+  		else {
+  			var selectedDate = "";
+  			selectedDate = document.GiftCardOrder.UseDT.value;
+  			var spltselectedDate = selectedDate.split('-');
+
+				var datenow = new Date();
+  			var datenew = new Date(datenow.getFullYear(), datenow.getMonth(), datenow.getDate(), (datenow.getHours() + 1), datenow.getMinutes());
+  			var datersv = new Date(spltselectedDate[0], (parseInt(spltselectedDate[1]) - 1), spltselectedDate[2], obj.value.toString(), spltselectedDate[4]);
+  			if (datenew > datersv) {
+  				alert("현재시각에서 1시간 이후 시각 보다 이전 시간은 예약할 수 없습니다.");
+  				obj.value = spltselectedDate[3];
+  			}
+  			else {
+  				spltselectedDate[3] = obj.value;
+  				document.GiftCardOrder.UseDT.value = spltselectedDate[0] + "-" + spltselectedDate[1] + "-" + spltselectedDate[2] + "-" + spltselectedDate[3] + "-" + spltselectedDate[4];
+  			}
+  		}
+  	}
+  	function MinuteCheck(obj) {
+  		if (document.GiftCardOrder.OrderType.value == "01") {
+  			var selectedDate = "";
+  			selectedDate = document.GiftCardOrder.UseDT.value;
+  			var spltselectedDate = selectedDate.split('-');
+
+				var datenow = new Date();
+  			var datenew = new Date(datenow.getFullYear(), datenow.getMonth(), datenow.getDate(), (datenow.getHours() + 1), datenow.getMinutes());
+  			var datersv = new Date(spltselectedDate[0], (parseInt(spltselectedDate[1]) - 1), spltselectedDate[2],spltselectedDate[3], obj.value.toString());
+  			if (datenew > datersv) {
+  				alert("현재시각에서 1시간 이후 시각 보다 이전 시간은 예약할 수 없습니다.");
+  				obj.value = spltselectedDate[4];
+  			}
+  			else {
+  				spltselectedDate[4] = obj.value;
+  				document.GiftCardOrder.UseDT.value = spltselectedDate[0] + "-" + spltselectedDate[1] + "-" + spltselectedDate[2] + "-" + spltselectedDate[3] + "-" + spltselectedDate[4];
+  			}
+  		}
+  		else {
+  			var selectedDate = "";
+  			selectedDate = document.GiftCardOrder.UseDT.value;
+  			var spltselectedDate = selectedDate.split('-');
+				var datenow = new Date();
+  			var datenew = new Date(datenow.getFullYear(), datenow.getMonth(), datenow.getDate(), (datenow.getHours() + 1), datenow.getMinutes());
+  			var datersv = new Date(spltselectedDate[0], (parseInt(spltselectedDate[1]) - 1), spltselectedDate[2], spltselectedDate[3], obj.value.toString());
+  			if (datenew > datersv) {
+  				alert("현재시각에서 1시간 이후 시각 보다 이전 시간은 예약할 수 없습니다.");
+  				obj.value = spltselectedDate[4];
+  			}
+  			else {
+  				spltselectedDate[4] = obj.value;
+  				document.GiftCardOrder.UseDT.value = spltselectedDate[0] + "-" + spltselectedDate[1] + "-" + spltselectedDate[2] + "-" + spltselectedDate[3] + "-" + spltselectedDate[4];
+  			}
+  		}
+  	}
+  	function NumFocusOut(obj) {
+  		var objEv = event.srcElement;
+  		var val = obj.value;
+  		var numcheck = val.substr(0, 2);
+
+  		if (numcheck != "01") {
+  			alert("핸드폰 번호를 정확히 입력해주세요.");
+  			objEv.value = "";
+  			return false;
+  		} else {
+  			if (val.length < 10 || val.length > 11) {
+  				alert("핸드폰 번호를 정확히 입력해주세요.");
+  				//objEv.value = "";
+  				return false;
+  			}
+  			return true;
+  		}
+  	}
+  	function NumObj(obj) {
+  		if (obj.value == "") {
+  			alert("공백은 불가능합니다.");
+  			obj.value = "1";
+  			AllAmtUpdate();
+  		}
+  		else {
+  			var objEv = event.srcElement;
+  			var numPattern = /([^0-9|])/;
+  			numPattern = objEv.value.match(numPattern);
+  			if (numPattern != null) {
+  				alert("숫자만 입력해 주세요!");
+  				objEv.value = "1";
+  				objEv.focus();
+  				AllAmtUpdate();
+  				return false;
+  			} else {
+  				AllAmtUpdate();
+  				return true;
+  			}
+  		}
+  	}
+  	function btndelshow(obj) {
+  		var objEv = event.srcElement;
+  		var numPattern = /([^0-9|])/;
+  		numPattern = objEv.value.match(numPattern);
+  		if (numPattern != null) {
+  			event.preventDefault();
+  		}
+  		if (objEv.value.length > 0) {
+  		 	$(".gc_btn_del").attr("style", "display:block");			
+  		} else {
+  		 	$(".gc_btn_del").attr("style", "display:none");
+  		 }
+  	}
+  	function txtdelete() {
+  		document.GiftCardOrder.senderHP.value = "";
+  		$(".gc_btn_del").attr("style", "display:none");
+  	}
+  	function NumText(obj) {
+  		var objEv = event.srcElement;
+  		var numPattern = /([^0-9|])/;
+  		numPattern = objEv.value.match(numPattern);
+  		if (numPattern != null) {
+  			alert("숫자만 입력해 주세요!");
+  			objEv.value = "";
+  			objEv.focus();
+  			return false;
+  		} else {
+  			return true;
+  		}
+  	}
+  	function AmtPlus(id) {
+  		//var amtval = $("#" + id.toString());
+  		var Amt = Number(id.value);
+  		Amt = Amt + 1;
+  		id.value = Amt.toString();
+  		AllAmtUpdate();
+  	}
+  	function AmtMinus(id) {
+  		//var amtval = $("#" + id.toString());
+  		var Amt = Number(id.value);
+  		if (Amt > 1) {
+  			Amt = Amt - 1;
+  			id.value = Amt.toString();
+  		}
+  		AllAmtUpdate();
+  	}
+  	function removeRow(rowT, row, delindex) {
+
+  		var price = parseInt(document.GiftCardOrder.order_price.value);
+  		document.GiftCardOrder.OrderValue.value = "";
+  		if (document.GiftCardOrder.OrderType.value == "01") {
+  			var hddHPRowIndex = document.getElementById("hddHPRowIndex");
+  			var rowcnt = parseInt(document.GiftCardOrder.hddHPRowIndex.value);
+  			for (var i = 0; i < rowcnt; i++) {
+  				if ((i + 1) == delindex)
+  					continue;
+  				var rowdata;
+  				var num = document.getElementById("phoneNumber" + (i + 1).toString());
+  				var amt = document.getElementById("HPAmt" + (i + 1).toString());
+  				var amount = (price * parseInt(amt.value)).toString();
+  				rowdata = num.value + "," + amt.value + "," + amount;
+  				if (document.GiftCardOrder.OrderValue.value != "")
+  					document.GiftCardOrder.OrderValue.value = document.GiftCardOrder.OrderValue.value + "/" + rowdata;
+  				else
+  					document.GiftCardOrder.OrderValue.value = rowdata;
+  			}
+
+  			hddHPRowIndex.value = (Number(hddHPRowIndex.value) - 1).toString();
+  			addRowRefresh();
+  		}
+  		else {
+  			var hddGDRowIndex = document.getElementById("hddGDRowIndex");
+  			var rowcnt = parseInt(document.GiftCardOrder.hddGDRowIndex.value);
+  			for (var i = 0; i < rowcnt; i++) {
+  				if ((i + 1) == delindex)
+  					continue;
+  				var rowdata;
+  				var num = document.getElementById("GDID" + (i + 1).toString());
+  				var amt = document.getElementById("GDAmt" + (i + 1).toString());
+  				var amount = (price * parseInt(amt.value)).toString();
+  				rowdata = num.value + "," + amt.value + "," + amount;
+  				if (document.GiftCardOrder.OrderValue.value != "")
+  					document.GiftCardOrder.OrderValue.value = document.GiftCardOrder.OrderValue.value + "/" + rowdata;
+  				else
+  					document.GiftCardOrder.OrderValue.value = rowdata;
+  			}
+  			hddGDRowIndex.value = (Number(hddGDRowIndex.value) - 1).toString();
+  			addRowRefresh();
+  		}
+
+  		//rowT.removeChild(row);
+  		AllAmtUpdate();
+  	}
+  	function addRowRefresh() {
+  		var html = "";
+  		if (document.GiftCardOrder.OrderType.value == "01") {
+  			var hddHPRowIndex = parseInt(document.GiftCardOrder.hddHPRowIndex.value);
+  			var data = document.GiftCardOrder.OrderValue.value;
+  			var rowdata = data.split('/');
+  			var senderHP = document.GiftCardOrder.senderHP.value;
+  			$("#HPRowT").text("");
+				html = html + "<li>";
+				html = html + "<em class='s_tit'>보내는분</em>";
+				html = html + "<div class='s_cont'>";
+				html = html + "<div class='full text_close'><input id='senderHP' class='gc_text' maxlength='11' type='number' value='" + senderHP + "' onKeyPress='javascript:btndelshow(this);' /><a class='gc_btn_del' href='javascript:void(0);' onclick='javascript:txtdelete();'><span>입력글삭제</span></a></div>";
+				html = html + "<p class='gc_txt_info'>전화번호가 아닌 숫자 입력 시 스팸 처리 될 수 있습니다. </p>";
+				html = html + "</div>";
+				html = html + "</li>";
+  			for (i = 0; i < hddHPRowIndex; i++) {
+  				var coldata = rowdata[i].split(',');
+  				html = html + "<li class='set_recive' id='HPRow" + (i + 1).toString() + "'>";
+  				if (i == 0) {
+  					html = html + "<em class='s_tit'>받는분 " + (i + 1).toString() + "</em>";
+  				}
+  				else {
+  					html = html + "<em class='s_tit'>받는분 " + (i + 1).toString() + " <a class='gc_rcv_del' id='HPDel" + (i + 1).toString() + "' href='javascript:void(0);' onclick='javascript:removeRow(HPRowT,HPRow" + (i + 1).toString() + "," + (i + 1).toString() + ");'><span>받는분삭제</span></a></em>";
+  				}
+  				html = html + "<div class='s_cont'>";
+  				html = html + "<div class='full'>";
+  				html = html + "<input id='phoneNumber" + (i + 1).toString() + "' maxlength='11' class='gc_text' type='number' value='" + coldata[0] + "' />"; //onblur='javascript:NumFocusOut(this);' onkeyup='javascript:NumText(this);'	//핸드폰번호검증로직 수정 20140417 by ahana05
+  				if ("@{@PageAttr.IsIphoneApp}" == "True" || "@{@PageAttr.IsAndroidApp}" == "True")
+  					html = html + "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:openPhoneAddress(" + (i + 1).toString() + ");'><span>폰주소록</span></a>";
+  				html = html + "</div>";
+  				html = html + "<div class='gc_box_ea'>";
+  				html = html + "<em class='s_tit_ea'>수량</em>";
+  				html = html + "<div class='s_cont_ea'>";
+  				html = html + "<div class='gc_set_ea'>";
+  				html = html + "<a class='minus' href='javascript:void(0);' onclick='javascript:AmtMinus(HPAmt" + (i + 1).toString() + ");'>감소</a>";
+  				html = html + "<input class='gc_text num' id='HPAmt" + (i + 1).toString() + "' type='number' onblur='javascript:NumObj(this);' value='" + coldata[1] + "' />";
+  				html = html + "<a class='plus' href='javascript:void(0);' onclick='javascript:AmtPlus(HPAmt" + (i + 1).toString() + ");'>증가</a>";
+  				html = html + "</div>";
+  				html = html + "</div>";
+  				html = html + "</div>";
+  				html = html + "</div>";
+  				html = html + "</li>";
+  			}
+  			jQuery("#HPRowT").append(html);
+  			$(".gc_btn_del").attr("style", "display:block");
+  		}
+  		else {
+  			var hddGDRowIndex = parseInt(document.GiftCardOrder.hddGDRowIndex.value);
+  			var data = document.GiftCardOrder.OrderValue.value;
+  			var rowdata = data.split('/');
+  			var senderGD = document.GiftCardOrder.senderGD.value;
+  			$("#GDRowT").text("");
+				html = html + "<li>";
+				html = html + "<em class='s_tit'>보내는분</em>";
+				html = html + "<div class='s_cont'>";
+				html = html + "<div class='full text_close'><input id='senderGD' class='gc_text type02' type='text' value='" + senderGD + "' readonly /><a class='gc_btn_del' href='javascript:void(0);'><span>입력글삭제</span></a></div>";
+				html = html + "</div>";
+				html = html + "</li>";
+  			for (i = 0; i < hddGDRowIndex; i++) {
+  				var coldata = rowdata[i].split(',');
+  				html = html + "<li class='set_recive' id='GDRow" + (i + 1).toString() + "'>";
+  				if (i == 0) {
+  					html = html + "<em class='s_tit'>받는분 " + (i + 1).toString() + "</em>";
+  				}
+  				else {
+  					html = html + "<em class='s_tit'>받는분 " + (i + 1).toString() + " <a class='gc_rcv_del' id='GDDel" + (i + 1).toString() + "' href='javascript:void(0);' onclick='javascript:removeRow(GDRowT,GDRow" + (i + 1).toString() + "," + (i + 1).toString() + ");'><span>받는분삭제</span></a></em>";
+  				}
+  				html = html + "<div class='s_cont'>";
+  				html = html + "<div class='full'>";
+  				html = html + "<input id='GDID" + (i + 1).toString() + "' class='gc_text' type='text' maxlength='10' placeholder='ID입력버튼을 누르세요.' value='" + coldata[0] + "' readonly />";
+  				html = html + "<a class='gc_btn02' href='javascript:void(0);' onclick='popPositMid(\"gc_id_chk\");idchange(\"GDID" + (i + 1).toString() + "\");return false;' ><span>ID입력</span></a>";
+  				html = html + "</div>";
+  				html = html + "<div class='gc_box_ea'>";
+  				html = html + "<em class='s_tit_ea'>수량</em>";
+  				html = html + "<div class='s_cont_ea'>";
+  				html = html + "<div class='gc_set_ea'>";
+  				html = html + "<a class='minus' href='javascript:void(0);' onclick='javascript:AmtMinus(GDAmt" + (i + 1).toString() + ");'>감소</a>";
+  				html = html + "<input class='gc_text num' id='GDAmt" + (i + 1).toString() + "' type='number' onblur='javascript:NumObj(this);' value='" + coldata[1] + "' />";
+  				html = html + "<a class='plus' href='javascript:void(0);' onclick='javascript:AmtPlus(GDAmt" + (i + 1).toString() + ");'>증가</a>";
+  				html = html + "</div>";
+  				html = html + "</div>";
+  				html = html + "</div>";
+  				html = html + "</div>";
+  				html = html + "</li>";
+  			}
+  			jQuery("#GDRowT").append(html);
+  		}
+  	}
+  	function HPaddRow() {
+  		var sOrderPrice = "@{@Model.OrderPrice}";
+  		sOrderPrice = sOrderPrice.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+
+  		var hddHPRowIndex = document.getElementById("hddHPRowIndex");
+  		hddHPRowIndex.value = (Number(hddHPRowIndex.value) + 1).toString();
+//  		if (Number(hddHPRowIndex.value) > 2) {
+//  			document.getElementById("HPDel" + (Number(hddHPRowIndex.value) - 1).toString()).style.display = "none";
+//  		}
+
+  		var html = "<li class='set_recive' id='HPRow" + hddHPRowIndex.value + "'>";
+  		html = html + "<em class='s_tit'>받는분 " + hddHPRowIndex.value + " <a class='gc_rcv_del' id='HPDel" + hddHPRowIndex.value + "' href='javascript:void(0);' onclick='javascript:removeRow(HPRowT,HPRow" + hddHPRowIndex.value + "," + hddHPRowIndex.value + ");'><span>받는분삭제</span></a></em>";
+  		html = html + "<div class='s_cont'>";
+  		html = html + "<div class='full'>";
+  		html = html + "<input id='phoneNumber" + hddHPRowIndex.value + "' maxlength='11' class='gc_text' type='number' />";	 //onblur='javascript:NumFocusOut(this);' onkeyup='javascript:NumText(this);'	//핸드폰번호검증로직 수정 20140417 by ahana05
+  		if ("@{@PageAttr.IsIphoneApp}" == "True" || "@{@PageAttr.IsAndroidApp}" == "True")
+  			html = html + "<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:openPhoneAddress(" + hddHPRowIndex.value + ");'><span>폰주소록</span></a>";
+  		html = html + "</div>";
+  		html = html + "<div class='gc_box_ea'>";
+  		html = html + "<em class='s_tit_ea'>수량</em>";
+  		html = html + "<div class='s_cont_ea'>";
+  		html = html + "<div class='gc_set_ea'>";
+  		html = html + "<a class='minus' href='javascript:void(0);' onclick='javascript:AmtMinus(HPAmt" + hddHPRowIndex.value + ");'>감소</a>";
+  		html = html + "<input class='gc_text num' id='HPAmt" + hddHPRowIndex.value + "' type='number' onblur='javascript:NumObj(this);' value='1' />";
+  		html = html + "<a class='plus' href='javascript:void(0);' onclick='javascript:AmtPlus(HPAmt" + hddHPRowIndex.value + ");'>증가</a>";
+  		html = html + "</div>";
+  		html = html + "</div>";
+  		html = html + "</div>";
+  		html = html + "</div>";
+  		html = html + "</li>";
+
+  		jQuery("#HPRowT").append(html);
+
+  		AllAmtUpdate();
+  	}
+  	function GDaddRow() {
+  		var sOrderPrice = "@{@Model.OrderPrice}";
+  		sOrderPrice = sOrderPrice.replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+
+  		var hddGDRowIndex = document.getElementById("hddGDRowIndex");
+  		hddGDRowIndex.value = (Number(hddGDRowIndex.value) + 1).toString();
+//  		if (Number(hddGDRowIndex.value) > 2) {
+//  			document.getElementById("GDDel" + (Number(hddGDRowIndex.value) - 1).toString()).style.display = "none";
+//  		}
+
+  		var html = "<li class='set_recive' id='GDRow" + hddGDRowIndex.value + "'>";
+  		html = html + "<em class='s_tit'>받는분 " + hddGDRowIndex.value + " <a class='gc_rcv_del' id='GDDel" + hddGDRowIndex.value + "' href='javascript:void(0);' onclick='javascript:removeRow(GDRowT,GDRow" + hddGDRowIndex.value + "," + hddGDRowIndex.value + ");'><span>받는분삭제</span></a></em>";
+  		html = html + "<div class='s_cont'>";
+  		html = html + "<div class='full'>";
+  		html = html + "<input id='GDID" + hddGDRowIndex.value + "' class='gc_text' type='text' maxlength='10' placeholder='ID입력버튼을 누르세요.' readonly />";
+  		html = html + "<a class='gc_btn02' href='javascript:void(0);' onclick='popPositMid(\"gc_id_chk\");idchange(\"GDID" + hddGDRowIndex.value + "\");return false;' ><span>ID입력</span></a>";
+  		html = html + "</div>";
+  		html = html + "<div class='gc_box_ea'>";
+  		html = html + "<em class='s_tit_ea'>수량</em>";
+  		html = html + "<div class='s_cont_ea'>";
+  		html = html + "<div class='gc_set_ea'>";
+  		html = html + "<a class='minus' href='javascript:void(0);' onclick='javascript:AmtMinus(GDAmt" + hddGDRowIndex.value + ");'>감소</a>";
+  		html = html + "<input class='gc_text num' id='GDAmt" + hddGDRowIndex.value + "' type='number' onblur='javascript:NumObj(this);' value='1' />";
+  		html = html + "<a class='plus' href='javascript:void(0);' onclick='javascript:AmtPlus(GDAmt" + hddGDRowIndex.value + ");'>증가</a>";
+  		html = html + "</div>";
+  		html = html + "</div>";
+  		html = html + "</div>";
+  		html = html + "</div>";
+  		html = html + "</li>";
+
+  		jQuery("#GDRowT").append(html);
+
+  		AllAmtUpdate();
+  	}
+  	function idchange(id) {
+  		document.GiftCardOrder.idsearch.value = id;
+  		document.GiftCardOrder.searchname.value = "";
+  		document.GiftCardOrder.searchid.value = "";
+  	}
+  	function AllAmtUpdate() {
+  		var stat = document.GiftCardOrder.OrderType.value;
+  		if (stat == "01") {
+  			var rowcnt = parseInt(document.GiftCardOrder.hddHPRowIndex.value);
+  			var AllAmt = 0;
+  			for (var i = 0; i < rowcnt; i++) {
+  				var amt = document.getElementById("HPAmt" + (i + 1).toString());
+  				AllAmt = AllAmt + parseInt(amt.value);
+  			}
+  			var orderP = document.GiftCardOrder.order_price.value.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+  			var AllPrice = parseInt(document.GiftCardOrder.order_price.value) * AllAmt;
+  			document.GiftCardOrder.order_cnts.value = AllAmt.toString();
+  			document.getElementById("orderQty").innerHTML = "<em>구매수량</em>GIFT CARD " + orderP + "원 X " + AllAmt.toString() + "장";
+  			document.getElementById("orderAmt").innerHTML = "<em>최종결제금액</em><strong>" + AllPrice.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,") + "</strong>원";
+  		}
+  		else if (stat == "02") {
+  			var orderP = document.GiftCardOrder.order_price.value.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+  			var amt = document.getElementById("KKAmt1");
+  			var AllAmt = parseInt(amt.value);
+  			var AllPrice = parseInt(document.GiftCardOrder.order_price.value) * AllAmt;
+  			document.GiftCardOrder.order_cnts.value = AllAmt.toString();
+  			document.getElementById("orderQty").innerHTML = "<em>구매수량</em>GIFT CARD " + orderP + "원 X " + AllAmt.toString() + "장";
+  			document.getElementById("orderAmt").innerHTML = "<em>최종결제금액</em><strong>" + AllPrice.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,") + "</strong>원";
+  		}
+  		else if (stat == "03") {
+  			var orderP = document.GiftCardOrder.order_price.value.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+  			var amt = document.getElementById("PCAmt1");
+  			var AllAmt = parseInt(amt.value);
+  			var AllPrice = parseInt(document.GiftCardOrder.order_price.value) * AllAmt;
+  			document.GiftCardOrder.order_cnts.value = AllAmt.toString();
+  			document.getElementById("orderQty").innerHTML = "<em>구매수량</em>GIFT CARD " + orderP + "원 X " + AllAmt.toString() + "장";
+  			document.getElementById("orderAmt").innerHTML = "<em>최종결제금액</em><strong>" + AllPrice.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,") + "</strong>원";
+  		}
+  		else if (stat == "04") {
+  			var rowcnt = parseInt(document.GiftCardOrder.hddGDRowIndex.value);
+  			var AllAmt = 0;
+  			for (var i = 0; i < rowcnt; i++) {
+  				var amt = document.getElementById("GDAmt" + (i + 1).toString());
+  				AllAmt = AllAmt + parseInt(amt.value);
+  			}
+  			var orderP = document.GiftCardOrder.order_price.value.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+  			var AllPrice = parseInt(document.GiftCardOrder.order_price.value) * AllAmt;
+  			document.GiftCardOrder.order_cnts.value = AllAmt.toString();
+  			document.getElementById("orderQty").innerHTML = "<em>구매수량</em>GIFT CARD " + orderP + "원 X " + AllAmt.toString() + "장";
+  			document.getElementById("orderAmt").innerHTML = "<em>최종결제금액</em><strong>" + AllPrice.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,") + "</strong>원";
+  		}
+  	}
+  	function kktxtChange(id) {
+  	    document.GiftCardOrder.KKTxtType.value = id;
+  	}
+  	function gotoOrderDetail_ServiceStop() {
+  	    alert("Gift Card 서비스 업그레이드 중입니다.\n더 나은 서비스로 찾아 뵙겠습니다.");
+  	    return;
+  	}
+  	function gotoOrderDetail() {
+
+  		var result = SetParam();
+  		var stat = document.GiftCardOrder.OrderType.value;
+
+  		if (result == true) {
+//  			if (stat == "03") {
+////  				var param = "{ 'gd_no':'" + $.trim(document.GiftCardOrder.goodscode.value) + "',";
+////  				param += "'price':'" + $.trim(document.GiftCardOrder.order_price.value) + "'}";
+
+////  				$.ajax({
+////  					type: 'POST',
+////  					url: "/GToken/GetGiftTokenOffStockCount",
+////  					contentType: "application/json;charset=utf-8",
+////  					data: param,
+////  					async: false,
+////  					success: function (data) {
+////  						DBStockCheck(data);
+////  					},
+////  					error: function (error) {
+////  						alert("재고 파악 실패!");
+////  						return;
+////  					}
+////  				});
+//  			}
+//  			else {
+  				document.GiftCardOrder.action = 'GiftCardOrderDetail';
+  				document.GiftCardOrder.submit();
+//  			}
+  		}
+  	}
+//  	function DBStockCheck(data) {
+//  		var nOrderCnt, nStockCnt;
+//  		nOrderCnt = Number(document.GiftCardOrder.order_cnts.value);
+//  		document.GiftCardOrder.offline_stock_cnt.value = data;
+//  		nStockCnt = data;
+
+//  		if (isNaN(nOrderCnt) || isNaN(nStockCnt) || nOrderCnt > nStockCnt) {  			
+//  			alert('플라스틱 선물권은 일시적인 재고 부족으로\n주문이 불가능합니다.\n\n몇 시간 또는 1 일 후 다시 주문해 주시기 바랍니다.');
+//  			//document.GiftCardOrder.menu1[0].checked = true;
+
+//  			//OrderTypeChange();
+//  		}
+//  		else {
+//  			document.GiftCardOrder.action = 'GiftCardOrderDetail';
+//  			document.GiftCardOrder.submit();
+//  		}
+//  	}
+  	function HPAddHipen(HP) {
+  		HP.replace('-', '');
+  		if (HP.length == 11) {
+  			HP = HP.substr(0, 3) + "-" + HP.substr(3, 4) + "-" + HP.substr(7, 4);
+  		}
+  		else {
+  			HP = HP.substr(0, 3) + "-" + HP.substr(3, 3) + "-" + HP.substr(6, 4);
+  		}
+  		return HP;
+  	}
+  	function SetParam() {
+  		document.GiftCardOrder.OrderValue.value = "";
+  		document.GiftCardOrder.GiftHPList.value = "";
+  		var stat = document.GiftCardOrder.OrderType.value;
+  		var price = parseInt(document.GiftCardOrder.order_price.value);
+  		if (stat == "01") {
+  			var senderHP = document.GiftCardOrder.senderHP.value;
+  			if (senderHP == "") {
+  				alert("보내는분 번호를 입력해주세요.");
+  				return false;
+  			}
+  			else {
+  				var HP = document.GiftCardOrder.senderHP.value;
+  				HP = HP.replace('-', '');
+  				HP = HP.replace('-', '');
+  				if (HP.length == 11) {
+  					HP = HP.substr(0, 3) + "-" + HP.substr(3, 4) + "-" + HP.substr(7, 4);
+  				}
+  				else {
+  					HP = HP.substr(0, 3) + "-" + HP.substr(3, 3) + "-" + HP.substr(6, 4);
+  				}
+  				document.GiftCardOrder.UserHPNum.value = HP;
+  			}
+  			var rowcnt = parseInt(document.GiftCardOrder.hddHPRowIndex.value);
+  			var AllAmt = 0;
+  			for (var i = 0; i < rowcnt; i++) {
+  				var rowdara;
+  				var num = document.getElementById("phoneNumber" + (i + 1).toString());
+  				if (num.value == "") {
+  					alert("핸드폰 번호를 입력해주세요.");
+  					return false;
+  				}
+  				////////////////////////////////////////전화번호 검증 로직 추가 20140417 by ahana05
+  				var numPattern = /([^0-9|])/;
+  				var val = num.value;
+  				var numcheck = val.substr(0, 2);
+					numPattern = num.value.match(numPattern);
+
+					if (numPattern != null) {		//숫자체크
+						alert("숫자만 입력해 주세요!");
+						//num.value = "";
+						num.focus();
+						return false;
+					}
+
+					if (numcheck != "01") {
+						alert("핸드폰 번호를 정확히 입력해주세요.");
+						num.focus();
+						return false;
+					} else {
+						if (val.length < 10 || val.length > 11) {
+							alert("핸드폰 번호 자릿수를 정확히 입력해주세요.");
+							//objEv.value = "";
+							num.focus();
+							return false;
+						}
+					}
+					///////////////////////////////////////
+  				var amt = document.getElementById("HPAmt" + (i + 1).toString());
+  				var amount = (price * parseInt(amt.value)).toString();
+  				rowdata = num.value + "," + amt.value + "," + amount;
+  				if (document.GiftCardOrder.OrderValue.value != "")
+  					document.GiftCardOrder.OrderValue.value = document.GiftCardOrder.OrderValue.value + "/" + rowdata;
+  				else
+  					document.GiftCardOrder.OrderValue.value = rowdata;
+  				if (document.GiftCardOrder.GiftHPList.value != "")
+  					document.GiftCardOrder.GiftHPList.value = document.GiftCardOrder.GiftHPList.value + "," + HPAddHipen(num.value);
+  				else
+  					document.GiftCardOrder.GiftHPList.value = HPAddHipen(num.value);
+  			}
+  		}
+  		else if (stat == "02") {
+  			var rowdata = "";
+  			var ast = $('#KKAmt1');
+  			var amtval = parseInt(ast.val());
+  			var amount = (price * amtval).toString()
+  			rowdata = "kakao" + "," + amtval.toString() + "," + amount;
+
+  			document.GiftCardOrder.OrderValue.value = rowdata;
+  		}
+  		else if (stat == "03") {
+  			var rowdata = "";
+  			var ast = $('#PCAmt1');
+  			var amtval = parseInt(ast.val());
+  			var amount = (price * amtval).toString()
+  			rowdata = "PCard" + "," + amtval.toString() + "," + amount;
+
+  			document.GiftCardOrder.OrderValue.value = rowdata;
+  		}
+  		else if (stat == "04") {
+  			var rowcnt = parseInt(document.GiftCardOrder.hddGDRowIndex.value);
+  			var AllAmt = 0;
+  			for (var i = 0; i < rowcnt; i++) {
+  				var rowdara;
+  				var num = document.getElementById("GDID" + (i + 1).toString());
+  				if (num.value == "") {
+  					alert("받으실 분 아이디를 입력해주세요.");
+  					return false;
+  				}
+  				var amt = document.getElementById("GDAmt" + (i + 1).toString());
+  				var amount = (price * parseInt(amt.value)).toString();
+  				rowdata = num.value + "," + amt.value + "," + amount;
+  				if (document.GiftCardOrder.OrderValue.value != "")
+  					document.GiftCardOrder.OrderValue.value = document.GiftCardOrder.OrderValue.value + "/" + rowdata;
+  				else
+  					document.GiftCardOrder.OrderValue.value = rowdata;
+  				if (document.GiftCardOrder.GiftHPList.value != "")
+  					document.GiftCardOrder.GiftHPList.value = document.GiftCardOrder.GiftHPList.value + "," + num.value;
+  				else
+  					document.GiftCardOrder.GiftHPList.value = num.value;
+  			}
+  		}
+  		return true;
+  	}
+  	function DBInsert() {
+
+  		var param = "{ 'CUST_NO':'" + $.trim(document.GiftCardOrder.UserCustNo.value) + "',";
+  		param += "'STAT': '" + $.trim(document.GiftCardOrder.OrderType.value) + "',";
+  		param += "'TRANSWAY': '" + $.trim(document.GiftCardOrder.OrderType.value) + "',";
+  		//param += "'BUY_QTY':'" + $.trim($("#account_no2").val()) + "',";
+  		param += "'DESIGN_TYPE':'" + $.trim("") + "',";
+  		param += "'SEND_MSG_TYPE':'" + $.trim(document.GiftCardOrder.KKTxtType.value) + "',";
+  		param += "'SEND_MSG':'" + $.trim(document.getElementById("HPtxtmsg").value) + "',";
+  		param += "'SENDER_INFO_CP':'" + $.trim(document.GiftCardOrder.senderHP.value) + "',";
+  		param += "'SENDER_INFO_NA':'" + $.trim("@{@Model.UserName}") + "',";
+  		param += "'RSV_TRANS_YN':'" + $.trim("N") + "',";
+  		param += "'RSV_DT':'" + $.trim("") + "',";
+  		//param += "'BULK_YN':'" + $.trim($("#City").val()) + "',";
+  		param += "'OrderValue':'" + $.trim(document.GiftCardOrder.OrderValue.value) + "',";
+  		param += "'orderPrice':'" + $.trim(document.GiftCardOrder.order_price.value) + "',";
+  		param += "'orderCnts':'" + $.trim(document.GiftCardOrder.order_cnts.value) + "',";
+  		param += "'GD_NO':'" + $.trim(document.GiftCardOrder.goodscode.value) + "'}";
+
+  		$.ajax({
+  			type: 'POST',
+  			url: "/GiftCard/SetGiftTokenOrderData",
+  			contentType: "application/json;charset=utf-8",
+  			data: param,
+  			async: false,
+  			success: function (data) {
+  				document.GiftCardOrder.GiftToken.value = data;
+  				orderPagemove();
+  			},
+  			error: function (error) {
+  				alert("Database 저장 실패!");
+  				return;
+  			}
+  		});
+
+  	}
+  	function GoKAKAOOrder_ServiceStop() {
+  	    alert("Gift Card 서비스 업그레이드 중입니다.\n더 나은 서비스로 찾아 뵙겠습니다.");
+  	    return;
+  	}
+  	function GoKAKAOOrder() {
+  		if (document.GiftCardOrder.chk_agree.checked == true) {
+  			var result = SetParam();
+  			if (result == true) {
+  				DBInsert();
+  			}
+  			else {
+  				alert("파라미터 설정에 실패하였습니다.");
+  			}
+  		}
+  		else {
+  			alert("GiftCard를 구매하시려면 약관에 동의하셔야 합니다.");
+  			return;
+  		}
+  	}
+  	function orderPagemove() {
+  		var orderprice = parseInt(document.GiftCardOrder.order_price.value);
+  		var ordercnts = parseInt(document.GiftCardOrder.order_cnts.value);
+  		var allprice = orderprice * ordercnts;
+  		var stat = document.GiftCardOrder.OrderType.value;
+  		if (stat == "03") {
+  			if (allprice > 50000) {
+  				document.GiftCardOrder.delivery_fee_yn.value = "N";
+  				document.GiftCardOrder.delivery_group_no.value = "";
+  				document.GiftCardOrder.delivery_group_nm.value = "";
+  				document.GiftCardOrder.basis_money.value = "";
+  				document.GiftCardOrder.delivery_fee.value = "";
+  				document.GiftCardOrder.delivery_fee_condition.value = "";
+  				document.GiftCardOrder.delivery_group_type.value = "";
+  				document.GiftCardOrder.who_fee.value = "";
+  			}
+  		}
+  		else {
+  			document.GiftCardOrder.delivery_fee_yn.value = "N";
+  			document.GiftCardOrder.delivery_group_no.value = "";
+  			document.GiftCardOrder.delivery_group_nm.value = "";
+  			document.GiftCardOrder.basis_money.value = "";
+  			document.GiftCardOrder.delivery_fee.value = "";
+  			document.GiftCardOrder.delivery_fee_condition.value = "";
+  			document.GiftCardOrder.delivery_group_type.value = "";
+  			document.GiftCardOrder.who_fee.value = "";
+  		}
+
+  		document.GiftCardOrder.action = "@Urls.MWebUrl" + "/Order/mpay/Instant.asp";
+			
+  		document.GiftCardOrder.submit();
+  	}
+  	$(document).ready(function () {
+  		displayLayer("progress_icon", "none");
+
+  		if ("@{@PageAttr.IsLogin}" == "True") {
+  			gc_msg_sel();
+  			gc_terms(0);
+
+  			$("#kakaoOrder").hide();
+  			setOrderChoice('01', 'HP');
+  			AllAmtUpdate();
+  			var orderP = document.GiftCardOrder.order_price.value.toString().replace(/(\d)(?=(?:\d{3})+$)/g, "$1,");
+  			document.GiftCardOrder.orderprice.value = orderP;
+  			$('#orderP strong').text(orderP);
+
+  			$("gc_txt_info03").hide();
+  		}
+  		else {
+  			document.location.href = "@Urls.LoginUrl";
+  		}
+  		$(".gc_btn_del").attr("style", "display:block");
+  	});
+		
+	</script>
+<!-- CONTENT -->
+@{Html.BeginForm("", "", FormMethod.Post, new { name = "GiftCardOrder", id = "GiftCardOrder" });}
+	<div id="content" class="ctns">
+		<div class="gc_location">
+			<span><a href="GiftCard" style="color:White;" >GIFT CARD</a></span>
+			<span>구매하기</span>
+		</div>
+		<div class="gc_box_price" id="orderP">선택한 GIFT CARD <strong>10,000</strong>원</div>
+		
+		<div class="gc_title">
+			<h3>보낼방법 선택</h3>
+		</div>
+		<div class="gc_list_sel">
+			<ul>
+				<li class="gc01"><a href="javascript:setOrderChoice('01','HP');"><span>휴대폰</span></a></li>
+				<li class="gc02"><a href="javascript:setOrderChoice('02','KK');"><span>카카오톡</span></a></li>
+				@if (Model.OrderPrice != "5000")
+				{
+					@:<li class="gc03"><a href="javascript:setOrderChoice('03','CD')"><span>플라스틱 카드</span></a></li>
+				}
+				<li class="gc04"><a href="javascript:setOrderChoice('04','ID')"><span>G마켓 ID</span></a></li>
+			</ul>
+			<div id="PCText"><p class="gc_txt_info03">결제 시 입력한 주소로 배송됩니다.<br />단, 총 구매금액이 5만원 이하는 배송비 2,000원이 부과됩니다.</p></div>
+		</div>
+		<!-- 핸드폰 구매 -->
+		<div class="gc_list_write" id="OrderLayer01">
+			<ul class="gc_list01" id="HPRowT">
+				<li>
+					<em class="s_tit">보내는분</em>
+					<div class="s_cont">
+						<div class="full text_close"><input id="senderHP" class="gc_text" maxlength="11" type="number" value="@Model.UserHPNum.Replace("-","")" onKeyPress="javascript:btndelshow(this);" /><a class="gc_btn_del" href="javascript:void(0);" onclick="javascript:txtdelete();"><span>입력글삭제</span></a></div>
+						<p class="gc_txt_info">전화번호가 아닌 숫자 입력 시 스팸 처리 될 수 있습니다. </p>
+					</div>
+				</li>
+				<!-- 받는분1 -->
+				<li id="HPrsv" class="set_recive">
+					<em class="s_tit">받는분 1 </em>@*<a class="gc_rcv_del" href="javascript:void(0);"><span>받는분삭제</span></a>*@
+					<div class="s_cont">
+						<div class="full"><input class="gc_text" id="phoneNumber1" maxlength="11" type="number" />	@*onblur="javascript:NumFocusOut(this);" onkeyup="javascript:NumText(this);"*@<!-- 핸드폰 검증로직 수정 20140417 by ahana05 -->
+						@if (PageAttr.IsIphoneApp == true || PageAttr.IsAndroidApp == true) {
+						<a class='gc_btn02' href='javascript:void(0);' onclick='javascript:openPhoneAddress(1);'><span>폰주소록</span></a>
+						}
+						</div>
+						<div class="gc_box_ea">
+							<em class="s_tit_ea">수량</em>
+							<div class="s_cont_ea">
+								<div class="gc_set_ea">
+									<a class="minus" href="javascript:void(0);" onclick="javascript:AmtMinus(HPAmt1);">감소</a>
+									<input class="gc_text num" id="HPAmt1" type="number" value="1" onblur="javascript:NumObj(this);" />
+									<a class="plus" href="javascript:void(0);" onclick="javascript:AmtPlus(HPAmt1);">증가</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</li>
+			</ul>
+			<div class="gc_set_btn">
+				<a class="gc_btn01 gc_add full" href="javascript:void(0);" onclick="javascript:HPaddRow();"><span>받는사람 추가</span></a>
+			</div>
+			<ul class="gc_list02">
+				<li id="send_timer1">
+					<em class="s_tit">발송시간</em>
+					<div class="s_cont">
+						<div class="gc_box_list_chk">
+							<div class="gc_set_chk">
+								<input id="chk01" type="checkbox" checked="checked" onchange="javascript:HPnow();" />
+								<label for="chk01">지금</label>
+							</div>
+							<div class="gc_set_chk">
+								<input id="chk02" type="checkbox" />
+								<label for="chk02">예약발송</label>
+							</div>
+						</div>
+					</div>
+				</li>
+				<li id="send_timer_cont1" style="display:none;">
+					<em class="s_tit">예약시간</em>
+					<div class="s_cont">
+						<div class="txt" id="HPRsvStat">- <a class="gc_btn02 type02" href="javascript:void(0);" onclick="javascript:MakeCalender('HP','N');"><span>설정</span></a></div>
+					</div>
+				</li>
+			</ul>
+			<script type="text/javascript">				sendTimer1();</script>
+		</div>
+		<!-- 핸드폰 구매 -->
+		<!-- 카카오톡 구매 -->
+		<div id="OrderLayer02">
+			<div class="gc_list_write">
+				<ul class="gc_list01">
+					<li class="set_recive">
+						<em class="s_tit">수량</em>
+						<div class="s_cont">
+							<div class="gc_set_ea">
+								<a class="minus" href="javascript:void(0);" onclick="javascript:AmtMinus(KKAmt1);">감소</a>
+								<input class="gc_text num" id="KKAmt1" type="number" value="1" onblur="javascript:NumObj(this);" />
+								<a class="plus" href="javascript:void(0);" onclick="javascript:AmtPlus(KKAmt1);">증가</a>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>	
+			<div class="gc_set_message type02">
+				<div class="gc_title">
+					<h3>보낼메시지 입력</h3>
+				</div>		
+				<ul class="gc_tab02">
+					<li><a href="javascript:void(0);" onclick="javascript:kktxtChange(1);">감사</a></li>
+					<li><a href="javascript:void(0);" onclick="javascript:kktxtChange(2);">축하</a></li>
+					<li><a href="javascript:void(0);" onclick="javascript:kktxtChange(3);">사랑</a></li>
+					<li><a href="javascript:void(0);" onclick="javascript:kktxtChange(9);">쓰기</a></li>
+					<li  class="on"><a href="javascript:void(0);" onclick="javascript:kktxtChange(0);">없음</a></li>
+				</ul>
+				<div class="box_msg_wirte">
+	<textarea id="HPtxtmsg" class="gc_txtarea full" cols="50" rows="5" readonly="readonly"></textarea>
+				</div>
+			</div>
+		</div>
+		<!-- 카카오톡 구매 -->
+		<!-- 플라스틱카드 구매 -->
+		<div id="OrderLayer03">
+			<div class="gc_list_write">
+				<ul class="gc_list01">
+					<li class="set_recive">
+						<em class="s_tit">보내는분</em>
+						<div class="s_cont">
+							<div class="full"><input class="gc_text type02" type="text" value="@Model.UserName" readonly /></div>
+							<div class="gc_box_ea">
+								<em class="s_tit_ea type02">수량</em>
+								<div class="s_cont_ea">
+									<div class="gc_set_ea">
+										<a class="minus" href="javascript:void(0);" onclick="javascript:AmtMinus(PCAmt1);">감소</a>
+										<input class="gc_text num" id="PCAmt1" type="number" value="1" onblur="javascript:NumObj(this);" />
+										<a class="plus" href="javascript:void(0);" onclick="javascript:AmtPlus(PCAmt1);">증가</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</li>
+				</ul>		
+			</div>
+			@*<div class="gc_set_message type02">
+				<div class="gc_title">
+					<h3>보낼메시지 입력</h3>
+				</div>		
+				<ul class="gc_tab02">
+					<li class="on"><a href="javascript:void(0);" >감사</a></li>
+					<li><a href="javascript:void(0);" >축하</a></li>
+					<li><a href="javascript:void(0);" >사랑</a></li>
+					<li><a href="javascript:void(0);" >쓰기</a></li>
+					<li><a href="javascript:void(0);" >없음</a></li>
+				</ul>
+				<div class="box_msg_wirte">
+	<textarea id="GDtxtmsg" class="gc_txtarea full" cols="50" rows="5" readonly="readonly">G마켓 Gift Card로 감사의 마음을 전합니다.
+	행복하세요.</textarea>
+				</div>
+			</div>*@
+		</div>
+		<!-- 플라스틱카드 구매 -->
+		<!-- 지마켓아이디 구매 -->
+		<div class="gc_list_write" id="OrderLayer04" >
+			<ul class="gc_list01" id="GDRowT">
+				<li>
+					<em class="s_tit">보내는분</em>
+					<div class="s_cont">
+						<div class="full text_close"><input id="senderGD" class="gc_text type02" type="text" value="@Model.UserName" readonly /></div>@*<a class="gc_btn_del" href="javascript:void(0);"><span>입력글삭제</span></a>*@<!--20140416 수정 ahana05-->
+					</div>
+				</li>
+				<!-- 받는분1 -->
+				<li id="GDrsv" class="set_recive">
+					<em class="s_tit">받는분 1 </em>@*<a class="gc_rcv_del" href="javascript:void(0);"><span>받는분삭제</span></a>*@
+					<div class="s_cont">
+						<div class="full">
+							<input class="gc_text" type="text" id="GDID1" maxlength="10" placeholder="ID입력버튼을 누르세요." readonly />
+							<a class="gc_btn02" href="javascript:void(0);" onclick="popPositMid('gc_id_chk');idchange('GDID1');return false;"><span>ID입력</span></a>	
+						</div>
+						
+						<div class="gc_box_ea">
+							<em class="s_tit_ea">수량</em>
+							<div class="s_cont_ea">
+								<div class="gc_set_ea">
+									<a class="minus" href="javascript:void(0);" onclick="javascript:AmtMinus(GDAmt1);">감소</a>
+									<input class="gc_text num" id="GDAmt1" type="number" value="1" onblur="javascript:NumObj(this);" />
+									<a class="plus" href="javascript:void(0);" onclick="javascript:AmtPlus(GDAmt1);">증가</a>
+								</div>
+							</div>
+						</div>
+						
+					</div>
+				</li>
+			</ul>
+			<div class="gc_set_btn">
+				<a class="gc_btn01 gc_add full" href="javascript:void(0);" onclick="javascript:GDaddRow();"><span>받는사람 추가</span></a>
+			</div>
+			<ul class="gc_list02">
+				<li id="send_timer2">
+					<em class="s_tit">발송시간</em>
+					<div class="s_cont">
+						<div class="gc_box_list_chk">
+							<div class="gc_set_chk">
+								<input id="chk03" type="checkbox" checked="checked" onchange="javascript:HPnow();" />
+								<label for="chk03">지금</label>
+							</div>
+							<div class="gc_set_chk">
+								<input id="chk04" type="checkbox" />
+								<label for="chk04">예약발송</label>
+							</div>
+						</div>
+					</div>
+				</li>
+				<li id="send_timer_cont2" style="display:none;">
+					<em class="s_tit">예약시간</em>
+					<div class="s_cont">						
+						<div class="txt" id="GDRsvStat">- <a class="gc_btn02 type02" href="javascript:void(0);" onclick="javascript:MakeCalender('GD','N');"><span>설정</span></a></div>
+					</div>
+				</li>
+			</ul>
+			<script type="text/javascript">
+				sendTimer2();
+			</script>
+		</div>
+		<!-- 지마켓아이디 구매 -->
+
+		<div id="box_calendar" class="gc_box_calenrdar">
+			<div class="set_date01" >
+				<div id="calYearMonth">2014년 01월</div>
+				<a class="prev_month" href="javascript:void(0);" onclick="javascript:MakeCalender('HP','B');"><span>이전달</span></a>
+				<a class="next_month" href="javascript:void(0);" onclick="javascript:MakeCalender('HP','A');"><span>다음달</span></a>
+			</div>
+			<div>
+			<table id="calenderDayT">
+				<thead>
+				<tr>
+					<th><div>SUN</div></th>
+					<th><div>MON</div></th>
+					<th><div>TUE</div></th>
+					<th><div>WED</div></th>
+					<th><div>THU</div></th>
+					<th><div>FRI</div></th>
+					<th><div>SAT</div></th>
+				</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+			</div>
+			<div class="set_date02">
+				@*<input type="text" class="gc_text" id="RSVHour" onkeyup="javascript:HourCheck(this);" value="0" />*@
+				<select name = 'RSVHour' id="RSVHour" onchange="javascript:HourCheck(this);">
+				@for (int i = 0; i < 24; i++) {
+					@:<option value = '@i.ToString()'>@i.ToString()</option>
+				}
+				</select>	
+				<span>시</span>
+				<select name = 'RSVMinute' id="RSVMinute" onchange="javascript:MinuteCheck(this);" >
+				@for (int i = 0; i < 60; i++) {
+					@:<option value = '@i.ToString()'>@i.ToString()</option>
+				}
+				</select>
+				 <span>분</span>
+			</div>
+			<div class="gc_set_btn" id="btnRservediv">
+				<a class="gc_btn02" href="javascript:void(0);" onclick="javascript:ReserveDelClick('HP');"><span>취소</span></a>
+				<a class="gc_btn03" href="javascript:void(0);" onclick="javascript:ReserveEditClick('HP');"><span>변경</span></a>
+			</div>
+		</div>
+
+		<div class="gc_total_price" >
+			<ul>
+				<li id="orderQty"><em>구매수량</em>GIFT CARD 50,000원 X 999장</li>
+				<li id="orderAmt" class="price"><em>최종결제금액</em><strong>50,000</strong>원</li>
+			</ul>
+		</div>
+		<!-- 140429_수정 -->
+		@*<div class="gc_set_btn02 b_nomarin" id="normalOrder">
+			@*<a class="btn_r type02" href="javascript:void(0);" onclick="javascript:gotoOrderDetail();"><span>다음</span></a>
+			<a class="btn_r" href="javascript:void(0);" onclick="javascript:gotoOrderDetail();"><span>다음</span></a><!-- 20140415 수정 ahana05 -->
+		</div>*@
+		@*<div class="gc_set_btn03" id="normalOrder">
+			<a href="javascript:void(0);" class="btn_blue" onclick="javascript:gotoOrderDetail();"><span>다음</span></a>
+		</div>*@
+		<div class="gc_set_btn03" id="normalOrder">
+			<a href="javascript:void(0);" class="btn_blue" onclick="javascript:gotoOrderDetail_ServiceStop();"><span>다음</span></a>
+		</div>
+		<!-- 140429_수정 -->
+		<div id="kakaoOrder">	
+		<div class="gc_box_terms">
+			<div class="box_title">
+				<strong class="s_tit">Gift Card 관련약관</strong>
+				<div class="gc_set_chk">
+					<input id="chk_agree" type="checkbox" checked />
+					<label for="chk_agree">동의</label>
+				</div>				
+				<div class="r_cont"><a id="gc_btn_terms" class="btn_terms" href="javascript:void(0);">펼쳐보기</a></div>
+			</div>
+			<div id="iscroll_terms" class="gc_box_scroll">
+				<dl class="list_terms">
+<dt>제1조 (목적)</dt>
+<dd>본 약관은 (주)이베이코리아(이하 "발행자"라함)가 발행하는 G마켓 선물권을 그 소지자(이하 "고객" 이라 함)가 사용함에 있어 고객과 발행자간에 준수해야 할 사항을 규정합니다.</dd>
+
+<dt>제2조 (적용범위)</dt>
+<dd>본 약관의 적용을 받는 선물권은 온라인 선물권으로서 선물권 면액에 상당하는 물품 또는 용역 ( 이하 " 물품 등 " 이라 함 ) 을 제공받을 수 있는 금액 선물권이며,G마켓 (www.gmarket.co.kr)상에서만 사용가능한 선물권을 말합니다.</dd>
+
+<dt>제3조 (선물권의 구매 및 취소/반품)</dt>
+<dd>1. 선물권은 현금, 신용카드, 실시간 계좌이체, 휴대폰 소액결제 등 발행자가 마련한 기타 결제수단으로 구매가 가능합니다.</dd>
+<dd>2. 구매 및 배송 완료 후 7일 이내에 선물권은 취소/반품할 수 있고, 이 때 실물로 발급된 선물권을 반납하여야 합니다. 단, 현금잔고 전환 등으로 이미 사용한 선물권은 취소/반품이 불가합니다.</dd><!--20140530 취소문구 수정 by ahana05-->
+
+<dt>제4조(선물권의 양도 및 취소)</dt>
+<dd>선물권을 구매한 고객은 이를 제3자에게 선물(양도)할 수 있으나, 양수인이 선물권을 수령하여 사용하기 위해서는 G마켓(www.gmarket.co.kr) 회원 가입 절차(양수인이 기존에 G마켓 회원이 아닌 경우에 한하여) 및 별도의 인증절차를 거칠 수가 있습니다. 단, 양수인의 G마켓 회원가입 아이디를 이용한 양도의 경우에는 양도취소가 불가능하며, 양수인의 휴대전화 번호, 이메일 주소를 이용한 양도의 경우에는 양수인이 인증절차를 거쳐서 선물권을 수령하지 않는 한 양도취소가 가능합니다.</dd>
+
+<dt>제5조 (선물권의 사용)</dt>
+<dd>1. 고객은 선물권을 현금잔고로 전환하여야 물품 등의 구매용으로 사용할 수 있습니다.</dd>
+<dd>2. 선물권을 이용해 전환한 G통장 서비스상의 현금잔고 잔액은 제8조에서 정한 사용에 따른 잔액반환의 경우를 제외하고는 자신의 계좌로 송금하거나 G캐시로 전환할 수 없습니다. 선물권을 이용해 전환한 G통장 서비스상의 현금잔고 잔액의 환급에 관하여는 본 약관의 내용이 전자금융서비스 약관 제24조에 우선하여 적용됩니다.</dd>
+<dd>3. 고객이 선물권면액의 범위 내에서 G마켓 구매서비스를 이용하고자 하는 경우, 발행자는 현금 또는 신용카드 거래자와 동등하게 서비스를 제공합니다.</dd>
+<dd>4. G마켓(www.gmarket.co.kr)상에서 로그인 한 고객은 물품 등의 구매 시에 언제든지 선물권을 사용할 수 있으며, 발행자는 가격할인기간이라 해도 고객의 선물권사용을 거부할 수 없습니다. 다만, 미리 고지한 특정 URL 등에서의 선물권 사용을 제한할 수 있습니다.</dd>
+
+<dt>제6조 (선물권의 도난&middot;분실 등에 대한 책임)</dt>
+<dd>1. 고객본인의 관리부주의로 G마켓 회원가입 아이디 및 패스워드가 유출되어 선물권이 도난∙분실된 경우, 발행자는 책임을 지지 아니하며 도난∙분실된 선물권을 재 발행하지 않습니다. 이 경우 고객은 자신의 주의의무를 다하였음을 입증해야 합니다. </dd>
+<dd>2. 발행자의 귀책사유 없이 네트워크상의 해킹 등 부정한 방법을 이용한 제3자의 불법행위로 말미암아 입게 되는 고객의 피해(도난 등)에 대하여 발행자는 책임을 부담하지 않습니다.</dd>
+
+<dt>제7조 (선물권의 유효기간)</dt>
+<dd>선물권은 상법 제64조의 상사채권 소멸시효규정에 의거 발행일로부터 5년 동안 유효합니다.</dd>
+
+<dt>제8조 (선물권의 잔액반환)</dt>
+<dd>1. 고객은 물품 등을 구매하고 남은 잔액에 대해 자신의 계좌로 송금을 요청하거나 G캐시로 전환을 요청할 수 있습니다.</dd>
+<dd>2. 전항의 경우를 제외하고 잔액은 현금으로 반환되지 않습니다.</dd>
+<dd>3. 제1항에 따라 고객이 송금을 요청하거나 전환을 요청하는 경우, 다음 각호의 1의 기준에 따라 발행자는 잔액을 현금으로 반환합니다. 다만, 당해 선물권의 결제 수단에 따라 일정한 기간이 경과된 이후에 한하여 그러한 반환이 허용될 수 있고, 이에 관한 상세한 내용은 해당 서비스 페이지에 고지된 바에 따릅니다.
+	<ol>
+		<li>① 선물권면액(선물권을 여러 장 동시에 사용하는 경우에는 총 합계 금액)이 1만원을 초과하는 상태에서 고객이 선물권면액의 100분의 60 이상에 해당하는 물품 등을 제공받고 잔액의 반환을 요구하는 경우.</li>
+		<li>② 선물권면액(선물권을 여러 장 동시에 사용하는 경우에는 총 합계 금액)이 1만원 이하인 상태에서 고객이 선물권면액의 100분의 80 이상에 해당하는 물품 등을 제공받고 잔액의 반환을 요구하는 경우.</li>
+	</ol>
+</dd>
+
+<dt>제9조 (기타)</dt>
+<dd>본 약관에 명시되지 아니한 사항 또는 약관해석상 다툼이 있는 경우에는 고객과 발행자 간의 합의에 의하여 결정하되, 합의가 이루어지지 아니한 경우에는 관계법령 및 일반 상 관례에 따릅니다.</dd>
+
+<dt>부칙</dt>
+<dd>제1조 (적용일자)</dd>
+<dd>본 약관은 2006년 08월 01일자로 적용됩니다.</dd>
+
+<dt>부칙</dt>
+<dd>제1조 (적용일자)</dd>
+<dd>본 약관은 2014년 04월 11일자로 적용됩니다.</dd>
+
+<dt>부칙</dt>
+<dd>제1조 (적용일자)</dd>
+<dd>본 약관은 2014년 06월 23일자로 적용됩니다.</dd>
+				</dl>
+			</div>
+		</div>
+		<!-- 140429_수정 -->
+		@*<div class="gc_set_btn02 b_nomarin">
+			<a class="btn_r" href="#" onclick="javascript:GoKAKAOOrder();"><span>주문</span></a>
+		</div>*@
+		@*<div class="gc_set_btn03">
+			<a href="#" class="btn_blue" onclick="javascript:GoKAKAOOrder();"><span>주문하기</span></a>
+		</div>*@
+		<div class="gc_set_btn03">
+			<a href="#" class="btn_blue" onclick="javascript:GoKAKAOOrder_ServiceStop();"><span>주문하기</span></a>
+		</div>
+		<!-- 140429_수정 -->
+	</div>
+		<!-- 아이디 확인 레이어 -->		
+		<div id="gc_id_chk" class="gc_layer">
+			<div class="gc_id_chk">
+				<input type="text" id="searchname" class="gc_text" placeholder="이름" />
+				<input type="text" id="searchid" class="gc_text" maxlength="10" placeholder="G마켓 ID" />
+			</div>
+			<div class="gc_set_btn">
+				<a class="gc_btn03" href="javascript:void(0);" onclick="javascript:btn_ID_Search();"><span>확인</span></a>
+				<a class="gc_btn02" href="javascript:void(0);" onclick="popPositMid('gc_id_chk');return false;"><span>취소</span></a>
+			</div>
+			<ul class="gc_list_bul">
+				<li><span>개인정보 보호를 위해 ID와 이름이 일치하는 경우만 조회됩니다.</span></li>
+				<li><span>하루 조회 실패 20회, 한달 조회 실패 50회 초과 시 당월 ID조회가 불가합니다.</span></li>
+			</ul>
+		</div>
+		<!-- //아이디 확인 레이어 -->
+		<div>
+<input type='hidden' id='idsearch' name='idsearch' value='' />
+<input type='hidden' id='OrderValue' name='OrderValue' value='' />
+<input type='hidden' id='KKTxtType' name='KKTxtType' value='0' />
+<input type='hidden' id='UseDT' name='UseDT' value='' />
+<input type='hidden' id='hddHPReserveDT' name='hddHPReserveDT' value='' />
+<input type='hidden' id='hddGDReserveDT' name='hddGDReserveDT' value='' />
+<input type='hidden' id='hddHPRowIndex' name='hddHPRowIndex' value='1' />
+<input type='hidden' id='hddGDRowIndex' name='hddGDRowIndex' value='1' />
+<input type='hidden' id='OrderType' name='OrderType' value='01' />
+<input type='hidden' id='HPRSVYN' name='HPRSVYN' value='N' />
+<input type='hidden' id='GDRSVYN' name='GDRSVYN' value='N' />
+<input type='hidden' id='UserCustNo' name='UserCustNo' value='@Model.UserCustNo' />
+<input type='hidden' id='UserName' name='UserName' value='@Model.UserName' />
+<input type='hidden' id='UserHPNum' name='UserHPNum' value='@Model.UserHPNum' />
+<input type='hidden' name='return_url' value='' />
+<input type='hidden' name='order_type' value='POPUP_ORDER' />
+<input type='hidden' name='goodscode' value='108224451' />
+<input type='hidden' name='goods_type' value='gmarket_token' />
+<input type='hidden' name='order_cnts' value='1' />
+<input type='hidden' name='order_price' value='@Model.OrderPrice' />
+<input type='hidden' id='orderprice' name='orderprice' value='' />
+<input type='hidden' name='gd_nm' value='10000원 G마켓 온라인 선물권' />
+<input type='hidden' name='trad_way' value='T1' />
+<input type='hidden' name='trad_way_nm' value='G-Mall' />
+<input type='hidden' name='buyer_mileage' value='0' />
+<input type='hidden' name='buddy_mileage' value='0' />
+<input type='hidden' name='tax_issue_yn' value='N' />
+<input type='hidden' name='cash_issue_yn' value='N' />
+<input type='hidden' name='gdlc_cd' value='100000022' />
+<input type='hidden' name='offline_stock_cnt' value='@Model.iOffLineStockCnt' />
+@if (Model.GiftOfflineDelivery == null)
+{
+@:<input type='hidden' name='delivery_fee_yn' value='N' />
+@:<input type='hidden' name='delivery_group_no' value='' />
+@:<input type='hidden' name='delivery_group_nm' value='' />
+@:<input type='hidden' name='basis_money' value='' />
+@:<input type='hidden' name='delivery_fee' value='' />
+@:<input type='hidden' name='delivery_fee_condition' value='' />
+@:<input type='hidden' name='delivery_group_type' value='' />
+@:<input type='hidden' name='who_fee' value='' />
+}
+else
+{
+@:<input type='hidden' name='delivery_fee_yn' value='Y' />
+@:<input type='hidden' name='delivery_group_no' value='@Model.GiftOfflineDelivery.DeliveryGroupNo' />
+@:<input type='hidden' name='delivery_group_nm' value='' />
+@:<input type='hidden' name='basis_money' value='@Model.GiftOfflineDelivery.BasisMoney' />
+@:<input type='hidden' name='delivery_fee' value='@Model.GiftOfflineDelivery.DeliveryFee' />
+@:<input type='hidden' name='delivery_fee_condition' value='@Model.GiftOfflineDelivery.DeliveryFeeCondition' />
+@:<input type='hidden' name='delivery_group_type' value='@Model.GiftOfflineDelivery.DeliveryGroupType' />
+@:<input type='hidden' name='who_fee' value='@Model.GiftOfflineDelivery.WhoFee' />
+}
+
+<input type='hidden' name='GiftType' value='HP' />
+<input type='hidden' name='GiftHPList' value='' />
+<input type='hidden' name='GiftToken' value='320' />
+<input type='hidden' name='seller_cust_no' value='110570630' />
+</div>
+@*</form>*@
+	</div>
+<!-- //CONTENT -->
+
+

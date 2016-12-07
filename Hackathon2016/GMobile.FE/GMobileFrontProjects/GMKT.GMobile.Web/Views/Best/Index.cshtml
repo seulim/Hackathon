@@ -1,0 +1,437 @@
+﻿@model GMKT.GMobile.Web.Models.BestModel
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+	<div class="best_tab">
+		<div class="tab_area">
+			<a id="tab_1" href="javascript:SnaUrlFooter('704900001'); Router.navigate('1');" class="on">모바일 베스트</a>
+			@if (Model != null && Model.GroupCategory != null && Model.GroupCategory.Count > 0)
+			{
+			<a id="tab_2" href="javascript:SnaUrlFooter('704900003'); onGroupTabClick();">그룹별 베스트</a>
+			}
+		</div>
+		<div class="tab_cont" style="display: block;">
+			<p class="dsc">모바일 베스트란 <button type="button" class="sp_best" onclick="SnaUrlFooter('704900002');">도움말</button></p>
+			<div class="bx">
+				<p class="tx">상품의 모바일 판매실적과 상품가격대별 모바일 가중치를 주된 기준으로 하여 G마켓이 선정한 상품입니다.</p>
+				<button type="button" class="btn_clse"><span class="sp_best">닫기</span></button>
+			</div>
+		</div>
+		<div class="tab_cont" style="display: none;">
+			<div class="sel_area">
+				<a href="javascript:SnaUrlFooter('705100001'); return false;"></a>
+				<a href="javascript:SnaUrlFooter('705100002'); return false;"></a>
+			</div>
+			@if (Model != null && Model.GroupCategory != null && Model.GroupCategory.Count > 0)
+			{
+				<ul class="cate_lst best">
+				@{
+					int GROUP_COUNT = 3;
+					int bestGroupFcdcode = 705000002;
+					int bestCategoryFcdcode = 705100003;
+					for (int lineIndex = 0; lineIndex < Model.GroupCategory.Count / GROUP_COUNT; lineIndex++)
+					{
+					<li>
+						@for (int i = lineIndex * GROUP_COUNT + 1; i < (lineIndex + 1) * GROUP_COUNT + 1; i++)
+						{
+						if (Model.GroupCategory[i] != null)
+						{
+						<div class="cate_sect">
+							<a id='tab_@Model.GroupCategory[i].Code' href="javascript:SnaUrlFooter('@bestGroupFcdcode'); Router.navigate('2/@Model.GroupCategory[i].Code');" class="btn_cate" ><span class="sp_best @Model.GroupCategory[i].CssName"></span><span class="txt">@Model.GroupCategory[i].Name</span></a>
+							<ul class="cate_sub_lst">
+							@if (Model.GroupCategory[i].LargeCategoryList != null)
+							{
+								foreach(GMKT.GMobile.Data.CategoryInfo ci in Model.GroupCategory[i].LargeCategoryList)
+								{
+								<li><a id='tab_@ci.Code' href="javascript:SnaUrlFooter('@bestCategoryFcdcode'); Router.navigate('2/@Model.GroupCategory[i].Code/@ci.Code');">@ci.Name</a></li>
+								}
+							}
+							</ul>
+						</div>
+						}
+						bestCategoryFcdcode++;
+						bestGroupFcdcode++;
+						
+						if (i == Model.GroupCategory.Count -1)
+						{
+							break;
+						}
+						}								
+					</li>
+					}
+				}
+				</ul>
+				<p class="dsc">그룹별 베스트란 <button type="button" class="sp_best" onclick="SnaUrlFooter('704900004');">도움말</button></p>
+				<div class="bx">
+					<p class="tx">상품의 판매실적을 기반으로 상품가격대별 가중치를 반영하여 G마켓이 선정한 상품입니다 </p>
+					<button type="button" class="btn_clse"><span class="sp_best">닫기</span></button>
+				</div>
+			}
+		</div>
+	</div>
+
+	<div class="mbest_wrap">
+		<ul id="list_bx" class="mbest_lst">
+			@if(Model.BestItems != null && Model.BestItems.Count > 0)
+				{
+					int bestItemFcd = 705200001;
+					int i = 1;
+					string adultImageUrl = Urls.MobileImageUrlV2 + GMKT.GMobile.Constant.Const.ADULT_IMAGE_280.Replace("images/", string.Empty);
+					string lastCss = "";
+					string noSale = "";
+					foreach(GMKT.GMobile.Data.SearchItemModel sm in Model.BestItems)
+					{
+						string vipUrl = sm.LinkURL;
+						if(i >= 100)
+						{
+							lastCss = "last";
+						}
+						noSale = sm.DiscountPrice == 0 ? "no_sale" : "";
+			<li>
+                @if(sm.IsAdult && !PageAttr.IsLogin)
+								{
+									vipUrl = GMKT.GMobile.Constant.ConstDef._GMW_LOGIN_AD_URL + "?rtnurl=" + HttpUtility.UrlEncode(sm.LinkURL) + "&adultUseLoinCheck=Y";
+								}
+				<a href="@GlobalFunction.GetSnaUrl(true, (bestItemFcd + (i / 4)).ToString(), vipUrl)">
+					<span class="rank @lastCss">@i.ToString()</span>
+					<div class="img_bx">
+						@if(sm.IsAdult && Model.ShowAdultImage)
+			{
+						<img src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@adultImageUrl" alt="성인인증 필요"/>
+			}
+			else
+			{
+						<img src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@sm.ImageUrl" alt="@sm.GoodsName"/>
+			}
+					</div>
+					<div class="info_bx @noSale">
+						<strong class="tit">@sm.GoodsName</strong>
+						<div class="price_box">
+							@if(sm.DiscountPrice > 0)
+			 {
+							<span class="per_price"><span class="blind">정가</span>@sm.SellPrice.ToString("#,##0")</span>
+			 }
+							<strong class="price"><span class="blind">할인가</span>@sm.DispPrice.ToString("#,##0")</strong>
+							@if(sm.DeliveryInfo.CompareTo("무료배송") == 0)
+			 {
+							<span class="ico_del">무료배송</span>
+			 }
+							@if(sm.IsTpl)
+			 {
+							<span class="ico_smart">스마트배송</span>
+			 }
+						</div>
+					</div>
+			</a>
+			</li>
+			 i++;
+					}
+				}
+		</ul>
+		<span class="ico_loading" style="display:none">로딩중</span>
+	</div>
+	<a href="#" class="btn_top_main">Top으로 이동</a>
+	<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+
+	@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "bestseller", ShareFcdCode = "704600003", ShortcutFcdCode = "704600004" })
+	
+</div>
+<!-- //CONTENT -->
+
+
+@section scripts
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/Router.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+<script id="best_item_template" type="text/x-handlebars-template">
+{{#each Items}}
+	<li>
+		<a href="{{getLinkUrl IsAdult LinkURL @@index}}">
+			<span class="rank {{getLastCssName @@index}}">{{getItemIndex @@index}}</span>
+			<div class="img_bx">
+				<img src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="{{getImageUrl IsAdult ImageUrl}}" alt="{{GoodsName}}" />
+			</div>
+			{{#if DiscountPrice}}
+			<div class="info_bx">
+			{{else}}
+			<div class="info_bx no_sale">
+			{{/if}}
+				<strong class="tit">{{GoodsName}}</strong>
+				<div class="price_box">
+					{{#if DiscountPrice}}
+					<span class="per_price"><span class="blind">정가</span>{{addComma SellPrice}}</span>
+					{{/if}}
+					<strong class="price"><span class="blind">할인가</span>{{addComma DispPrice}}</strong>
+					{{renderFreeDelivery DeliveryInfo}}
+					{{#if IsTpl}}
+					<span class="ico_smart">스마트배송</span>
+					{{/if}}					
+				</div>
+			</div>
+		</a>
+	</li>	
+{{/each}}
+</script>
+<script type="text/javascript">
+	var currentCode = "@Model.Code";
+	Router.add(/([^\/]+)\/?([^\/]*)\/?([^\/]*)/, function () {
+		var tabNumber = arguments[0];
+		var groupcode = arguments[1];
+		var subgroupcode = arguments[2];
+
+		if (tabNumber === '1') {
+			if (currentCode !== 'G00') {
+				ViewBestItemTotal();
+			}
+		}
+		else if (tabNumber === '2') {
+			var code;
+			if (groupcode) {
+				if (subgroupcode) {
+					code = subgroupcode;
+				}
+				else {
+					code = groupcode;
+				}
+			}
+			else {
+				$('.best_tab .cate_lst .cate_sect').removeClass('selected');
+				$('.best_tab .sel_area').hide();
+				$('.best_tab .cate_lst .btn_cate').show();
+				code = 'G01';
+			}
+			if (code !== currentCode) {
+				ViewBestItem(code);
+			}
+		}
+
+		$(document).ready(function () {
+			if (tabNumber) {
+				$('#tab_' + tabNumber).trigger('click');
+			}
+			if (groupcode) {
+				$('#tab_' + groupcode).trigger('click');
+			}
+			if (subgroupcode) {
+				$('#tab_' + subgroupcode).trigger('click');
+			}
+			else {
+				$('.best_tab .cate_sub_lst a').each(function () {
+					$(this).removeClass('selected');
+				});
+			}
+		});
+	}).check().listen();
+
+	$(document).ready(function () {
+		if (!window.location.hash && !location.search) {
+			Router.navigate('1');
+		}
+
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+
+		/* landing Banner */
+		var em = eModule
+                    , apps = em.apps
+                    , landing = apps.landing;
+
+		landing.init({
+			pageName: 'Best',
+			landingType: '@Model.LandingBanner.Type',
+			imageUrl: '@Model.LandingBanner.ImageUrl',
+			description: '@Model.LandingBanner.Description',
+			campaign: '@Model.Campaign.Name',
+			medium: '@Model.Campaign.Medium',
+			mediumSource: '@Model.Campaign.MediumSource',
+			mediumContent: '@Model.Campaign.MediumContent',
+			term: '@Model.Campaign.Keyword'
+		});
+
+		$("#lay_notice").on('click', '#goToApp', function (e) {
+			e.preventDefault();
+			landing.installApp();
+		}).on('click', '#landingClose', function (e) {
+			e.preventDefault();
+			landing.close();
+		});
+		/* landing Banner */
+
+		$("div.img_bx img").lazyload({
+			effect: "fadeIn",
+			threshold: 350
+		});
+
+		KakaoInit();
+		ShareTo("kakaotalk");
+	});
+
+	var ShareTo = function (type) {
+		var dataName = "G마켓 베스트100";
+		switch (type) {
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "베스트100";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name": dataName,
+			"url": "@Urls.MobileWebUrl" + "/Best",
+			"title": ""
+		};
+
+		if (type == "kakaotalk") {
+			KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+		}
+		else {
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data));
+		}
+	}
+
+	var loginUrl = '@GMKT.GMobile.Constant.ConstDef._GMW_LOGIN_AD_URL';
+	var adultImageUrl = "@Urls.MobileImageUrlV2" + '@GMKT.GMobile.Constant.Const.ADULT_IMAGE_280.Replace("images/", string.Empty)';
+	var showAdultImage = "@Model.ShowAdultImage".toLowerCase() == "true" ? true : false;
+	var isLogin = "@PageAttr.IsLogin".toLowerCase() == "true" ? true : false;
+	var selectedBestCode = null;
+	var isMobileBest = true;
+
+	Handlebars.registerHelper('getItemIndex', HHgetItemIndex);
+	Handlebars.registerHelper('getLinkUrl', HHgetLinkUrl);
+	Handlebars.registerHelper('getImageUrl', HHgetImageUrl);
+	Handlebars.registerHelper('addComma', HHaddComma);
+	Handlebars.registerHelper('renderFreeDelivery', HHrenderFreeDelivery);
+	Handlebars.registerHelper('getLastCssName', HHgetLastCssName);
+
+	function HHgetItemIndex(index) {
+		return new Handlebars.SafeString(index + 1);
+	}
+	function HHgetLinkUrl(isAdult, url, index) {
+		var linkUrl = url;
+		var fcdMobileBest = 705200001;
+		var fcdGroupBest = 713800001;
+
+		var fcd;
+		if (isMobileBest) {
+			fcd = fcdMobileBest + index % 4;
+		}
+		else {
+			fcd = fcdGroupBest;
+		}
+
+		if (isAdult && !isLogin) {
+			linkUrl = loginUrl + "?rtnurl=" + encodeURIComponent(linkUrl) + "&adultUseLoinCheck=Y";
+		}
+		linkUrl = "http://sna.gmarket.co.kr/?fcd=" + fcd + "&url=" + encodeURIComponent(linkUrl);
+
+		return new Handlebars.SafeString(linkUrl);
+	}
+	function HHrenderFreeDelivery(deliveryInfo) {
+		if (deliveryInfo == "무료배송") {
+			return new Handlebars.SafeString('<span class="ico_del">무료배송</span>');
+		}
+	}
+	function HHgetLastCssName(index) {
+		if (index + 1 >= 100) {
+			return new Handlebars.SafeString('last');
+		}
+	}
+	function HHgetImageUrl(isAdult, imageUrl) {
+		var url = imageUrl;
+		if (isAdult && showAdultImage) {
+			url = adultImageUrl;
+		}
+		return new Handlebars.SafeString(url);
+	}
+	function HHaddComma(nStr) {
+		nStr += '';
+		x = nStr.split('.');
+		x1 = x[0];
+		x2 = x.length > 1 ? '.' + x[1] : '';
+		var rgx = /(\d+)(\d{3})/;
+		while (rgx.test(x1)) {
+			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+		}
+		return new Handlebars.SafeString(x1 + x2);
+	}
+
+	function BestTitleCode() {
+		var title = $('.s_tit .in_txt').text();
+		var isSubCategoryStyle = $('.t_dep').attr('style');
+		if (title == "베스트100 전체" && isSubCategoryStyle == "display: none;") {
+			SnaUrlFooter(704900001);
+		} else {
+			SnaUrlFooter(705100002);
+		}
+	}
+
+	function ViewBestItemTotal() {
+		ViewBestItem("G00");
+	}
+
+	function ViewBestItem(code) {
+		if (history && history.replaceState) {
+			history.replaceState({}, null, '?code=' + code + location.hash);
+		}
+		if (code === 'G00') {
+			isMobileBest = true;
+		}
+		else {
+			isMobileBest = false;
+		}
+		if (code == null) {
+			code = 'G01';
+		}
+
+		$('#list_bx').html('');
+		$(".ico_loading").show();
+		$.ajax({
+			type: "POST",
+			url: "/Best/GetBestItems",
+			dataType: "json",
+			data: {
+				code: code
+			},
+			error: function (request, status, error) {
+				$(".ico_loading").hide();
+			},
+			success: function (result) {
+				currentCode = code;
+				if (code !== 'G00') {
+					selectedBestCode = location.hash;
+				}
+				if (result != null && result != undefined) {
+					$('#itemLoading').hide();
+					var template = Handlebars.compile($('#best_item_template').html());
+					$('#list_bx').html(template({ Items: result }));
+					$("div.img_bx img").lazyload({
+						effect: "fadeIn",
+						threshold: 350
+					});
+					$('html, body').animate({ scrollTop: $(window).scrollTop() + 1 }, "fast");
+				}
+				$(".ico_loading").hide();
+				
+			}
+		});
+
+	}
+
+	function onGroupTabClick(){
+		if(selectedBestCode){
+			Router.navigate(selectedBestCode.substring(1));
+		}
+		else{
+			Router.navigate('2');
+		}
+	}
+</script>
+}

@@ -1,0 +1,139 @@
+﻿@using GMKT.GMobile.Web.Models;
+@model FaqModel
+@{
+    ViewBag.Title = "FaqSearch";
+
+	string Search = Request["search"];
+}
+<script type="text/javascript">
+	window.onload = function () {
+
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+	}
+
+	$(function () {
+		var search = $("#txtSearch");
+		var searchClick = $("#searchClick");
+
+		$("#sc").click(
+		function () { search.val(''); });
+
+		search.keydown(function () {
+			if (event.keyCode == "13") {
+				searchClick.click();
+			}
+		});
+
+		// 질문 검색시 자주묻는질문 페이지로 이동.
+		searchClick.click(
+		function () {
+			var search = $("#txtSearch").val();
+
+			if (search != "" && search != "undefined" && search != null) {
+
+				location.href = "@Urls.MobileWebUrl/customercenter/FaqSearch?search=" + encodeURIComponent(search);
+			}
+			else {
+				alert('검색어를 입력해주세요');
+			}
+		});
+	});	
+	
+    var curPage = 2;
+	var search = "@Search";
+
+    function FaqListPage() {
+		FaqList(curPage);
+    }
+
+    function FaqList(pageIndex) {
+
+		var _FaqList = $('#FaqList');
+		var _pageIndex = $('#pageIndex');
+		if (pageIndex == 1) {
+			curPage = 1;
+			_FaqList.html('');
+		}
+
+		$.ajax({
+			type: 'POST',
+			dataType: 'json',
+			url: "/CustomerCenter/GetFaqList",
+			data: {
+    			"cateCd": "",
+				"search": search,
+				"pageIndex": pageIndex
+			},
+			success: function (result) {
+
+				if (result.Items.length == 0) {
+          			$("#moreThen").hide();
+          			curPage = 1;
+          			_FaqList.html('');
+          			return;
+          		}
+
+          		$("#moreThen").show();
+          		curPage = result.NextPageNo;
+
+          		if (curPage == 0) {
+          			$("#moreThen").hide();
+          		}
+          		var PageNo = result.PageNo;
+
+          		_pageIndex.html(PageNo);
+
+          		for (var i = 0; i < result.Items.length; i++) {
+          			var _item = result.Items[i];
+          			_FaqList.append("<li><a href=\"javascript:fnFaqDetail('" + _item.seqNo + "');\"><span class=\"num\">" + _item.rnum + "</span><em>" + _item.faqLclassNm + "</em>" + _item.title + "</a></li>");
+          		}
+			},
+			error: function (result) {
+          		alert("오류가 발생했습니다.");
+			}
+		});
+    }
+
+    // 질문 클릭시 질문 상세 보여주기.
+    function fnFaqDetail(seq) {
+		location.href = "@Urls.MobileWebUrl/customercenter/FaqDetail?seq=" + seq + "&search=@Search&type=faqlist";
+    }
+</script>
+
+<!-- CONTENTS -->
+<div id="contents" class="cts">
+	<div class="cstm_ct">
+		<h3 class="tit">모바일 고객센터 검색결과</h3>
+		<div class="of_ques often">
+			<div class="inpt">
+				<span class="inpt_wp"><input type="text" id="txtSearch" placeholder="질문을 입력하세요" /><a href="javascript:" id="sc" class="del">검색어 삭제</a></span><a href="javascript:" class="btn_qus" id="searchClick"><span>질문검색</span></a></div>
+		</div>
+		<h4 class="sch_result"><strong>@Search</strong><span>@(@Model.TotalCnt)개의 검색결과</span></h4>
+
+@if (Model.Items.Count > 0)
+{ 
+		<div class="ques_listw">
+			<ul class="ques_list" id="FaqList">
+	@foreach (var item in Model.Items)
+	{
+				<li><a href="javascript:fnFaqDetail('@item.seqNo');"><span class="num">@item.rnum</span><em>@item.faqLclassNm</em>@item.title</a></li>
+	}
+			</ul>
+		</div>
+}
+else
+{ 
+		<div id="empty"  class="sch_none">
+			해당하는 검색결과가 없습니다.
+			<a href="@Urls.MobileWebUrl/customercenter" class="go_cmain">모바일 고객센터 메인으로 돌아가기</a>
+		</div>
+}
+		<div class="com_more" id="moreThen"  @if(Model.NextPageNo < 2){<text>style="display:none;"</text>}>
+			<a href="javascript:FaqListPage();" class="more">더보기(<span id='pageIndex'>1</span>/@Model.PageCnt)</a>
+		</div>
+	</div>
+</div>
+<!--// CONTENTS -->
+

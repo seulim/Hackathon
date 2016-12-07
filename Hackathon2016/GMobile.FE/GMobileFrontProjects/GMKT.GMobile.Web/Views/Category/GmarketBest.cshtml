@@ -1,0 +1,82 @@
+﻿@using GMKT.GMobile.Data;
+
+@model List<SearchItemModel>
+@{
+    ViewBag.Title = "GmarketBest";
+}
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/cpplpsrp.js"></script>
+
+	<div id="content" class="ctns">
+		<div class="mw_wrap">
+			<ul class="mw_tab">
+			<li><a href="@(Urls.MobileWebUrl + "/Category/Category?lcId=" + ViewBag.lcId)" class="in_tab">카테고리</a></li>
+			<li class="selected"><a href="@(Urls.MobileWebUrl + "/Category/GmarketBest?lcid=" + ViewBag.lcId)" class="in_tab">카테고리 베스트<span class="sp_mw btn">도움말</span></a></li>
+			<li><a href="@(Urls.MobileWebUrl + "/Category/SpecialShopList?lcId=" + ViewBag.lcId)" class="in_tab">기획전</a></li>
+			</ul>
+			<div class="best_info">
+				<p>상품의 판매실적을 기반으로 상품가격대별 가중치를 반영하여 G마켓이 선정한 상품입니다 </p>
+				<button type="button" class="btn_clse"><span class="sp_mw">닫기</span></button>
+			</div>
+			<!-- [D] 탭 선택 시 타이틀 변경 -->
+			<h3 class="blind">카테고리 베스트</h3>
+			<div class="mw_contbx">
+@if ( Model.Count > 0 )
+{
+				<div class="kind_artwrap">
+					<ul class="best_lst">
+@for( var i = 0; i < Model.Count; i++ )
+{
+	SearchItemModel item = Model[i];
+
+					<li>
+						<a href="@item.LinkURL">						
+							<span class="img_box">
+								<em class="rank_num">@(i+1)</em>
+								<img src="@item.ImageUrl" alt="">
+							</span>
+							<span class="txt_box">
+								<strong class="prd_tit">@item.GoodsName</strong>
+								<span class="price_box">
+									<span class="origin_price"><span class="blind">정가</span>@CurrencyUtil.ToMoney( @item.SellPrice.ToString(), true )</span>
+									<strong class="sale_price"><span class="blind">할인가</span>@CurrencyUtil.ToMoney( @item.DispPrice.ToString(), true )</strong>
+								</span>
+								<span class="option_bx">
+
+	@if( "BLUE".Equals(item.DeliveryType) )
+	{
+									<span class="opt_free">@item.DeliveryText</span>
+	}
+	else if( "SMART".Equals(item.DeliveryType) )
+	{
+									<span class="opt_smart">@item.DeliveryText</span>
+	}
+	else if( "MOUNT".Equals(item.DeliveryType) )
+	{
+									<span class="opt_tire">@item.DeliveryText</span>
+	}	
+	else if( "GRAY".Equals(item.DeliveryType) )
+	{
+									<span class="opt_delivery">@item.DeliveryText</span>
+	}									
+								</span>
+							</span>
+						</a>
+					</li>
+}
+					</ul>
+				</div>
+}
+else
+{
+				<div class="mw_none">
+					<h4>조회된 내역이 없습니다.</h4>
+					<p></p>
+					<span class="sp_mw">Gmarket</span>
+				</div>
+}
+			</div>
+			<div class="mw_contbx">
+				
+			</div>
+		</div>
+	</div>

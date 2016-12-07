@@ -1,0 +1,150 @@
+﻿@{
+    ViewBag.Title = "홈플러스 배송 주소 설정";
+	Layout = "~/Views/Shared/_ItemLayout.cshtml";
+	CheckAppVersion checkAppVersion = new CheckAppVersion();	
+	AppVersionDigit nativeVipVersion = checkAppVersion.GetAppVersion("5.6.4");
+	bool isNativeVipVersion = checkAppVersion.CheckOverVersion(PageAttr.AppVersion, nativeVipVersion);	
+}
+
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+
+	<!-- VIP -->
+	<div class="goods">
+		<div class="prod_tit prod_tit_v2">
+			<h3>배송주소 설정</h3>
+		</div>
+		<div class="homeplus_view">
+			<div id="hplus_addresss" class="layer_hplus plus_addr">
+				<div class="l_wrap">
+					<div class="l_cont">
+						<form>
+							<ul class="addr_tab">
+								<li class="sel_addr on"><a href="#sel_addr">배송지 선택</a></li>
+								<li class="new_addr"><a href="#new_addr">새로운 주소</a></li>
+							</ul>
+							<!-- [D] 배송지 선택 -->
+							<div id="sel_addr" class="htab_view">
+								<div id="fixed_scroll_addr" class="fixed_scroll_addr scroll">
+									<ul class="h_lst_addr" id="hplus_address_ul">
+									</ul>
+								</div>
+								<div class="ft_box">
+									<span class="market_txt"></span><button id="btnSetBranch" onclick="javascript:setMyHomePlusBranch(true);return false;" class="btn_gray chk click_a">확인</button>
+								</div>
+							</div>
+							<!--// [D] 배송지 선택 -->
+							<!-- [D] 새로운 주소 -->
+							<div id="new_addr" class="new_addr_bx htab_view">
+								<div class="ipt_sec">
+									<ul class="lst_srch">
+										<li>
+											<label for="u_name">이름</label>
+											<div class="input_area"><input type="text" id="u_name" class="click_a input_txt" /></div>
+										</li>
+										<li>
+											<label for="txtZipCodeFront">주소</label>
+												<div class="code">
+													<div class="input_area"><input type="text" id="txtZipCodeFront" class="click_a input_txt" readonly="readonly" title="우편번호 앞자리" /></div>
+													<span class="dash">-</span>
+													<div class="input_area"><input type="text" id="txtZipCodeBack" class="click_a input_txt" readonly="readonly" title="우편번호 뒷자리" /></div>
+													<a href="javascript:;" class="click_a btn_zip"><span>주소찾기</span></a>
+												</div>
+											<div class="input_area sec"><input type="text" id="txtBasicAddr" readonly="readonly" class="click_a input_txt" title="기본주소" /></div>
+											<div class="input_area sec"><input type="text" id="" class="click_a input_txt" title="상세주소" /></div>
+										</li>
+										<li>
+											<label for="u_phone">연락처</label>
+											<div class="phone">
+												<div class="input_area"><input type="number" id="u_phone" class="click_a input_txt" title="전화번호 맨 앞 자리" maxlength="4" max="9999" oninput="maxLengthCheck(this)"/></div>
+												<span class="dash">-</span>
+												<div class="input_area"><input type="number" class="click_a input_txt" title="전화번호 가운데 자리" maxlength="4" max="9999" oninput="maxLengthCheck(this)"/></div>
+												<span class="dash">-</span>
+												<div class="input_area"><input type="number" class="click_a input_txt" title="전화번호 마지막 자리" maxlength="4" max="9999" oninput="maxLengthCheck(this)"/></div>
+											</div>
+										</li>
+									</ul>
+									<div class="ft_box">
+										<!-- [D] 새로운 주소 인풋에 모두 입력완료시 해당버튼 class의 disabled 와  속성 disabled 제거 처리 부탁드립니다. -->
+										<button id="btnSetBranchWithNewAddr" onclick="javascript:setMyHomePlusBranchWithNewAddr();return false;" class="btn_gray chk click_a">확인</button>
+									</div>
+								</div>
+								<!-- [D] 우편번호 검색 -->
+								<div id="zip_code" class="ser_zip">
+									<div class="adr_find">
+										<p>찾고자 하는 주소의 동(읍/면/리/가)명을 입력하세요.</p>
+										<div class="find_area">
+											<label for="adr_name">지역명</label>
+											<div class="input_area"><input type="text" id="adr_name" class="input_txt click_a"></div>
+											<button type="button" class="btn_find click_a" onclick="javascript:findZipCode(true);return false;">찾기</button>
+										</div>
+									</div>
+									<h5 class="noti" style="display:none">아래의 주소 중에서 해당 되는 주소를 선택해 주세요.</h5>
+									<div id="fixed_scroll_addr2" class="fixed_scroll_addr2 scroll">
+									<ul class="zip_lst" id="zip_lst_ul"></ul>
+									</div>
+								</div>
+								<!-- // [D] 우편번호 검색 -->
+							</div>
+							<!--// [D] 새로운 주소 -->
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+@section Script
+{
+
+<script id="tmpl_setting_delivery_address" type="text/x-handlebars-template">
+{{#each addrList}}
+<li class="chk_f">
+	<input type="radio" name="adr" id="{{AddrNo}}" class="input_rdo click_a" onclick="javascript:getHomePlusBranchName('list','{{FriendZipCode}}', null, true)";/>
+	<label for="{{AddrNo}}">
+		{{#if IsDefaultAddress}}
+		<span class="default">기본</span>
+		{{/if}}
+		<strong class="name_tit">{{FriendAddrAlias}} /</strong> <span>{{FriendHpNo}}</span>
+		<span class="sec_line">{{FriendFrontAddress}} {{FriendBackAddress}}</span>
+	</label>
+</li>
+{{/each}}
+</script>
+<script id="tmpl_zipcode_address" type="text/x-handlebars-template">
+	<ul class="zip_lst">
+		{{#each zipList}}
+		<li class="chk_f">
+			<a onclick="javascript:getHomePlusBranchName('search', '{{Zipcode}}','{{City}} {{Gu}} {{Dong}}', true);return false;">
+			<input type="radio" name="adr" id="zip{{@@index}}" class="input_rdo click_a" />
+			<label for="zip{{@@index}}">
+				<span class="z_num">{{Zipcode}}</span>
+				<span>{{City}} {{Gu}} {{Dong}} {{BunJi}}</span>
+			</label>
+			</a>
+		</li>
+		{{/each}}
+	</ul>
+</script>
+
+<script type="text/javascript">
+	var CONST_MOBILE_WEB_URL = "@Urls.MobileWebUrl";
+	var CONST_MOBILE_WEB_URL_SECURE = "@Urls.MobileWebUrlSecure";
+	var CONST_VIP_URL = "@Urls.MItemWebURL" + "/Item?goodsCode=" + "@ViewBag.GoodsCode";
+	var isApp = @PageAttr.IsApp.ToString().ToLower();
+	var isNative = @isNativeVipVersion.ToString().ToLower();
+	if (isApp && isNative) {
+		CONST_VIP_URL = "gmarket://closeandrefresh?goodsCode=" + "@ViewBag.GoodsCode";
+	}
+	$(document).ready(function () {
+		getMyAddrList(false);
+	});	
+</script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/HomePlusController.js"></script>
+<!--script type="text/javascript" src="@Urls.MobileWebUrlSecure/Scripts/HomePlusController.js"></script-->
+
+}

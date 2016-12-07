@@ -1,0 +1,627 @@
+﻿@{
+    ViewBag.Title = "Gmarket BizOn";
+}
+@model GMKT.GMobile.Web.Models.BizOnHomeModel
+@functions{
+	public string GetDeliveryCss(string deliveryStr)
+	{
+		String result = String.Empty;
+
+		switch(deliveryStr){
+			case "무료배송" :
+				result = "free2";
+				break;
+			case "스마트배송" :
+				result = "smart";
+				break;
+			case "조건부무료" :
+				result = "free";
+				break;
+			case "":
+				result = "";
+				break;
+			default:
+				result = "type"; //ex) 배송비 2,500
+				break;
+		}
+		return result;
+	}
+}
+<div class="bizon_head">
+	<div class="logo_wrap">
+		<h2 class="logo">biz on</h2>
+		<p class="tx">사업자 회원의 합리적인 선택</p>
+	</div>
+	<div class="hd_btn_wrap">
+		<div class="more_bx_wrap">
+			<button onclick="javascript:SnaUrlFooter('712000001');" class="btn_more">더보기</button>
+			<div class="more_bx">
+				<!-- 타이틀 -->
+				<div class="tit_wrap">
+					<h4 class="sub_tit">EASY BIZ ON</h4>
+				</div>
+				<!-- //타이틀 -->
+				<dl id="bizon_history_wrapper" class="cate_list_bx">
+				<!-- <dd>
+					<a href="#">자동차/오토바이용품 > 실내 공기청정/방향제</a>
+				</dd>
+				<!-- [D] 최근 본 카테고리 리스트가 없을 경우
+				<dd class="none">최근 카테고리가 없습니다.</dd>-->
+				</dl>
+				<div class="btn_wrap">
+					<ul class="btn_list">
+					<li>
+						<a href="@Urls.MobileWebUrl/SignUp" onclick="javascript:SnaUrlFooter('712900001');">
+							<span class="temp"></span><span class="tx">Biz On<br>회원가입</span>
+						</a>
+					</li>
+					<li>
+						<a href="@Urls.MobileWebUrl/BizOn/Guide?Type=buy" onclick="javascript:SnaUrlFooter('712900002');">
+							<span class="temp"></span><span class="tx">구매<br>가이드</span>
+						</a>
+					</li>
+					<li>
+						<a href="@Urls.MobileWebUrl/BizOn/Guide?Type=sell" onclick="javascript:SnaUrlFooter('712900003');">
+							<span class="temp"></span><span class="tx">판매<br>가이드</span>
+						</a>
+					</li>
+					<li>
+						<a href="@Urls.MobileWebUrl/CustomerCenter" onclick="javascript:SnaUrlFooter('712900004');">
+							<span class="temp"></span><span class="tx">FAQ</span>
+						</a>
+					</li>
+					</ul>
+				</div>
+				<button class="btn_clse"><span>닫기</span></button>
+			</div>
+		</div>
+		<div class="find_wrap">
+			<button onclick="javascript:SnaUrlFooter('712000002');" class="btn_find">검색</button>
+			<div class="srch_bx">
+				<form>
+					<fieldset>
+					<legend>비즈온 상품 검색</legend>
+						<div class="srch_cont">
+							<input type="text" id="bizOnKeyword" placeholder="비즈온 맞춤 상품을 검색해 보세요" class="inp_bx">
+							<button type="submit"" class="btn_srch" onclick="javascript:doBizOnSearch(); return false;"><span>검색</span></button>
+						</div>
+					</fieldset>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- //HEADER -->
+
+<hr /><!-- CONTENT -->
+<div id="content">
+	<div class="biz_cont">
+		<!-- 배너 플리킹 -->
+		<div class="banner_wrap">
+			<div id="bnGrp" class="bnGrp">
+				<ul class="img_area">
+				@if (Model.Banners != null && Model.Banners.Count > 0)
+	{
+		int bannerFcd = 712100002;	
+		foreach (GMKT.GMobile.Data.BizOnBannerT banner in Model.Banners)
+		{
+			//int bannerFcd = 712100002 + Model.Banners.IndexOf(banner);
+			<li><a href="@banner.LinkUrl" onclick="javascript:SnaUrlFooter('@bannerFcd');"><img src="@banner.ImageUrl" alt="@banner.Title"></a></li>
+			bannerFcd++;	
+		}
+	}
+				</ul>
+			</div>
+			<div id="bnTurn" class="biz_bnTurn">
+				<button type="button" id="prev" class="btn_prev" onclick="gallery1.prev();return false;"><span>이전</span></button>
+				<button type="button" id="next" class="btn_next" onclick="gallery1.next();return false;"><span>다음</span></button>
+			</div>
+			<div class="biz_bnr_btm">
+				<div class="pagi" id="bnIndex1">
+					@if (Model.Banners != null && Model.Banners.Count > 0)
+	 {
+		 for (int i = 0; i < Model.Banners.Count; i++)
+		 {
+				<a href="#" @if (i == 0)
+				{<text>class="selected"</text>}>배너로 이동</a>
+		 }
+	 }
+				</div>
+				<div class="biz_bnr_all"><a onclick="javascript:SnaUrlFooter('712100001');">펼치기</a></div>
+			</div>
+		</div>
+		<div id="layer_bnr_all" class="biz_bnr_layer">
+			<strong>사업자 회원의 합리적인 선택</strong>
+			<ul class="biz_list_bnr"></ul>
+			<button type="button" class="close">닫기</button>
+		</div>
+		<!-- //배너 플리킹 -->
+			
+		<!-- 카테고리 -->
+		<div class="cate_wrap">
+			<ul class="main_cate" style="padding-bottom:99px">
+			@if (Model.CategoryGroups != null && Model.CategoryGroups.Count > 0)
+   {
+	   int LcateFcd = 712300001;
+	   foreach (GMKT.GMobile.Web.Models.BizOnCategoryGroupModel group in Model.CategoryGroups)
+	   {
+		   int LLcateFcd = 712200001 + Model.CategoryGroups.IndexOf(group);
+		   
+			<li @if (0 == Model.CategoryGroups.IndexOf(group))
+	   {<text>class="on"</text>}>
+				<a onclick="javascript:SnaUrlFooter('@LLcateFcd');"><span class="@group.GroupClass">@group.GroupNm</span></a>
+				<ul class="sub_cate"> 
+				@if (group.GdlcCds != null && group.GdlcCds.Count > 0)
+	{
+		foreach (GMKT.GMobile.Data.BizOnGdlcT gdlc in group.GdlcCds)
+		{
+					<li><a href="" onclick="javascript:goLp('@gdlc.Code','@LcateFcd'); return false;">@gdlc.Name</a></li>
+			LcateFcd++;
+		}
+	}
+				</ul>
+			</li>
+	   }
+   }
+			</ul>
+		</div>
+		<!-- //카테고리 -->
+			
+		<!-- 타이틀 -->
+		<div class="tit_wrap">
+			<h4 class="sub_tit">BIZ ON 특가</h4>
+		</div> 
+		<!-- //타이틀 -->
+			
+		<!-- BIZ ON 특가 -->
+		<div class="biz_spcial_cont">
+			<div class="biz_on_spcial">
+				<div id="bnGrp2" class="biz_on_sec">
+				
+	@if (Model.SpecialPriceSection != null && Model.SpecialPriceSection.Count > 0)
+{
+	int specialFcd = 712400001;
+	int specialRelatedFcd = 712500001;
+	int groupCnt = Model.SpecialPriceSection.Count /2;
+	groupCnt = (Model.SpecialPriceSection.Count % 2 > 0)? groupCnt + 1: groupCnt ;
+	int GROUP_COUNT = 2;
+
+	for (int lineIndex = 0; lineIndex < groupCnt; lineIndex++)
+	{ 
+		<ul class="biz_on_group">
+		@{
+		int endCnt = (lineIndex + 1) * GROUP_COUNT;
+		if(endCnt > Model.SpecialPriceSection.Count) {endCnt= Model.SpecialPriceSection.Count; }
+		
+			for (int i = lineIndex * GROUP_COUNT ; i < endCnt ; i++)
+			{
+				if (Model.SpecialPriceSection[i] != null)
+				{
+				<li>
+					<a href="@Model.SpecialPriceSection[i].LinkURL" onclick="javascript:SnaUrlFooter('@specialFcd');" class="link">
+						<span class="img_bx"><img src="@Model.SpecialPriceSection[i].ImageURL" alt="" /></span>
+						<div class="txt_box">
+							<span class="txt">@Model.SpecialPriceSection[i].ItemTitle</span>
+							<span class="ico @GetDeliveryCss(Model.SpecialPriceSection[i].DeliveryString)">@Model.SpecialPriceSection[i].DeliveryString</span>
+							@if(Model.SpecialPriceSection[i].DiscountRate != 0){<strong class="down_per">@Model.SpecialPriceSection[i].DiscountRate<span>%</span></strong>
+							<em class="down_price">@Model.SpecialPriceSection[i].OriginalPrice</em>}
+							<strong class="price">@Model.SpecialPriceSection[i].Price</strong>
+						</div>
+					</a>
+					<a href="@Model.SpecialPriceSection[i].RelativeUrl" onclick="javascript:SnaUrlFooter('@specialRelatedFcd');" class="about_link">연관상품</a>
+				</li>
+					specialFcd++;
+					specialRelatedFcd++;
+				}
+			}
+		}
+		</ul>
+	}
+}
+				</div>
+				<div class="biz_on_pagebx">
+					<div id="bnTurn2">
+						<button type="button" id="prev2" class="btn btn_prev" onclick="gallery2.prev();return false;"><span class="sp_del">이전</span></button>
+						<button type="button" id="next2" class="btn btn_next" onclick="gallery2.next();return false;"><span class="sp_del">다음</span></button>
+					</div>
+					<div id="bnIndex2" class="pagi">
+	@if (Model.SpecialPriceSection != null && Model.SpecialPriceSection.Count > 0)
+ {
+	 int pagecnt = Model.SpecialPriceSection.Count / 2;
+	 if (Model.SpecialPriceSection.Count % 2 > 0) { pagecnt = pagecnt + 1; }
+	 for (int i = 0; i < pagecnt; i++)
+	 {
+						<a href="#" @if (i == 0)
+				  {<text>class="selected"</text>}>배너로 이동</a>
+	 }
+ }
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- //BIZ ON 특가-->
+			
+		<!-- 타이틀 -->
+		<div class="tit_wrap">
+			<h4 class="sub_tit">BIZ ON BEST</h4>
+			<a href="@Urls.MobileWebUrl/BizOn/Best" onclick="javascript:SnaUrlFooter('712600001');" class="more">더보기</a>
+		</div>
+		<!-- //타이틀 -->
+			
+		<!-- BIZ ON BEST -->
+		<ul class="biz_list_type">
+		@if (Model.BestSection != null && Model.BestSection.Count > 0)
+  {
+	  int bestFcd = 712600002;
+	  foreach (GMKT.GMobile.Data.BizOnItem item in Model.BestSection)
+	  {
+			<li>
+				<a href="@item.LinkURL" onclick="javascript:SnaUrlFooter('@bestFcd');">
+					<div class="img_bx">
+						@if(item.DiscountRate != 0){<span class="sale">@item.DiscountRate<span>%</span></span>}
+						<img src="@item.ImageURL" alt="">
+					</div>
+					<div class="info_bx">
+						<strong class="tit">@item.ItemTitle</strong>
+						<div class="price_wrap">
+							@if(item.DiscountRate != 0){<span class="per_price">@item.OriginalPrice</span>}
+							<strong class="price">@item.Price</strong>
+							<span class="ico @GetDeliveryCss(item.DeliveryString)">@item.DeliveryString</span>
+						</div>
+					</div>
+				</a>
+			</li>
+		  bestFcd++;
+	  }
+  }
+		</ul>
+		<!-- //BIZ ON BEST -->
+			
+		<!-- 타이틀 -->
+		<div class="tit_wrap">
+			<h4 class="sub_tit">추천검색어 인기상품</h4>
+		</div>
+		<!-- //타이틀 -->
+			
+		<ul class="biz_pop_list">
+	@if (Model.KeywordSection != null && Model.KeywordSection.Count > 0)
+ {
+	 int keywordFcd = 712800001;
+	 foreach (GMKT.GMobile.Data.KeywordSection group in Model.KeywordSection)
+	 {
+			<li @if (0 == Model.KeywordSection.IndexOf(group))
+	   {<text>class="selected"</text>}>
+				<a onclick="javascript:SnaUrlFooter('@keywordFcd');">@group.Keyword</a>
+				<ul class="pop_list_bx">
+				@if (group.Item != null && group.Item.Count > 0)
+	{
+		foreach (GMKT.GMobile.Data.BizOnItem item in group.Item)
+		{
+					<li>
+						<a href="@item.LinkURL">
+							<span class="img"><img src="@item.ImageURL" alt=""></span>
+							<span class="tx">@item.ItemTitle</span>
+							<span class="price">@item.Price</span>
+						</a>
+					</li>
+		}
+	}
+				</ul>
+			</li>
+	keywordFcd++;
+	 }
+ }
+		</ul>
+	</div>
+	@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "bizon", ShareFcdCode = "704600017", ShortcutFcdCode = "704600018", TargetUrl = (@Urls.MobileWebUrl + "/BizOn"), Title = "Gmarket BizOn" })
+
+</div>
+<!-- //CONTENT -->
+<hr />@section Css{	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/main.css" />
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/bizon.css" />
+}@section scripts
+{	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>	<script type="text/javascript">
+	function doBizOnSearch() {
+		//뒤공백 제거 후 비교
+		var keyword = $("#bizOnKeyword").val().replace(/\s*$/, "");
+		if (keyword == "") {
+			alert("검색어를 입력해 주세요");
+		} else {
+			var url = "@Urls.MobileWebUrl/Search/Search?primeKeyword=" + keyword + "&isBizOn=Y";
+			document.location.href = url;
+		}
+	}
+
+	function goLp(categoryCd, fcd) {
+		SnaUrlFooter(fcd);
+		document.location.href = "/BizOn/List?bizOnCategoryCode=" + categoryCd;
+	}
+
+	function ifGdscExist(a, opts) {
+
+		if (typeof a === 'undefined' || a == null || a == '')
+			return opts.inverse(this);
+		else
+			return opts.fn(this);
+	}
+
+	$(document).ready(function () {
+		if (typeof AndroidLocalStorage != "undefined" && AndroidLocalStorage) {
+			mobileLocalStorage = AndroidLocalStorage;
+		}
+		KakaoInit();
+		ShareTo("kakaotalk");
+
+		if (mobileLocalStorage) {
+			var $bizOnHisoryWrapper = $("#bizon_history_wrapper");
+			var bizOnHistoryTemplate = Handlebars.compile($("#bizon_history_template").html());
+			Handlebars.registerHelper('ifGdscExist', ifGdscExist);
+
+			var bizOnHistory = mobileLocalStorage.getItem("GMKTBizOnHistory");
+
+			if (bizOnHistory != undefined && bizOnHistory != null && bizOnHistory != "") {
+				bizOnHistory = JSON.parse(bizOnHistory);
+			}
+
+			if (bizOnHistory != null && bizOnHistory.length > 0) {
+				$bizOnHisoryWrapper.html(bizOnHistoryTemplate({ data: bizOnHistory.reverse() }));
+			} else {
+				$bizOnHisoryWrapper.html(bizOnHistoryTemplate({ data: null }));
+			}
+		}
+	});
+
+	var ShareTo = function (type) {
+		var dataName = "G마켓 BizOn";
+		switch (type) {
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "BizOn";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name": dataName,
+			"url": "@Urls.MobileWebUrl" + "/BizOn",
+			"title": ""
+		};
+		if (type == "kakaotalk") {
+			KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+		}
+		else {
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data))
+		}
+	};
+
+	
+	</script>
+
+	 <!-- layer -->
+	<script type="text/javascript">
+		var layer_banner_all = {}
+		layer_banner_all.items = [];
+		$(window).load(function () {
+			var $box_list_bnr = $('#layer_bnr_all')
+			var $list_bnr = $('#layer_bnr_all .biz_list_bnr');
+			var $list_bnr_close = $box_list_bnr.find('.close');
+			var box_list_items = '';
+			$('.biz_bnr_all > a').on('click', function () {
+				$box_list_bnr.show();
+
+				$("<div id='mask' selected='true'></div>").appendTo("#wrap");
+				for (var i = 0; i < layer_banner_all.items.length; i++) {
+					box_list_items += '<li>' + layer_banner_all.items[i] + '</li>';
+				}
+				$list_bnr.html(box_list_items);
+				setTimeout(function () {
+					$('#wrap #mask').on('click', function (e) {//131206 body--> #mask 수정
+						if (e.target.getAttribute('id') == 'mask') {
+
+							$('#wrap #mask').off(); //131206 body--> #mask 수정
+							layer_banner_all.items = [];
+							$box_list_bnr.hide();
+							$("#wrap #mask").remove();
+						}
+					});
+				}, 100);
+			});
+			$list_bnr_close.on('click', function () {
+				$('#wrap #mask').off(); //131206 body--> #mask 수정
+				layer_banner_all.items = [];
+
+				setTimeout(function () {
+					$box_list_bnr.hide();
+					$("#wrap #mask").remove();
+				}, 300)
+				return false;
+			});
+		});
+	</script>
+	<!-- banner -->	<script type="text/javascript">
+
+		var gallery1,
+			el,
+			i,
+			page,
+			dots1 = document.querySelectorAll('#bnIndex button');
+		dots12 = document.querySelectorAll('#bnIndex1 a');
+
+		/* HTML 파싱 */
+		var bnGrpList1 = $("#bnGrp li");
+
+		if (1 < bnGrpList1.length) {
+
+			var bnGrpListAtag1 = [];
+
+			var bnGrpListAtag1_planned = [];
+
+			for (var j = 0; j < bnGrpList1.length; j++) {
+				bnGrpListAtag1_planned[j] = bnGrpList1[j].innerHTML;
+				bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+			}
+			layer_banner_all.items = bnGrpListAtag1_planned;
+
+			var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+			/* //HTML 파싱 */
+
+			gallery1 = new SwipeView('#bnGrp', {
+				numberOfPages: bnGrpListAtag1.length,
+				hastyPageFlip: true,
+				flickTime: 1000 // 4초후 
+			});
+
+			// Load initial data
+			for (i = 0; i < 3; i++) {
+
+				if (1 == bnGrpListAtag1.length) {
+					page = i == 0 || 2 ? bnGrpListAtag1.length - 1 : i - 1;
+				}
+				else {
+					page = i == 0 ? bnGrpListAtag1.length - 1 : i - 1;
+				}
+
+				el = document.createElement('span');
+				el.innerHTML = bnGrpListAtag1[page];
+				gallery1.masterPages[i].appendChild(el)
+
+				el.width = bnGrpListAtag1[page].width;
+				el.height = bnGrpListAtag1[page].height;
+				el.onload = function () { this.className = ''; }
+			}
+
+			gallery1.onFlip(function () {
+				var el,
+					upcoming,
+					i;
+
+				for (i = 0; i < 3; i++) {
+					upcoming = gallery1.masterPages[i].dataset.upcomingPageIndex;
+
+					if (upcoming != gallery1.masterPages[i].dataset.pageIndex) {
+						el = gallery1.masterPages[i].querySelector('span');
+						el.innerHTML = bnGrpListAtag1[upcoming];
+					}
+				}
+				document.querySelector('#bnIndex1 .selected').className = '';
+				dots12[gallery1.pageIndex].className = 'selected';
+			});
+
+			flicking("bnGrp", "prev", "next");
+
+		} else if (1 == bnGrpList1.length) {
+
+			var bnGrpListAtag1 = [];
+
+			for (var j = 0; j < bnGrpList1.length; j++) {
+				bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+			}
+			var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+			$("#bnGrp").append(globalBnGrpListAtag1);
+			flicking("bnGrp", "prev", "next");
+
+		} 
+	</script>
+
+	<script type="text/javascript">
+	var height = $(".biz_on_group").height();
+	var gallery2,
+		el,
+		i,
+		page,
+		dots2 = document.querySelectorAll('#bnIndex2 a');
+	/* HTML 파싱 */
+	var bnGrpList2 = $("#bnGrp2 ul");
+	if (1 < bnGrpList2.length) {
+		var bnGrpListAtag2 = [];
+		for (var j = 0; j < bnGrpList2.length; j++) {
+			bnGrpListAtag2[j] = bnGrpList2[j].innerHTML;
+		}
+		var globalBnGrpListAtag2 = bnGrpListAtag2.join(",");
+		/* //HTML 파싱 */
+		gallery2 = new SwipeView('#bnGrp2', {
+			numberOfPages: bnGrpListAtag2.length,
+			hastyPageFlip: true,
+			flickTime: 0 // 0은 작동안함
+		});
+		// Load initial data
+		for (i = 0; i < 3; i++) {
+			if (1 == bnGrpListAtag2.length) {
+				page = i == 0 || 2 ? bnGrpListAtag2.length - 1 : i - 1;
+			}
+			else {
+				page = i == 0 ? bnGrpListAtag2.length - 1 : i - 1;
+			}
+			el = document.createElement('ul');
+			el.innerHTML = bnGrpListAtag2[page];
+			gallery2.masterPages[i].appendChild(el)
+			el.width = bnGrpListAtag2[page].width;
+			el.height = bnGrpListAtag2[page].height;
+			el.onload = function () { this.className = ''; }
+		}
+		gallery2.onFlip(function () {
+			var el,
+				upcoming,
+				i;
+			for (i = 0; i < 3; i++) {
+				upcoming = gallery2.masterPages[i].dataset.upcomingPageIndex;
+				if (upcoming != gallery2.masterPages[i].dataset.pageIndex) {
+					el = gallery2.masterPages[i].querySelector('ul');
+					el.innerHTML = bnGrpListAtag2[upcoming];
+				}
+			}
+			document.querySelector('#bnIndex2 .selected').className = '';
+			dots2[gallery2.pageIndex].className = 'selected';
+		});
+	} else if (1 == bnGrpList2.length) {
+		var bnGrpListAtag2 = [];
+		for (var j = 0; j < bnGrpList2.length; j++) {
+			bnGrpListAtag2[j] = bnGrpList2[j].innerHTML;
+		}
+		var globalBnGrpListAtag2 = bnGrpListAtag2.join(",");
+
+		var globalWrap2 = globalBnGrpListAtag2.wrap("<ul>");
+		$("#bnGrp2").append(globalWrap2);
+	}
+	flicking("bnGrp2");
+	//래퍼 높이값 자동 조절
+
+	if (typeof orientationchange != "undefined") {
+		$(window).on("orientationchange", function () {
+			changeCtext('bnGrp2');
+		});
+	}
+	else {
+		$(window).on("resize", function () {
+			changeCtext('bnGrp2');
+		});
+	}
+	function changeCtext(id) {
+		var wrapObj = $('#' + id);
+		var bnrImg = wrapObj.find('ul li');
+
+		var bnrImgHeight = bnrImg.height(); //리스트 높이값
+		wrapObj.css('height', height + 'px'); //래퍼높이값 조절
+	}
+	$('#bnGrp2 ul').addClass('biz_on_group');
+
+	window.onload = function () {
+		changeCtext('bnGrp2');
+	}
+	</script>	<script type="text/x-handlebars-template" id="bizon_history_template">
+		<dt>최근 본 카테고리</dt>
+		{{#each data}}
+			<dd>
+					{{#ifGdscExist GdscName}}
+					<a href="{{Url}}"> {{GdmcName}} > {{GdscName}}</a>
+					{{else}}
+					<a href="{{Url}}"> {{GdmcName}}</a>
+					{{/ifGdscExist}}
+			</dd>
+		{{else}}
+			<dd class="none">최근 카테고리가 없습니다.</dd>
+		{{/each}}
+	</script>
+}

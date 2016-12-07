@@ -1,0 +1,795 @@
+﻿@using GMKT.GMobile.Constant;
+@using GMobile.Data.Tiger;
+@using GMobile.Data.DisplayDB;
+@using GMobile.Data.Diver;
+@using GMKT.Web.Membership
+
+@model GMKT.GMobile.Web.Models.HomeModelV2
+ 
+@{
+	PageAttr.IsMain = true;
+}
+<hr />
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+	<div class="resps_wraper type2">
+		<div class="display_bnr">
+			<div class="bnr_w">
+				<div id="bnrList" class="lst"><div class="bnrbg"></div></div>
+				<div class="h_page">
+					
+					<div id="bnrPage" class="page" onclick="$('a.bnr_all').click();"><span class="pag">1</span>/<span class="pag2">10</span></div>
+					<a href="javascript:sendPDSLogBasic('200000240','Utility');SnaUrlFooter('704300030');" class="bnr_all">배너모두보기</a>
+                    @if (Convert.ToBoolean(ViewBag.SwipeAuto))
+                    {
+                        <a href="#" class="btn_ctrl">정지</a>
+                    }
+				</div>
+			</div></div>
+			<div class="sevlist_cnt">
+				<ul class="lst_cnt">
+@if (Model.HomeIcon != null && Model.HomeIcon.Count > 0)
+{
+    foreach (var Icon in Model.HomeIcon)
+    {
+        <li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, Icon.Fcd, Icon.LinkUrl)" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog="@Icon.PdsLogJson"><img src="@Icon.ImageUrl" alt="@Icon.Text1" />@if(Icon.IsNew){<span class="new">NEW</span>}</a></li>
+    }
+    foreach (var Icon in Model.HomeIcon2)
+    {
+         <li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, Icon.Fcd, Icon.LinkUrl)" onclick="javascript:sendPDSLogFromEliment(this)" data-pdslog="@Icon.PdsLogJson}}"><img src="@Icon.ImageUrl" alt="@Icon.Text1" />@if(Icon.IsNew){<span class="new">NEW</span>}</a></li>
+    }
+
+    <li class="last"></li>
+<li class="last"></li>
+}
+
+				</ul>
+			</div>
+
+		
+		<!-- 주요서비스 w_mode -->
+		
+		<!--// 주요서비스 w_mode -->
+	</div>
+@if (PageAttr.Exid == GMKT.Web.Membership.ExIdAppEnum.SFC)
+{
+	<div class="sfc_deal">
+	@if (Model.ExternalMallTopBanner != null && Model.ExternalMallTopBanner.Count > 0 && Model.ExternalMallTopBanner[0] != null)
+ {
+     GMKT.GMobile.Data.HomeMainBanner banner = Model.ExternalMallTopBanner[0];
+		<div class="bnr_area">
+			<a href="@banner.LinkUrl" class="noBorder noBorder" onclick="SnaUrlFooter('7145100006')"><img src="@banner.ImageUrl" alt="@banner.Title"></a>
+		</div>
+ }	
+</div>	
+}
+ 
+@if (Model.ListingGroup != null && Model.ListingGroup.Count > 0)
+{ 
+	<div class="super_deal">
+    <div class="sdeal_wrap"> 
+		<div class="tit_sdeal">
+			<h3><a href="@Urls.MobileWebUrl/SuperDeal/" class="tit" onclick="javascript:sendPDSLogBasic('200000242','Link');SnaUrlFooter('716000036');"><span class="sp_sdeal">슈퍼딜</span></a></h3>
+		</div>
+		<div id="sdScroll" class="sdeal_cate">
+				<ul class="lst_cate">
+				@foreach (var category in Model.SuperDealCategoryList)
+    {
+					<li><a href="@category.LinkURL" onclick="javascript:sendPDSLogFromEliment(this);SnaUrlFooter('@category.Fcd');" data-pdslog="@category.PdsLogJson">@category.Name</a></li>
+    }
+			
+				</ul>
+			</div>
+            </div>
+		<span class="ico_loading" style="display:none">로딩중</span>
+		<div class="bx_sdeal">
+	
+
+	@*if (Model.ExternalMallListingGroup != null && Model.ExternalMallListingGroup.Count > 0 && PageAttr.Exid == GMKT.GMobile.Membership.ExIdAppEnum.SFC)
+	{
+			<div class="sfc_tit">
+					<h3><a href="http://mobile.gmarket.co.kr/Display/SpecialShopping?lcId=&sid=137982" class="noBorder noBorder" onclick="javascript:SnaUrlFooter('7145100007');">삼성가족 전용상품 <span class="ico">SALE</span></a></h3>
+			</div>	
+	}*@
+	<ul class="lst_prd">
+		@foreach (GMKT.GMobile.Data.HomeMainGroup group in Model.ExternalMallListingGroup)
+  {
+      if (group.Type == GMKT.GMobile.Data.HomeMainGroupType.ExternalMallItem)
+      {
+          int numSFCount = 0;
+          foreach (GMKT.GMobile.Data.HomeMainItem item in group.ItemList)
+          {
+              if (numSFCount == 0)
+              {
+                    @GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, false, Urls.MobileImageUrlV2, "7145100008", true, "7145100007", "7145100007", "7145100007", true);
+              }
+              else
+              {
+				@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, false, Urls.MobileImageUrlV2, "7145100008", true);
+              }
+              numSFCount++;
+          }
+      }
+  }			
+@*SFC-end*@
+@{ var i = 0; var classStr = ""; List<GMKT.GMobile.Data.HomeMainBanner> familySite = new List<GMKT.GMobile.Data.HomeMainBanner>(); ;}
+@foreach (GMKT.GMobile.Data.HomeMainGroup group in Model.ListingGroup)
+{
+    if (group.Type == GMKT.GMobile.Data.HomeMainGroupType.SuperdealItem)
+    {
+        foreach (GMKT.GMobile.Data.HomeMainItem item in group.ItemList)
+        {
+            if (i < 20)
+            {
+					@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, false, Urls.MobileImageUrlV2, "716000043", false, "716000045", "716000046", "716000044");
+            }
+            else
+            {
+					@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, true, Urls.MobileImageUrlV2, "716000043", false, "716000045", "716000046", "716000044");
+            }
+
+            i++;
+
+        }
+    }
+	else if(group.Type == GMKT.GMobile.Data.HomeMainGroupType.ListingDABanner)
+	{
+				<li class="box deal_ad da_ad_box" id="listingDA_@group.Title" exposearea="@group.Title">
+					<div class="bx_prd">
+						<div class="ad_area">
+						</div>
+					</div>
+				</li>
+	}
+    else if (group.Type == GMKT.GMobile.Data.HomeMainGroupType.ListingBanner1)
+    {
+        var rnd = new Random();
+			<li class="box deal_ad">
+				<div class="bx_prd">
+				<div class="ad_area">
+					<div class="swiper-container">
+						<div class="swiper-wrapper">
+							@foreach (GMKT.GMobile.Data.HomeMainBanner banner in group.BannerList.OrderBy(a => rnd.Next()).ToList())
+       {
+           string imageUrl = (banner.AnimatedImageUrl != null && banner.AnimatedImageUrl != String.Empty) ? banner.AnimatedImageUrl : banner.ImageUrl;
+           //string trackingUrl = (banner.TrackingUrl != null && banner.TrackingUrl != String.Empty) ? banner.TrackingUrl : "";
+           string linkURL = linkURL = banner.LinkUrl; //GlobalFunction.GetSnaUrl(PageAttr.IsMain, banner.Fcd, banner.LinkUrl);	
+									<div class="swiper-slide">
+									<a href="@linkURL" onclick="javascript:sendPDSLogFromEliment(this);sendClickLog(event, '@banner.ClickUrl', @linkURL, this);" data-pdslog="@banner.PdsLogJson" impid=""><img src="@imageUrl" alt="" ad="@banner.ImpUrl" /></a>
+									</div>
+           if (!string.IsNullOrEmpty(banner.Text1))
+           {
+					                        <div class="txt_wrap"><p class="txt c1">@banner.Text1<br /><strong>@banner.Text2</strong></p></div>
+           }
+       }
+						    </div>
+						    
+							<div class="swiper-pagination"></div>
+					      </div>
+				        </div>
+					
+				        </div>
+			   </li>
+                                
+    }
+    else if (group.Type == GMKT.GMobile.Data.HomeMainGroupType.ListingBanner2)
+    {
+        var rnd = new Random();
+	<li class="box deal_ad">
+				<div class="bx_prd">
+				
+				<div class="ad_area">
+					<div class="swiper-container">
+						<div class="swiper-wrapper">
+							@foreach (GMKT.GMobile.Data.HomeMainBanner banner in group.BannerList.OrderBy(a => rnd.Next()).ToList())
+       {
+           string imageUrl = (banner.AnimatedImageUrl != null && banner.AnimatedImageUrl != String.Empty) ? banner.AnimatedImageUrl : banner.ImageUrl;
+           string linkURL = GlobalFunction.GetSnaUrl(PageAttr.IsMain, banner.Fcd, banner.LinkUrl);  //GlobalFunction.GetSnaUrl(PageAttr.IsMain, banner.Fcd, banner.LinkUrl);	
+												                    <div class="swiper-slide">
+														                    <a href="@linkURL"><img src="@imageUrl" alt=""></a>
+													                    </div>
+       }
+						</div>
+						<!-- Add Pagination -->
+								<div class="swiper-pagination"></div>
+							</div>
+						</div>	
+					</div>
+				</li>
+    }
+    else if (group.Type == GMKT.GMobile.Data.HomeMainGroupType.ListingBanner3)
+    {
+        var rnd = new Random();
+				<li class="box deal_ad">
+					<div class="bx_prd">	
+						<div class="ad_area">
+							<div class="swiper-container">
+								<div class="swiper-wrapper">
+		@foreach (GMKT.GMobile.Data.HomeMainBanner banner in group.BannerList.OrderBy(a => rnd.Next()).ToList())
+		{
+			string imageUrl = (banner.AnimatedImageUrl != null && banner.AnimatedImageUrl != String.Empty) ? banner.AnimatedImageUrl : banner.ImageUrl;
+			string linkURL = GlobalFunction.GetSnaUrl(PageAttr.IsMain, banner.Fcd, banner.LinkUrl);  //GlobalFunction.GetSnaUrl(PageAttr.IsMain, banner.Fcd, banner.LinkUrl);	
+									<div class="swiper-slide">
+										<a href="@linkURL"><img src="@imageUrl" alt=""></a>
+									</div>
+		}
+								</div>
+								<!-- Add Pagination -->
+								<div class="swiper-pagination"></div>
+							</div>
+						</div>
+					</div>
+				</li>
+    }
+    else if (group.Type == GMKT.GMobile.Data.HomeMainGroupType.FamilySite)
+    {
+        familySite = group.BannerList;
+    }
+}
+		<li class="box">
+			<div class="bx_prd bx_banner ty6">
+				<p class="stit">패밀리 사이트</p>
+				<ul>
+					@{
+
+foreach (var familyItem in familySite)
+{
+		<li class="@familyItem.ImageCss"><a href="@familyItem.LinkUrl" class="bx_site" onclick="javascript:sendPDSLogFromEliment(this);SnaUrlFooter('@familyItem.Fcd');" data-pdslog="@familyItem.PdsLogJson">@familyItem.Text1<br /><strong>@familyItem.Text2</strong><span>바로가기</span></a></li>
+}
+					}
+				</ul>
+			</div>
+		</li>
+</ul>
+
+		</div>
+		<a href="@Urls.MobileWebUrl/SuperDeal/" onclick="javascript:sendPDSLogBasic('200000243','Link');SnaUrlFooter('716000037');" class="btn_all">전체보기</a>
+    
+	</div>
+}
+	<div id="view_bnr_all">
+		<div class="lay_tit"><strong>추천 이벤트</strong></div>
+		<div class="list_bnr"></div>
+		<a class="close" href="#"><span>닫기</span></a>
+        <!--140305 닫기추가-->
+		<span class="cls">
+        <button type="button" class="close"><span>닫기</span></button>
+	</div>
+@if (Model.HasHomeNotice && Model.HomeNotice != null)
+{
+	@* 전면광고 레이어 *@
+	<div id="layer_hmBanner" class="layer_hm_banner" data-seq="@Model.HomeNotice.Seq" style="display:none;">
+		<div class="img_bx">
+			<a href="@Model.HomeNotice.LandingUrl" onclick="javascript:sendPDSLogFromEliment(this)" data-pdslog="@Model.HomeNotice.PdsLogJson"><img src="@Model.HomeNotice.BannerImageUrl" alt="@Model.HomeNotice.Title" /></a>
+		</div>
+		<a href="#" class="btn_close" onclick="popBlockUI('layer_hmBanner'); return false;">닫기</a>
+	</div>
+	@* // 전면광고 레이어 *@
+}
+@if (Model.HasLGUPlusNotice && Model.LGUPlusNotice != null && ViewBag.IsUPlusIpAddress)
+{
+    <div id="layer_lgUBanner" class="ly_lgu" data-seq="@Model.LGUPlusNotice.DailySeq" style="display:none;">
+		<div class="ly_img" data-pdslog="@Model.LGUPlusNotice.PdsLogImpression">
+			<a href="@Model.LGUPlusNotice.LandingUrl" class="btn_view" onclick="sendPDSLogFromEliment(this);" data-pdslog="@Model.LGUPlusNotice.PdsLogDetail"><span class="blind">자세히 보기</span></a>
+			<button type="button" class="btn_clse"  data-pdslog="@Model.LGUPlusNotice.PdsLogDoNotSee"><span class="blind">한 달간 보지 않기</span></button>
+			<button type="button" class="btn_clse2" data-pdslog="@Model.LGUPlusNotice.PdsLogClose"><span class="blind">닫기</span></button>				
+		</div>
+	</div>
+}
+
+	<a href="#" class="btn_top_main">Top으로 이동</a>
+	<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+</div>
+<!-- //CONTENT -->
+<script type="text/x-handlebars-template" id="homead_template">
+	<div class="li {{getHomeAdBannerClass this}}">
+		<a href="{{LinkUrl}}" onclick="sendPDSLogFromBanner(this);SnaUrlFooter('704300001');sendClickLog(event, '{{ClickUrl}}', '{{LinkUrl}}', this);" data-pdslog="{{PdsLogJson}}">
+			<img src="{{ImageUrl}}" imp="{{TrackingUrl}}" impId="" firstExposureYn="{{FirstExposureYn}}"/>
+		</a>
+	</div>
+</script>
+<script type="text/x-handlebars-template" id="listingad_template">
+<div class="swiper-container">
+	<div class="swiper-wrapper">	
+	{{#each RandomBannerList}}		
+		<div class="swiper-slide">
+			<a href="{{LinkUrl}}" onclick="sendPDSLogFromBanner(this);sendClickLog(event, '{{ClickUrl}}', '{{LinkUrl}}', this);"  data-pdslog="{{PdsLogJson}}">
+				<img src="{{ImageUrl}}" alt="" ad="{{ImpUrl}}" impId=""/>
+			</a>
+		</div>		
+		{{#ifNotEmpty Text1}}
+		<div class="txt_wrap"><p class="txt c1">{{Text1}}<br /><strong>{{Text2}}</strong></p></div>
+		{{/ifNotEmpty}}
+	{{/each}}
+	</div>
+	<div class="swiper-pagination"></div>
+</div>
+</script>
+@section scripts
+{
+<script type="text/javascript">
+var listingDASlide = function($el){
+	var smartSwiper;
+	//var $el = $('#'+elId);
+	if($el.find('.swiper-container').size() > 0) {
+		$el.find('.swiper-container').each(function(){
+			var $this = $(this);				
+			smartSwiper = new Swiper($(this), {
+				slidesPerView: 'auto',
+				centeredSlides: true,
+				spaceBetween: 0,
+				pagination: $(this).find('.swiper-pagination'),
+				paginationClickable: true,
+				onSlideChangeEnd: function (swiper) {
+					var $img = $this.find('.swiper-slide-active img');
+					var trackingUrl = $img.attr('ad');
+					sendImpressionLog(trackingUrl, $img);
+				}
+			});
+			var $img = $this.find('.swiper-slide-active img');
+			var trackingUrl = $img.attr('ad');
+			sendImpressionLog(trackingUrl, $img);
+		});
+	}
+};
+
+Handlebars.registerHelper("ifNotEmpty", function (str, opts) {
+	if(str && str !== '')
+		return opts.fn(this);
+	else
+		return opts.inverse(this);
+});
+
+Handlebars.registerHelper("getHomeAdBannerClass", function (obj) {
+	return (obj && obj.TrackingUrl && obj.TrackingUrl !== "") ? "home_da_ad" : "";
+});
+
+function getHomeListingDABanner(exposeArea) {
+	var $el = $('#listingDA_'+exposeArea);
+	$.ajax({
+		url: '@Urls.MobileWebUrl/Home/GetHomeListingDABanner?exposeArea=' + exposeArea,
+		success: function(group) {
+			if(group && group.BannerList && group.BannerList.length > 0) {
+				var daTemplate = Handlebars.compile($('#listingad_template').html());
+				$el.find('.ad_area').html(daTemplate({RandomBannerList : group.BannerList}));
+				//TODO by sue
+				listingDASlide($el);
+			} else {
+				$el.remove();
+			}			
+		},
+		error: function() {
+			$el.remove();
+		}
+	});
+}
+
+$(document).ready(function () {
+	$(".superdeal_lazy").lazyload({
+		effect: "fadeIn",
+		threshold: 400
+	});
+
+	var wdW = $(window).width();
+	var responseRatio = 64;
+	var imgW = 640;
+	var imgH = 294;
+	var tgH;
+	if(wdW >=610){
+		var w = wdW*responseRatio/100; 
+		tgH = w*imgH / imgW;
+	}
+	else{
+		tgH = wdW*imgH / imgW;
+	}
+	$("#bnrList").height(tgH);
+	$(".bnrbg").remove();
+
+	topBanerList = setDataArray(topBanerList, 1);
+	//spcListScroller = swipeGmk(topBanerList, "#bnrList", "bnrPage", true, false, @Model.CountOfExternalMallAdBanner);
+    spcListScroller = swipeGmk(topBanerList, "#bnrList", "bnrPage", true , swipeAuto);
+
+    /* landing Banner 9 */
+    var em = eModule
+        , apps = em.apps
+        , landing = apps.landing;
+
+    landing.init({
+        pageName: 'Home',
+        landingType: '@Model.LandingBanner.Type',
+        imageUrl: '@Model.LandingBanner.ImageUrl',
+        description: '@Model.LandingBanner.Description',
+        campaign: '@Model.Campaign.Name',
+        medium: '@Model.Campaign.Medium',
+        mediumSource: '@Model.Campaign.MediumSource',
+	    mediumContent: '@Model.Campaign.MediumContent',
+        term: '@Model.Campaign.Keyword'
+    });
+
+    $("#lay_notice").on('click','#goToApp' , function(e){
+        e.preventDefault();
+        landing.installApp();
+    }).on('click', '#landingClose', function(e){
+        e.preventDefault();
+        landing.close();
+    });
+    /* landing Banner 9 */
+
+	$(".da_ad_box").each(function(){
+		var exposeArea = $(this).attr('exposearea');
+		getHomeListingDABanner(exposeArea);
+	});
+});
+
+var topBanerList = [];
+//var topFirstExposureBanerList = [];
+var homeadModel = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.HomeAdBanner));
+var swipeAuto = @ViewBag.SwipeAuto;
+var template = Handlebars.compile($('#homead_template').html());
+homeadModel.forEach(function(el){ topBanerList.push(template(el)); });
+
+function swipeGmk(data, areaId, pageId, random, auto, count)
+{
+	var dots;
+	var tempSwipe = new SwipeView(areaId, { numberOfPages: data.length, autoSwipe:auto });
+	if(pageId != null && pageId != '')
+	{
+		$('.pag').text(tempSwipe.pageIndex + 1);	
+		$('.pag2').text(data.length);
+	}
+
+	for (var i=0; i<3; i++) 
+	{
+		var page = i==0 ? data.length-1 : data.length==1 ? 0 : i-1;
+		tempSwipe.masterPages[i].innerHTML = data[page];
+	}
+
+	tempSwipe.onFlip(function () {
+		var upcoming;
+
+		for (var i=0; i<3; i++) 
+		{
+			upcoming = tempSwipe.masterPages[i].dataset.upcomingPageIndex;
+
+			if (upcoming != tempSwipe.masterPages[i].dataset.pageIndex) {
+				tempSwipe.masterPages[i].innerHTML = data[upcoming];
+			}	
+		}
+		if(pageId != null && pageId != '')
+		{
+			$('.pag').text(tempSwipe.pageIndex + 1);	
+		}
+
+		var impUrl = $(tempSwipe.wrapper).find('.swipeview-active img').attr('imp');
+		if(impUrl && impUrl !== '') sendImpressionLog(impUrl, $(tempSwipe.wrapper).find('.swipeview-active img'));
+		var bannerImpPdsLog = $(tempSwipe.wrapper).find('.swipeview-active').find('a').data('pdslog');
+		sendPDSImpressionLog(bannerImpPdsLog);
+	});
+		
+	var index = 0;
+    
+	if(random)
+	{
+		var length = (count > 0) ? count : data.length;
+		index = Math.floor(Math.random() * length) % length;
+	    
+        if(!auto){
+            index = @Model.FirstExposureMainBannerIndex;
+        }
+
+		tempSwipe.goToPage(index);
+	}
+	if(auto)
+	{
+		tempSwipe.t = setInterval(function() {tempSwipe.next();}, 4000);
+	}
+    $('.display_bnr .btn_ctrl').click(function(){
+			if(!$(this).hasClass('btn_play')){
+				clearInterval(tempSwipe.t);
+				$(this).addClass('btn_play');
+                $(this).text('시작');
+			}else{
+				tempSwipe.t = setInterval(function() {tempSwipe.next();}, 4000);
+				$(this).removeClass('btn_play');
+                $(this).text('정지');
+			}
+			
+		});
+
+	return tempSwipe;
+}
+
+function setDataArray(data, dispCnt){
+	if(dispCnt > 1)
+	{
+		var totDispCnt = data.length;
+		var totPage = Math.floor(data.length / dispCnt);
+		var tmpArr = new Array();
+		var tmpHtml = '';
+		for(var i=0; i < totPage; i++)
+		{
+			for(var j = 0; j < dispCnt; j++){
+				tmpHtml += data[i*dispCnt+j];
+			}
+			tmpArr[i] = tmpHtml;
+			tmpHtml = '';
+		}	
+		return tmpArr;
+	} else {
+		return data;
+	}
+}
+	
+//래퍼 높이값 자동 조절
+window.onload = function(){changeCtext('bnrList');}
+
+if (typeof orientationchange != "undefined"){
+	$(window).on("orientationchange", function(){
+		changeCtext('bnrList');
+	});
+} else{
+	$(window).on("resize",function(){
+		changeCtext('bnrList');
+	});
+};
+
+function changeCtext(id){
+	var wrapObj = $('#' + id);
+	var bnrImg = wrapObj.find('a > img');
+	var bnrImgHeight = bnrImg.height();//이미지높이값
+	wrapObj.css('height',bnrImgHeight+'px');//래퍼높이값 조절
+		
+	//ios7에서 높이값 잡지 못하는 버그	
+	$('#swipeview-slider').children().height(bnrImgHeight);
+};
+
+function sendImpressionLog(trackingUrl, $img) {
+	if (trackingUrl != undefined) {
+		var imgTag = document.createElement('img');	// new Image(1, 1);
+		var impId =  uuid.v1().replace(/-/g, ""); //imp log 날릴때 uuid 생성
+		$img.attr('impId', impId);
+		imgTag.src = trackingUrl + "&impId=" + encodeURIComponent(impId);
+	}
+}
+
+function sendClickLog(e, clickUrl, landingUrl, el) {
+	var landingCb = function(){	document.location.href = landingUrl; };
+	if(typeof adprofiler === 'object' && typeof adprofiler.sendAd === 'function' && clickUrl != '') {
+		e.preventDefault();
+		setTimeout(landingCb, 0);
+		var impId = $(el).find('img').attr('impId'); //imp log 날릴때 생성한 uuid
+		adprofiler.sendAd(clickUrl + "&impId=" + encodeURIComponent(impId), landingCb);
+	}
+}
+</script>
+
+<script type="text/javascript">
+	$(function () {
+		//$('.lst_prd').masonry({
+		//	// options
+		//	itemSelector: '.box',
+		//	percentPosition: true
+		//});
+	});
+
+	var layer_banner_all = {}
+
+	var IsLogin = "@ViewBag.IsLogin";
+	var MWebUrl = "@ViewBag.MWebUrl";
+	var MItemWebURL = "@ViewBag.MItemWebURL";
+
+	$(window).load(function () {
+		layer_banner_all.items = topBanerList;
+		var $box_list_bnr = $('#view_bnr_all')
+		var $list_bnr = $('#view_bnr_all .list_bnr');
+		var $list_bnr_close = $box_list_bnr.find('.close');
+		var box_list_items = '';
+		$('a.bnr_all').on('click', function () {
+			$box_list_bnr.show();
+			$('#wrap').addClass('no_highlight');
+			$("<div id='mask' selected='true' style='z-index:310'></div>").appendTo("#wrap");
+			for (var i = 0; i < layer_banner_all.items.length; i++) {
+				box_list_items += layer_banner_all.items[i];
+			}
+			$list_bnr.html(box_list_items);
+
+			$list_bnr.find("div.home_da_ad img").each(function (index, img) {
+				var url = $(img).attr('imp');
+				sendImpressionLog(url, $(img));
+			});
+			
+			setTimeout(function () {
+				$('#wrap #mask').on('click', function (e) {
+					if (e.target.getAttribute('id') == 'mask') {
+						$('#wrap').removeClass('no_highlight');
+						$('#wrap #mask').off();
+						layer_banner_all.items = [];
+						$box_list_bnr.hide();
+						$("#wrap #mask").remove();
+					}
+				});
+			}, 100);
+		});
+		$list_bnr_close.on('click', function () {
+			$('#wrap #mask').off();
+			layer_banner_all.items = [];
+			$('#wrap').removeClass('no_highlight');
+			setTimeout(function () {
+				$box_list_bnr.hide();
+				$("#wrap #mask").remove();
+			}, 300)
+			return false;
+		});
+	});
+$('.sp_sdeal.btn_zzim').click(function (e) {
+    e.preventDefault();
+	    if ($(this).attr("isSoldOut") != "True") {
+	        SnaUrlFooter('716000044');
+	        
+
+	        var el = this;
+	      
+	        var parameter = "itemNos=" + $(el).attr("goodscode");
+	        $.getJSON("/Common/AddFavoriteItems?" + parameter,
+				function (data) {
+				    var result = data.result;
+				    if (result == 0) {
+				        if (!$(el).hasClass('btn_zzim_on')) {
+				            $(el).addClass("btn_zzim_on");
+				            superInter();
+
+				        } else {
+				            //	$(el).parent(".u_area.ly_inter").remove();
+				            $(el).removeClass("btn_zzim_on");
+				        }
+				    } else {
+				        alert(data.msg);
+				        if (result == -100) {
+				            location.href = "@Urls.MobileWebUrl/Login/Login";
+				        }
+				    }
+				}
+			);
+	    }
+
+	});
+	
+</script>
+
+<script type="text/javascript">
+	var responMain = {};
+	var flag_resp;
+	responMain.$service = $('.sevlist_cnt .lst_srv');
+	responMain.$service2 = $('.resps_gow .sevlist_wp2');
+	responMain.$serviceHTML = responMain.$service.html();
+
+	function playResponse() {
+		responMain.$winWidth = window.innerWidth;
+		console.log(window.innerWidth)
+		if (responMain.$winWidth > 610) {
+			if (responMain.$service2.children().size() == 0) {
+				var $tag = responMain.$service.children().detach();
+				responMain.$service2.append($tag);
+			}
+		}
+		else {
+			if (responMain.$service.children().size() == 0) {
+				var $tag = responMain.$service2.children().detach();
+				responMain.$service.append($tag);
+			}
+		}
+	}
+</script>
+
+	@if (Model.HasHomeNotice)
+ {
+@* 전면광고 레이어 *@
+<script type="text/javascript">
+    var $homeNoticeLayer = $("#layer_hmBanner");
+    var $lgUPlusNoticeLayer = $("#layer_lgUBanner");
+
+	function showHomeNotice() {
+		if ($homeNoticeLayer.length > 0) {
+			$homeNoticeLayer.show();
+
+			$homeNoticeLayer.find(".btn_close").click(function () {
+			    $('body').unbind('touchmove');
+			    checkLgUPlusNotice();
+			});
+			$("<div id='mask' selected='true'></div>").appendTo("#content");
+			$('body').bind('touchmove', function (e) { e.preventDefault() });
+
+			if (typeof mobileLocalStorage !== "undefined") {
+				mobileLocalStorage.setItem("GMobileHomeNoticeHideSeq", $homeNoticeLayer.data("seq"));
+			}
+
+			var noticeImpPdsLog = $homeNoticeLayer.find('.img_bx').find('a').data('pdslog');
+			sendPDSImpressionLog(noticeImpPdsLog);
+		}
+    }
+
+    function showLgUPlusNotice() {
+        if ($lgUPlusNoticeLayer.length > 0) {
+            $lgUPlusNoticeLayer.show();
+
+            if (typeof mobileLocalStorage !== "undefined") {
+                mobileLocalStorage.setItem("GMobileLgUPlusNoticeHideSeq", $lgUPlusNoticeLayer.data("seq").toString());
+            }
+
+            $lgUPlusNoticeLayer.find(".btn_clse").click(function (e) {
+                sendPDSLogFromEliment(this);
+                popBlockUI('layer_lgUBanner');
+                if (typeof mobileLocalStorage !== "undefined") {
+                    mobileLocalStorage.setItem("GMobileLgUPlusNoticeHideSeq", $lgUPlusNoticeLayer.data("seq").toString().substring(0,$lgUPlusNoticeLayer.data("seq").toString().length -2));
+                }    
+            });
+
+            $lgUPlusNoticeLayer.find(".btn_clse2").click(function (e) {
+                sendPDSLogFromEliment(this);
+                popBlockUI('layer_lgUBanner');
+            });
+
+            var impressionLog = $lgUPlusNoticeLayer.find(".ly_img").data("pdslog");
+            sendPDSImpressionLog(impressionLog);
+        }
+    }
+
+    function checkLgUPlusNotice() {
+        if ($lgUPlusNoticeLayer.length > 0) {
+            if (typeof mobileLocalStorage !== "undefined") {
+                var hideLgUPlusSeq = mobileLocalStorage.getItem("GMobileLgUPlusNoticeHideSeq");
+                var dailyLgUPlusSeq = $lgUPlusNoticeLayer.data("seq").toString();
+                var monthlyLgUPlusSeq = $lgUPlusNoticeLayer.data("seq").toString().substring(0, $lgUPlusNoticeLayer.data("seq").toString().length - 2);
+                if (hideLgUPlusSeq == dailyLgUPlusSeq || hideLgUPlusSeq == monthlyLgUPlusSeq) {
+                    $lgUPlusNoticeLayer.remove();
+                }   
+                else {
+                    showLgUPlusNotice();
+                }
+            }
+            else {
+                showLgUPlusNotice();
+            }
+        }     
+    }
+
+    $(document).ready(function () {
+        if (typeof mobileLocalStorage !== "undefined") {
+            var hideSeq = Number(mobileLocalStorage.getItem("GMobileHomeNoticeHideSeq"));
+            if (hideSeq >= $homeNoticeLayer.data("seq")) {
+                $homeNoticeLayer.remove();
+                checkLgUPlusNotice();
+            } else {
+                showHomeNotice();
+            }
+        } else {
+            showHomeNotice();
+        }
+    });
+</script>
+@* // 전면광고 레이어 *@
+ }
+}
+
+@section scriptfiles
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/swiper.min.js?v=1"></script>
+<!--script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/masonry.pkgd.min.js"></!--script-->
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/handlebars-v1.1.2.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/PdsLogSender.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/uuid.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/ats_gmkt.js"></script>
+}
+
+@section iframes
+{
+<form id="MainWiseLogForm" name="MainWiseLogForm" method="post" >
+<iframe id="ifrMainWiseLogForm" name="ifrMainWiseLogForm" src="about:blank"  height="0" width="0" style="display:none;"></iframe>
+</form>
+}

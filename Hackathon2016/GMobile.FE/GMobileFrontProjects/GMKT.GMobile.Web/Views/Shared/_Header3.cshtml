@@ -1,0 +1,111 @@
+﻿@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Controllers;
+@using GMKT.Web.Membership
+@{
+    string rawURL = Request.RawUrl.ToLower();
+
+    if (rawURL.IndexOf("?") >= 0)
+    {
+        rawURL = rawURL.Substring(0, rawURL.IndexOf("?"));
+    }
+	
+	string jaehuid = String.Empty;
+	if (GMobileWebContext.Current != null && String.IsNullOrEmpty(GMobileWebContext.Current.JahuID) == false)
+	{
+		jaehuid = GMobileWebContext.Current.JahuID;
+	}
+}
+ 
+@if (PageAttr.ViewHeader == true)
+{
+	<!-- SKIP NAVI -->
+	<div class="hp">
+		<a href="#content">본문 바로가기</a>
+	</div>
+	<!-- //SKIP NAVI -->
+	<!-- HEADER -->
+	<div id="head" class="new @(PageAttr.IsMain ? "head_main" : "")">
+		<div id="header_wrapper">
+	@if (PageAttr.Exid == ExIdAppEnum.None)
+ {
+			<div class="hd_wrap" id="header_st">
+			</div>
+ }
+		</div>
+		<script type="text/javascript">
+			var gmHeader = new GMHeader(@PageAttr.IsMain.ToString().ToLower(), @Convert.ToInt32(PageAttr.HeaderType), "@PageAttr.HeaderCode");
+			@if (ViewBag.HeaderTitle != null && ViewBag.HeaderTitle is String && !String.IsNullOrEmpty(ViewBag.HeaderTitle))
+   {
+			<text>
+			gmHeader.setAppHeaderTitle("@Html.Raw(ViewBag.HeaderTitle)");
+			</text>
+   }
+		</script>
+
+		@if (PageAttr.HomeTabNames != null && PageAttr.HomeTabNames.Count > 0)
+  {
+            
+		<!--home tab-->
+		<div class="menu_scut" id="home_tabs">
+        <div class="inner_wrap" id="home_tabs_scroll">
+        <div class="inner">
+            @{
+      int homeTabFcdCode = 716000001;
+				int index = 1;
+      foreach (var tab in PageAttr.HomeTabNames)
+      {
+          if (tab.TabName == "e쿠폰")
+          {
+                        <a href="@GlobalFunction.GetSnaUrl(true, "716000085", tab.LinkPath)" onclick="javascript:sendPDSLogHomeHeader('@jaehuid', '@tab.TabName', '@index.ToString()');" class="@tab.ImagePath @(tab.TabName == PageAttr.HomeTabName ? " on" : "")">@tab.TabName</a>
+          }
+          else
+          {  
+					<a href="@GlobalFunction.GetSnaUrl(true, homeTabFcdCode.ToString(), tab.LinkPath)" onclick="javascript:sendPDSLogHomeHeader('@jaehuid', '@tab.TabName', '@index.ToString()');" class="@tab.ImagePath @(tab.TabName == PageAttr.HomeTabName ? " on" : "")">@tab.TabName</a>
+          }
+          homeTabFcdCode++;
+					index++;
+      }
+            }
+            </div>
+            </div>
+		</div>	
+		<!--//home tab-->
+		<script type="text/javascript">
+			function sendPDSLogHomeHeader(jaehuid, name, asn) {
+
+				var pdsData = {};
+				pdsData.AreaCode = "200000238";
+				pdsData.AreaType = "Link";
+				pdsData.Parameter = {};
+
+				pdsData.Parameter.jaehuid = jaehuid;
+				pdsData.Parameter.tabName = name;
+				pdsData.Parameter.asn = asn;
+
+				try {
+					if (typeof pvprofiler !== "undefined" && typeof pvprofiler.sendEvt !== "undefined")
+						pvprofiler.sendEvt("click", pdsData.AreaCode, pdsData.AreaType, pdsData.Parameter);
+				}
+				catch (ex) { }
+			}
+		</script>
+  }
+	</div>
+	<!--// HEADER -->
+}
+else
+{
+    if (PageAttr.Exid == ExIdAppEnum.SFC)
+    {
+        <script type="text/javascript">
+			var gmHeader = new GMHeader(@PageAttr.IsMain.ToString().ToLower(), @Convert.ToInt32(PageAttr.HeaderType), "@PageAttr.HeaderCode");
+			@if (ViewBag.HeaderTitle != null && ViewBag.HeaderTitle is String && !String.IsNullOrEmpty(ViewBag.HeaderTitle))
+               {
+			                        <text>
+			                        gmHeader.setAppHeaderTitle("@Html.Raw(ViewBag.HeaderTitle)");
+			                        </text>
+               }
+		</script>
+    }
+
+}

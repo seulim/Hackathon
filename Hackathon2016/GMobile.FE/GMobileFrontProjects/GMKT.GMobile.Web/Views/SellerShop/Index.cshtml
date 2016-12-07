@@ -1,0 +1,203 @@
+﻿@using GMKT.GMobile.Web.Models 
+@using GMKT.GMobile.Data.SellerShop
+@model SellerShopMainModel
+@{  
+    char shopLevel = Char.ToUpper(ViewBag.Shop.DisplayInfo.ShopLevel);
+
+    //0-미사용,1,2,3,4,5-상품전시형,6-동영상링크,7-브랜드형, 8-롤링형
+    int mainImageDisplayType = (shopLevel == 'P') ? ViewBag.Shop.DisplayInfo.MainImageDispType : 1;
+
+    if (mainImageDisplayType == 2 || mainImageDisplayType == 3 || mainImageDisplayType == 4 || mainImageDisplayType == 5)
+    {
+        mainImageDisplayType = 1;
+    }
+
+    string vdoKey = (mainImageDisplayType == 6 && Model.MainDisplayInfo != null && Model.MainDisplayInfo.MainImage != null) ? Model.MainDisplayInfo.MainImage.VdoKey : "";
+}
+
+@section scripts{
+    <script src="@Urls.ScriptUrl/mobile/js/masonry.pkgd.min.js "></script>
+
+    <script type="text/javascript">
+        $(function () {
+            displaySwipeItems($('[data-product-list-view="rolling"]'));
+
+            shopSwipe('shopImgSwipe'); //메인이미지
+
+            var vdoKey = "@vdoKey";
+
+            if (vdoKey)
+                getYoutubeVodInfo($("#main_video"), vdoKey, Handlebars.compile($("#main_vod_template").html()));
+        })
+    </script>
+
+    <script id="main_vod_template" type="text/x-handlebars-template">
+        <div class="main--img-video__item">
+	        <div class="item-video">
+		        {{#ifIsApp}}
+			        <a href="{{VodUrl}}">
+		        {{else}}
+			        <a href="{{VodUrl}}" target="_blank">
+		        {{/ifIsApp}}
+			        <span class="data"><img src="{{ImgUrl}}" alt="" /></span>
+			        <span class="play"></span>
+		        </a>
+	        </div>
+	        <div class="item-txt">
+		        <p class="item-txt_name">{{Title}}</p>
+                <p class="item-txt_desc"><span class="block">{{Desc}}</span></p>
+		        <p class="item-txt_source">{{VodUrl}}</p>
+	        </div>
+        </div>
+    </script>
+}
+<!-- 샵 영역 -->
+<div id="content" class="mshopCtns">
+	@Html.Partial("_SellerShopHeaderPartial")
+	<!-- 샵 바디 -->
+	<div class="shop--body">
+
+		<!-- 전시영역 -->
+		<div class="shop--display">
+
+			<!-- 메인이미지 -->
+			<div class="main-image-view">
+            @if (mainImageDisplayType == 1)
+            {
+                if (Model.MainDisplayInfo != null && Model.MainDisplayInfo.MainImage != null)
+                {
+                    if (Model.MainDisplayInfo.MainImage.Items != null && Model.MainDisplayInfo.MainImage.Items.Count > 0)
+                    {   
+                        <!-- 상품전시형 -->
+				        <div class="main--img-goods" data-product-list-view="rolling">
+					        <div class="product-title">
+						        <h2 class="product-title__name">@Model.MainDisplayInfo.MainImage.Title</h2>
+					        </div>
+					        <div class="swipe--conatiner" id="mainImageProductRollingList">
+						        <ul class="product-list">
+                                @foreach (GMKT.GMobile.Data.SellerShop.SellerShopItem item in Model.MainDisplayInfo.MainImage.Items)
+                                {
+                                    string strPrice = item.AdCouponPrice;
+                                    <li class="product-list__item">
+	                                    <div class="product">
+		                                    <div class="product__image">
+			                                    <a href="@item.LandingUrl"><img src="@item.Image400Url" alt=""></a>
+		                                    </div>
+		                                    <div class="product__body">
+			                                    <div class="product__title">
+				                                    <a href="@item.LandingUrl">@item.GoodsName</a>
+			                                    </div>
+			                                    <div class="product__price">@strPrice</div>
+		                                    </div>
+	                                    </div>
+                                    </li>
+                                }
+                                </ul>
+					        </div>
+				        </div>
+				        <!-- //상품전시형 -->
+                    }
+                }
+            }
+            else if (mainImageDisplayType == 6)
+            {
+                <!-- 동영상링크형 -->
+				<div id="main_video" class="main--img-video"></div>
+				<!-- //동영상링크형 -->
+            }
+            else if (mainImageDisplayType == 7)
+            {
+                if (Model.MainDisplayInfo.MoreMainImages != null && Model.MainDisplayInfo.MoreMainImages.Count > 0)
+                {
+                    <!-- 브랜드형 -->
+                    foreach (var i in Model.MainDisplayInfo.MoreMainImages)
+                    {
+				        <div class="main--img-brand">
+					        <div class="main--img-brand__item">
+						        <a href="@(String.IsNullOrEmpty(i.ImageLinkUrl) ? "javascript:;" : i.ImageLinkUrl)"><img src="@i.ImageUrl" alt=""></a>
+					        </div>
+				        </div>
+                    }
+				    <!-- //브랜드형 -->
+                }
+            }
+            else if (mainImageDisplayType == 8)
+            {
+                if (Model.MainDisplayInfo.MoreMainImages != null && Model.MainDisplayInfo.MoreMainImages.Count > 0)
+                {
+                <!-- 롤링형 -->
+				<div class="main--img-rolling swipe--conatiner" id="shopImgSwipe">
+					<div class="swipe--unit">
+                    @foreach (var i in Model.MainDisplayInfo.MoreMainImages)
+                    {
+						<div class="main--img__item swipe--item">
+							<a href="@(String.IsNullOrEmpty(i.ImageLinkUrl) ? "javascript:;" : i.ImageLinkUrl)"><img src="@i.ImageUrl" alt=""></a>
+						</div>
+                    }
+					</div>
+					<button type="button" class="button button--roll-prev swipe--btn"><span class="arrow-roll_left">Prev</span></button>
+					<button type="button" class="button button--roll-next swipe--btn"><span class="arrow-roll_right">Next</span></button>
+				</div>
+				<!-- //롤링형 -->
+                }
+            }
+			</div>
+			<!-- //메인이미지 -->
+
+            @if (Model.MainDisplayInfo.SelectedItem != null)
+            {
+	            <!-- 선택한 상품 -->
+	            <div class="clicked_product">
+		            <h2 class="clicked_product__title">선택한 상품</h2>
+		            <div class="clicked_product__item">
+			            <div class="c_product">
+				            <div class="c_product__image">
+					            <a href="@Model.MainDisplayInfo.SelectedItem.LandingUrl"><img src="@Model.MainDisplayInfo.SelectedItem.Image400Url" alt="" onerror="this.onerror=null;this.src='@Model.MainDisplayInfo.SelectedItem.ImageUrl';"/></a>
+				            </div>
+				            <div class="c_product__body">
+					            <div class="c_product__title">
+						            <a href="@Model.MainDisplayInfo.SelectedItem.LandingUrl">@Model.MainDisplayInfo.SelectedItem.GoodsName</a>
+					            </div>
+					            @if (Model.MainDisplayInfo.SelectedItem.DiscountRate > 0)
+                                {
+						            <div class="c_product__price-normal">
+							            <del>@Model.MainDisplayInfo.SelectedItem.SellPrice</del>
+							            <span class="rate">@Model.MainDisplayInfo.SelectedItem.DiscountRate %</span>
+						            </div>
+						            <div class="c_product__price">@Model.MainDisplayInfo.SelectedItem.AdCouponPrice</div>
+                                }
+                                else
+                                {
+						            <div class="c_product__price">@Model.MainDisplayInfo.SelectedItem.AdCouponPrice</div>
+                                }
+					            @if (Model.MainDisplayInfo.SelectedItem.Shipping == "무료배송")
+                                {
+						            <div class="c_product__delivery">
+							            <img src="http://pics.gmarket.co.kr/mobile/corner/shop/icon/ico_free.png" width="47" height="19" alt="무료배송"/>
+						            </div>
+                                }
+					            <button type="button" class="button c_button--favorite" onclick="sellershopController.addFavoriteItem(@Model.MainDisplayInfo.SelectedItem.GoodsCode)" data-goodscode="@Model.MainDisplayInfo.SelectedItem.GoodsCode"><span class="icon_favorite">관심상품</span></button>
+				            </div>
+			            </div>
+		            </div>
+	            </div>
+	            <!-- //선택한 상품 -->
+            }
+
+
+            <!-- 전시 상품, 상품 영역 -->
+            @Html.Action("ItemDisplay", new { shopDispNo = Model.MainDisplayInfo.ShopDispNo, addVideoKey = Model.MainDisplayInfo.AddVdoKey, isMain = 1 })
+            <!-- 전시 상품, 상품 영역 -->
+
+		</div>
+		<!-- //전시영역 -->
+
+	</div>
+	<!-- //샵 바디 -->
+    @if (!PageAttr.IsApp)
+    {
+	<div class="shop--overlay"></div>
+	<a href="javascript:;" class="btn_top_bar">Top으로 이동</a>
+    }
+</div>
+<!-- //샵 영역 -->

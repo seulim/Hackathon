@@ -1,0 +1,54 @@
+﻿@{
+	Layout = null;
+	CheckAppVersion checkAppVersion = new CheckAppVersion();
+	AppVersionDigit recentItemAppVersion = checkAppVersion.GetAppVersion("5.3.4");
+	bool isRecentItemAppVersion = checkAppVersion.CheckOverVersion(PageAttr.AppVersion, recentItemAppVersion);
+}
+
+@model string
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/GMobile.js?v=20160817"></script>
+@if (PageAttr.IsAndroidApp && PageAttr.AppVersion.Digit1 >= 5)
+{
+	if (false == isRecentItemAppVersion)
+	{
+	<script type="text/javascript">
+		$(document).ready(function () {
+			if (typeof AndroidLocalStorage != "undefined" && AndroidLocalStorage) {
+				mobileLocalStorage = AndroidLocalStorage;
+			}
+
+			var recentItemsController = new RecentItemsController(true);
+			recentItemsController.setRecentItem("@Model", "@BizUtil.GetGoodsImagePath(Model, "M3").Replace("https://ssl", "http://")");
+		});
+	</script>
+	}
+	else
+	{
+	<script type="text/javascript">
+		$(document).ready(function () {
+			var param = {"goodscode": "@Model", "imageurl": "@BizUtil.GetGoodsImagePath(Model, "M3").Replace("https://ssl", "http://")"};
+			var schemeUrl = "gmarket://recentitem?type=set&item=" + encodeURIComponent(JSON.stringify(param));
+			location.href = schemeUrl;
+		});
+	</script>
+	}
+}
+else if (PageAttr.IsIphoneApp && true == isRecentItemAppVersion)
+{
+	<script type="text/javascript">
+		$(document).ready(function () {
+			var param = {"goodscode": "@Model", "imageurl": "@BizUtil.GetGoodsImagePath(Model, "M3").Replace("https://ssl", "http://")"};
+			var schemeUrl = "gmarket://recentitem?type=set&item=" + encodeURIComponent(JSON.stringify(param));
+			location.href = schemeUrl;
+		});
+	</script>
+}
+else
+{
+<script type="text/javascript">
+	var recentItemsController = new RecentItemsController(true);
+	recentItemsController.setRecentItem("@Model", "@BizUtil.GetGoodsImagePath(Model, "M3").Replace("https://ssl", "http://")");
+</script>
+}

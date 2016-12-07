@@ -7,12 +7,11 @@
 	function GetFindFile(filename) {
 		$('#tb_aphoto').val($('#findfile').val())
 	}
-
 	function UploadImage() {
 		var params = [
 		//{ name: 'file', value: $(':radio[name="rdoCustType"]:checked').val() }
-		{ name: 'filepath', value: $('#tb_aphoto').val() }
-		//{ name: 'filepath', value: "C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/test6.jpg" }
+		//{ name: 'filepath', value: $('#tb_aphoto').val() }
+		{ name: 'filepath', value: "C:/git_repo/Hackathon2016/Hackathon2016/Hackathon2016/TestImage/test6.jpg" }
 
 		];
 		$.ajax({
@@ -22,20 +21,29 @@
 			data: params,
 			async: false,
 			success: function (result) {
-				alert(result);
-				//if (result.success)
-				//	alert(result.message);
-				//else
-				//	alert(result.message);
-			},
-			error: function (error) {
+				var $ul = $('#divRecommedKeyword').find('ul.recom_lst');
+				$ul.empty();
+				if (!$.isArray(result) || result.length === 0) {
+					$('#divRecommedKeyword').hide();
+					return;
+				}
+
+				var size = result.length;
+				var $result = $();
+				for (var i = 0; i < size; i++) {
+					var item = result[i];
+					var $element = $('<li><a href="#" onclick="javascript:selectKeyword(this);" class="in_txt">' + item + '</a></li>')
+					$result = $result.add($element);
+				}
+				$ul.append($result);
+				$('#divRecommedKeyword').show();
 			}
 		});
 
 	}
 </script>
 
-
+@* 파일 업로드 *@
 <div class="file-upload-wrap">
 	<input type="text" class="text fileupload" id="tb_aphoto" name="" size="18" value="">
 	<div class="file-upload">
@@ -45,4 +53,14 @@
 		</span>
 	</div>
 	<input type="button" id="btnUploadImage" name="btnUploadImage" size="18" value="Upload" onclick="UploadImage()" />
+</div>
+
+@* 키워드 생성 *@
+<div class="recom_artbx" id="divRecommedKeyword" style="display:none">
+	<div class="recom_arttit">
+		<h2 class="recom_tit"></h2>
+		<div class="scroll_inner">
+			<ul class="recom_lst comma"></ul>
+		</div>
+	</div>
 </div>

@@ -1,0 +1,100 @@
+﻿@using GMKT.GMobile.Constant;
+@using GMobile.Data.Tiger;
+@using GMobile.Data.DisplayDB;
+@using GMobile.Data.Diver;
+
+@model GMKT.GMobile.Web.Models.LoginSFCM
+
+@{
+	Layout = null;
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+	@Html.Partial("_incHeader_320")
+
+	<link rel="stylesheet" type="text/css" href="@Urls.ScriptUrl/mobile/css/etc.css" />
+</head>
+<body>
+	<!-- WRAPPER -->
+	<div id="wrapper">
+		<!-- CONTENTS -->
+		<div id="contents" class="cts">
+			<!-- LOGIN -->
+			<div class="login_sfc">
+				<div class="spot"><img src="@Urls.MobileImagePics/mobile/sfc/spot_sfc.jpg" alt="삼성가족구매센터"></div>
+				<form name="loginform" id="loginform" method="post" action="@Urls.MobileWebUrlSecure/Login/LoginSFC" onsubmit="checkValid(); return false;">
+					<input type="hidden" name="url" value="@Model.ReturnUrl" />
+
+					<fieldset>
+					<legend>로그인</legend>
+					<div class="section_login">
+						<p class="tx_sfc">삼성 임직원을 위한 특별한 혜택을 만나세요.</p>
+						<div class="login_area">
+							<label for="id" class="blind">아이디</label>
+							<input type="text" id="id" name="id" class="inp_txt" placeholder="아이디" onfocus="this.placeholder=''" onblur="this.placeholder='아이디'">
+							<label for="pwd" class="blind">비밀번호</label>
+							<input type="password" id="pwd" name="pwd" class="inp_txt" placeholder="비밀번호"  onfocus="this.placeholder=''" onblur="this.placeholder='비밀번호'">
+
+							<button type="submit" class="btn_login">로그인</button>
+						</div>
+						<div class="chk_login">
+							<input type="checkbox" id="auto_login" name="auto_login" class="inp_chk" value="true"/>
+							<label for="auto_login">자동 로그인</label>
+							<input type="checkbox" id="save_id" class="inp_chk"/>
+							<label for="save_id">아이디 저장</label>
+							<input type="checkbox" id="push_agree" name="push_agree" class="inp_chk" value="true"/>
+							<label for="inp_chk3">알림 받기</label>
+						</div>
+					</div>
+					</fieldset>
+				</form>
+
+				<ul class="lst_sfc">
+					<li>처음 사용하시는 경우에는 마이싱글을 통해서 최초 1회 회원 동의 후 사용가능합니다. </li>
+					<li>마이싱글 접속이 어려우신 경우에는 삼성가족구매센터 PC웹 (SFCMall.com)에서 최초 1회 회원동의를 해주세요. </li>
+					<li>아이디, 비밀번호 찾기는 삼성구매가족구매센터 PC웹에서 가능합니다.</li>
+					<li>알림 서비스는 이벤트 특가정보 알림 메시지를 실시간으로 받을 수 있으며, 알림 해지는 설정메뉴에서 가능합니다.</li>
+				</ul>
+			</div>
+			<!--// LOGIN -->
+		</div>
+		<!--// CONTENTS -->
+	</div>
+	<!--// WRAPPER -->
+
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/GMobile.js?v=20160817"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/guidGeneration.js"></script>
+	<script type="text/javascript">
+		var _ubLogActEnum = {
+			click: "click"
+		}
+
+		function _ubLog(code, act) {
+			if (typeof ubprofiler === 'object' && typeof ubprofiler.send === 'function') {
+				ubprofiler.send(
+              'event'         // behavior
+              , 'page'        // src
+              , 'm/1.0'       // id, version info
+              ,
+							{
+								'url': document.location.href,  // url, required 
+								'ref': document.referrer,       // referrer url, optional
+								'act': act,                 // action, required
+								'acode': code        // area code, required
+							});
+			}
+		}
+	</script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/member/LoginSFC.js"></script>
+
+@if (Model.IsFailLogin)
+{
+	<script type="text/javascript">
+		alert('로그인에 실패하였습니다.\n\n다시 확인 하신 후 로그인 하시기 바랍니다.');
+	</script>
+}
+</body>
+</html>

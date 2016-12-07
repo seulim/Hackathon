@@ -1,0 +1,109 @@
+﻿@using GMKT.GMobile.Web.Models;
+@{
+	//ViewData["Title"] = "공지사항";
+}
+<script type="text/x-jscript-tmpl" id="notice_item_template">
+    <li>
+		<a href="javascript:goDetail('{{Seq}}')">
+			{{Title}}
+			<span>{{Today:formatDate}}</span>
+		</a> 
+	</li>
+</script>
+
+<script type="text/javascript">
+
+    var pageNo = 1;
+    var nKind = '@Model.nKind';
+
+	jQuery(document).ready(function () {
+
+	    displayLayer("progress_icon", "none");
+
+	    loadNotice(nKind, pageNo);
+
+	});
+
+	function loadNotice(kind) {
+	    $("#selNotiCode").val(kind);
+
+	    var params = { nKind: kind, pageNo: pageNo, pageSize: 10 };
+
+	    nKind = kind;
+
+	    if (pageNo == 1)
+	        $('#dataListAjax').empty();
+
+	    jQuery.ajax({
+	        type: "POST",
+	        url: "@Urls.MobileWebUrl/Etc/NoticeListJson",
+			dataType: "json",
+			data: params,
+			crossDomain: true,
+			success: function (data) {
+
+			    if (data == null || data == 'undefined') return;
+
+			    $('#dataListAjax').render({
+			        append: true,
+			        template: 'notice_item_template',
+			        model: data.Items
+			    });
+
+			    var totalCount = data.TotalCount;
+			    var itemCount = data.Items.length;
+			    var pageSize = data.PageSize;
+
+			    if (pageNo < data.PageCount)
+			        $('.list_view').show();
+			    else
+			        $('.list_view').hide();
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+
+			}
+		});
+
+    }
+
+    function formatDate(date) {
+        return date.substr(0, 10);
+    }
+
+
+    function more() {
+        pageNo++;
+        loadNotice(nKind);
+    }
+
+    function goDetail(seq) {
+        document.location.href = '@Urls.MobileWebUrl/Etc/NoticeDetail?seq=' + seq + '&nKind=' + nKind;
+	}
+
+</script>
+
+<hr />
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+	<div class="notice">
+		<h3>공지사항</h3>
+        <div class="noti_sel">
+				<select id="selNotiCode" onchange="pageNo=1;loadNotice(this.value, pageNo);">
+                    <option value="ALL" selected = "selected"> 전체</option>
+                    <option value="CUSTOM"> 고객서비스 </option>
+                    <option value="EVENT"> 이벤트당첨 </option>
+                    <option value="TRADE"> 안전거래 </option>
+                    <option value="HARM"> 위해상품 </option>
+                </select>
+			</div>
+		<ul class="list" id="dataListAjax">
+			
+		</ul>
+
+		<button type="button" class="list_view" onclick="more();">목록 더 보기</button>
+
+	</div>
+</div>
+<!-- //CONTENT -->
+<hr />

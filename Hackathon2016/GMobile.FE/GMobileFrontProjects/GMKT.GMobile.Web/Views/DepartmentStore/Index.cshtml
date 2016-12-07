@@ -1,0 +1,411 @@
+﻿@{
+	const string searchFcd = "715300001";
+	const string mainBannerFcd = "715300002";
+	const string brandBannerFcd = "715300003";
+	const string categoryFcd = "715300004";
+	const string bestFcd = "715300005";
+	const string minishopFcd = "715300006";
+	
+}
+
+@model GMKT.GMobile.Web.Models.DepartmentStoreMainModel
+
+
+
+
+@section scripts{
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/PdsLogSender.js"></script>
+
+	<script type="text/javascript">
+		$(function () {
+			$('.sp_sdeal.btn_zzim').click(function (e) {
+
+				e.preventDefault();
+				if ($(this).attr("isSoldOut") != "True") {
+					var el = this;
+
+					var parameter = "itemNos=" + $(el).attr("goodscode");
+					$.getJSON("/Common/AddFavoriteItems?" + parameter,
+				function (data) {
+					var result = data.result;
+					if (result == 0) {
+						if (!$(el).hasClass('btn_zzim_on')) {
+							$(el).addClass("btn_zzim_on");
+							superInter();
+						} else {
+							//	$(el).parent(".u_area.ly_inter").remove();
+							$(el).removeClass("btn_zzim_on");
+						}
+					} else {
+						alert(data.msg);
+						if (result == -100) {
+							location.href = "@Urls.MobileWebUrl/Login/Login?type=old&rtnurl=" + encodeURIComponent(document.location.href);
+						}
+					}
+				}
+			);
+				}
+			});
+		});
+	</script>
+}
+
+
+
+
+<script type ="text/javascript">
+	var topBannerList = [];
+	var allBannerList = [];
+
+	@foreach(var banner in Model.Banner.MainBanner)
+	{
+		<text>
+		topBannerList.push('<div class="li"><a href="@GlobalFunction.GetSnaUrl(true,mainBannerFcd,banner.LandingUrl)" onclick=\"javascript:sendPDSLogFromEliment(this);\" data-pdslog="@banner.PdsLogJson"><img src="@banner.BannerImageUrl" alt="@banner.BannerTitle" /></a></div>');
+		</text>
+	}
+
+	@foreach(var banner2 in Model.Banner.AllBanner)
+	{
+		<text>
+		allBannerList.push('<div class "li"><a href="@banner2.LandingUrl" onclick=\"javascript:sendPDSLogFromEliment(this);\" data-pdslog="@banner2.PdsLogJson"><Img src = "@banner2.BannerImageUrl" alt="@banner2.BannerTitle"/></a></div>');
+		</text>
+	}
+	
+	var ShareTo = function(type){
+		var dataName = "G마켓 백화점";
+		switch(type){
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "백화점";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name":dataName,
+			"url":"@Urls.MobileWebUrl" + "/DepartmentStore",
+			"title":""
+		};
+
+		if(type == "kakaotalk"){
+			KakaoController("#SnsKakaoTalk", new SnsParam(type, data), "home");
+		}else{
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data));
+		}
+	}
+
+
+	function swipeGmk(data, areaId, pageId, random, auto) {
+		var tempSwipe = new SwipeView(areaId, { numberOfPages: data.length, autoSwipe: auto });
+		if (pageId != null && pageId != '') {
+			$('.pag').text(tempSwipe.pageIndex + 1);
+			$('.pag2').text(data.length);
+		}
+
+		for (var i = 0; i < 3; i++) {
+			var page = i == 0 ? data.length - 1 : data.length == 1 ? 0 : i - 1;
+			tempSwipe.masterPages[i].innerHTML = data[page];
+		}
+
+		tempSwipe.onFlip(function () {
+			var upcoming;
+
+			for (var i = 0; i < 3; i++) {
+				upcoming = tempSwipe.masterPages[i].dataset.upcomingPageIndex;
+
+				if (upcoming != tempSwipe.masterPages[i].dataset.pageIndex) {
+					tempSwipe.masterPages[i].innerHTML = data[upcoming];
+				}
+			}
+			if (pageId != null && pageId != '') {
+				$('.pag').text(tempSwipe.pageIndex + 1);
+			}
+		});
+
+		var index = 0;
+
+		if (random) {
+			index = Math.floor(Math.random() * data.length) % data.length;
+			tempSwipe.goToPage(index);
+		}
+		if (auto) {
+			tempSwipe.t = setTimeout(function () { tempSwipe.next(); }, 3000);
+		}
+
+		return tempSwipe;
+	}
+
+	function setDataArray(data, dispCnt){
+		if(dispCnt > 1)
+		{
+			var totDispCnt = data.length;
+			var totPage = Math.floor(data.length / dispCnt);
+			var tmpArr = new Array();
+			var tmpHtml = '';
+			for(var i=0; i < totPage; i++)
+			{
+				for(var j = 0; j < dispCnt; j++){
+					tmpHtml += data[i*dispCnt+j];
+				}
+				tmpArr[i] = tmpHtml;
+				tmpHtml = '';
+			}	
+			return tmpArr;
+		} else {
+			return data;
+		}
+	}
+</script>
+<script type = "text/javascript">
+	$(document).ready(function () {
+		var srpUrl = "@Urls.MobileWebUrl/DepartmentStore/Search?primeKeyword=";
+
+		$("#departmentStoreSearchKeyword").bind("click",function(event){
+			$("#departmentStoreSearchKeyword").focus();
+		});
+
+		$("#departmentStoreSearchForm").bind("submit",function(event){
+			if($("#departmentStoreSearchKeyword").val().trim()){
+				var encode = encodeURIComponent($("#departmentStoreSearchKeyword").val());				
+				pdsClickLog('200000302','utility',{'keyword':encode});
+				location.href = getSnaUrl(@searchFcd,srpUrl+encode);
+			}
+			else{
+				alert("검색어를 입력해주세요.");
+			}
+			event.preventDefault();
+		});
+
+		/* landing Banner */
+		var em = eModule
+		, apps = em.apps
+		, landing = apps.landing;
+
+		landing.init({
+			pageName: 'DepartmentStore',
+			landingType: '@Model.LandingBanner.Type',
+			imageUrl: '@Model.LandingBanner.ImageUrl',
+			description: '@Model.LandingBanner.Description',
+			campaign: '@Model.Campaign.Name',
+			medium: '@Model.Campaign.Medium',
+			mediumSource: '@Model.Campaign.MediumSource',
+			mediumContent: '@Model.Campaign.MediumContent',
+			term: '@Model.Campaign.Keyword'
+		});
+
+		$("#lay_notice").on('click', '#goToApp', function (e) {
+			e.preventDefault();
+			landing.installApp();
+		}).on('click', '#landingClose', function (e) {
+			e.preventDefault();
+			landing.close();
+		});
+		/* landing Banner */
+	});
+</script>
+
+
+	<!-- CONTENT -->
+	<div id="content" class="dept">
+		<h3 class="blind">백화점</h3>		
+		<div class="display_bnr">
+			<div class="bnr_w">
+				<div id="bnrList" class="lst"><div class="bnrbg"></div></div>				
+				<div class="h_page">
+					@*<a href="javascript:;" id="hotPrev" class="prev" onclick="spcListScroller.prev();">이전</a>
+					<a href="javascript:;" id="hotNext" class="next" onclick="spcListScroller.next();">다음</a>*@
+					<div id="bnrPage" class="page"><span class="pag">1</span>/<span class="pag2">10</span></div>
+					<a class="bnr_all">배너모두보기</a>
+				</div>
+			</div>
+			<script>
+				topBannerList = setDataArray(topBannerList, 1);
+				spcListScroller = swipeGmk(topBannerList, "#bnrList", "bnrPage", true);
+			</script>
+		</div>
+        <div class="lst_dept_links">  
+ 			<ul>  
+ 				<li><a href="@Urls.MobileWebUrl/SellerShop/lotteec" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog='{"Parameter":{"servicename":"롯데백화점","url":"@Urls.MobileWebUrl/SellerShop/lotteec","ans":"1"},"AreaType":"Link","AreaCode":"200000301"}'>롯데</a></li>  
+ 				<li><a href="@Urls.MobileWebUrl/SellerShop/shinsegae9" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog='{"Parameter":{"servicename":"신세계백화점","url":"@Urls.MobileWebUrl/SellerShop/shinsegae9","ans":"2"},"AreaType":"Link","AreaCode":"200000301"}'>신세계</a></li>  
+ 				<li><a href="@Urls.MobileWebUrl/SellerShop/hdepart01" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog='{"Parameter":{"servicename":"현대백화점","url":"@Urls.MobileWebUrl/SellerShop/hdepart01","ans":"3"},"AreaType":"Link","AreaCode":"200000301"}'>현대</a></li>  
+ 				<li><a href="@Urls.MobileWebUrl/SellerShop/galleriamall" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog='{"Parameter":{"servicename":"갤러리아백화점","url":"@Urls.MobileWebUrl/SellerShop/galleriamall","ans":"4"},"AreaType":"Link","AreaCode":"200000301"}'>갤러리아</a></li>  
+ 			</ul>  
+		</div>  
+ 		<div class="sch_dept">
+            <form id="departmentStoreSearchForm" action ="DepartmentStore/Search" method = "get">
+ 			    <input type="text" title="검색어 입력" placeholder="백화점 상품 검색" id="departmentStoreSearchKeyword" />
+				<button type="button" class="ip_delete">검색어 삭제</button>
+ 			    <button type="submit" class="btn_sch" id="departmentStoreSearchButton">백화점 검색</button>  			    
+            </form>        
+		</div>
+
+		<!-- .super_deal -->
+		<div class="super_deal">
+			<div class="sdeal_wrap">
+				<div class="tit_sdeal">
+					<h3><a href="DepartmentStore/Now" class="tit" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog='{"Parameter":{},"AreaType":"Link","AreaCode":"200000303"}'><span class="sp_sdeal">백화점Now</span></a></h3>
+				</div>
+				<div id="sdScroll0" class="sdeal_cate" style="overflow: hidden;">
+					<ul class="lst_cate" style="width: 715px; transition-property: transform; transform-origin: 0px 0px 0px; transform: translate(0px, 0px) translateZ(0px);">
+					@foreach (var shopCategory in Model.ShopCategory)
+	 {
+						<li><a href="@shopCategory.LandingUrl" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog="@shopCategory.PdsLogJson">@shopCategory.CategoryName</a></li>
+	 }
+					</ul>
+				</div>
+			</div>			<div class="bx_sdeal">
+						
+				<ul class="lst_prd" id="list_superdeal">
+				@{ var i = 0;  }
+					@foreach (GMKT.GMobile.Data.HomeMainItem item in Model.Item)
+	 {
+		 if (i < 20)
+		 {
+								@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, false, Urls.MobileImageUrlV2, "716000055", false, "716000057", "716000058", "716000056");
+		 }
+		 else
+		 {
+								@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, true, Urls.MobileImageUrlV2, "716000055", false, "716000057", "716000058", "716000056");
+		 }
+
+		 i++;
+	 }
+				</ul>
+			</div>				
+		</div>
+		<!-- //.super_deal -->		<div class="dpt-category-section">
+			<ul class="dpt-category-nav">
+				@foreach (var shopCategory in Model.BottomShopCategory)
+	{
+				<li class="dpt-category-nav_item"><a href="@shopCategory.LandingUrl" class="dpt-category-nav_item_link" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog="@shopCategory.PdsLogJson">@shopCategory.CategoryName</a></li>
+	}
+			</ul>
+		</div>
+
+		<div id="view_bnr_all">
+			<div class="lay_tit"><strong>백화점 이벤트 전체보기</strong></div>
+			<div class="list_bnr"></div>
+			<a class="close"><span>닫기</span></a>
+			<span class="cls">
+                <button type="button" class="close"><span>닫기</span></button>
+            </span>
+		</div>
+		<script type="text/javascript">
+			var layer_banner_all = {}
+			layer_banner_all.items = allBannerList;
+		</script>
+		
+		<div class="dimmed" style="display:block"></div>			
+@if (false == PageAttr.IsApp)
+{
+	<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+}
+		<a href="#" class="btn_top_main">Top으로 이동</a>
+
+		@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "departmentstore", ShareFcdCode = "715400001", ShortcutFcdCode = "715400002"})
+
+
+		<script type="text/javascript">
+			$(document).ready(function () {
+				$(".superdeal_lazy").lazyload({
+					effect: "fadeIn",
+					threshold: 400
+				});
+
+				KakaoInit();
+				ShareTo("kakaotalk");
+			});
+
+
+			//래퍼 높이값 자동 조절
+			window.onload = function () { changeCtext('bnrList'); }
+			if (typeof orientationchange != "undefined") {
+				$(window).on("orientationchange", function () {
+					changeCtext('bnrList');
+				});
+			}
+			else {
+				$(window).on("resize", function () {
+					changeCtext('bnrList');
+				});
+			}
+			function changeCtext(id) {
+				var wrapObj = $('#' + id);
+				var bnrImg = wrapObj.find('a > img');
+				var bnrImgHeight = bnrImg.height(); //이미지높이값
+				wrapObj.css('height', bnrImgHeight + 'px'); //래퍼높이값 조절
+
+				//ios7에서 높이값 잡지 못하는 버그	
+				$('#swipeview-slider').children().height(bnrImgHeight);
+			}
+
+
+			function getSnaUrl(fcd, url) {
+				var snaUrl = url || '';
+
+				if (fcd != undefined && fcd != null && fcd != '') {
+					snaUrl = 'http://sna.gmarket.co.kr/?fcd=' + fcd + '&url=' + encodeURIComponent(url);
+				}
+				return new Handlebars.SafeString(snaUrl);
+			}
+
+			$(document).ready(function () {
+				var wdW = $(window).width();
+				var imgW = 720;
+				var imgH = 330;
+				var tgH;
+				tgH = wdW * imgH / imgW;
+				$("#bnrList").height(tgH);
+				$(".bnrbg").remove();
+			});
+
+			$(window).load(function () {
+				var $box_list_bnr = $('#view_bnr_all')
+				var $list_bnr = $('#view_bnr_all .list_bnr');
+				var $list_bnr_close = $box_list_bnr.find('.close');
+				var box_list_items = '';
+				$('a.bnr_all').on('click', function () {
+					$box_list_bnr.show();
+					$('#wrap').addClass('no_highlight');
+					$("<div id='mask' selected='true' style='z-index:310'></div>").appendTo("#wrap");
+					for (var i = 0; i < layer_banner_all.items.length; i++) {
+						box_list_items += layer_banner_all.items[i];
+					}
+					$list_bnr.html(box_list_items);
+					setTimeout(function () {
+						$('#wrap #mask').on('click', function (e) {
+							if (e.target.getAttribute('id') == 'mask') {
+								$('#wrap').removeClass('no_highlight');
+								$('#wrap #mask').off();
+								layer_banner_all.items = [];
+								$box_list_bnr.hide();
+								$("#wrap #mask").remove();
+							}
+						});
+					}, 100);
+				});
+				$list_bnr_close.on('click', function () {
+					$('#wrap #mask').off();
+					layer_banner_all.items = [];
+					$('#wrap').removeClass('no_highlight');
+					setTimeout(function () {
+						$box_list_bnr.hide();
+						$("#wrap #mask").remove();
+					}, 300)
+					return false;
+				});
+			});
+		</script>
+	</div>
+	<!-- //CONTENT -->
+
+	<hr />
+
+

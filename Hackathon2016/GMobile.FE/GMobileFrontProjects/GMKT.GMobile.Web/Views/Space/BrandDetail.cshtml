@@ -1,0 +1,59 @@
+﻿
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		<section class="sec_room">
+			<div class="bx_detail">
+				<!-- [D] iframe 영역 -->
+				@Html.Raw(Model.Html)
+			</div>
+			<!--  item 영역 -->
+			<ul class="lst_prd2">
+			@for (var i = 0; i < Model.Items.Count; i++)
+			{ 
+				<li>
+					<a href="@(Urls.MItemUrl)?goodscode=@Model.Items[i].GoodsCode">
+						<span class="img_box">
+							<img src="@Model.Items[i].ImageUrl" alt="@Model.Items[i].GoodsName">
+						</span>
+						<span class="txt_box">
+							<strong class="prd_tit">@Model.Items[i].GoodsName</strong>
+							<span class="price_box">
+							@if (Model.Items[i].DiscountRate != 0)
+							{
+								@*<strong class="per_price"><span class="blind">할인율</span>@Model.Items[i].DiscountRate<span class="per">%</span></strong>*@
+								<span class="origin_price"><span class="blind">정가</span>@Model.Items[i].SellPrice.ToString("N0")</span>
+							}
+							else
+							{ 
+								<span class="origin_price"><span class="blind">정가</span></span>
+							}
+							
+								<strong class="sale_price"><span class="blind">할인가</span>@Model.Items[i].AdCouponPrice.ToString("N0")</strong>
+							</span>
+							<span class="option_bx">
+							@if (false == string.IsNullOrEmpty(Model.Items[i].Shipping))
+							{
+								if (Model.Items[i].Shipping == "무료배송")
+								{
+									<span class="opt_free">무료배송</span>
+								}
+								else if (Model.Items[i].Shipping == "스마트배송")
+								{
+									<span class="opt_smart">스마트배송</span>
+								}
+								else
+								{
+									<span class="opt_delivery">@Model.Items[i].Shipping</span>
+								}
+							}
+							</span>
+						</span>
+					</a>
+				</li>
+			}
+			</ul>
+			<!-- // item 영역 -->
+		</section>
+	</div>
+	<!-- //CONTENT -->
+	

@@ -1,0 +1,334 @@
+﻿@using GMKT.GMobile.Data.EventV2;
+@using GMKT.GMobile.Web.Models.EventV2;
+@model GMKT.GMobile.Web.Models.EventV2.SuperGiftModel
+<script type="text/javascript" src="@Urls.MWebUrl/event/Common/CommonMobileEventFunction.js"></script>
+<script type="text/javascript" src="@Urls.MWebUrl/event/Common/CommonMobileAjax.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/sns_common.js"></script>
+<script type="text/javascript" src="http://connect.facebook.net/ko_KR/all.js"></script>
+<div id="content" class="ctns">
+	@Html.Partial( "Event/_NavigationBar", @Model.NaviIcons, new ViewDataDictionary { { "selectTab", "슈퍼기프트" } } )
+	<div class="banner_box">
+		@if( Model.TopBanner != null )
+		{
+			<img src="@Model.TopBanner.ImageUrl"	alt="@Model.TopBanner.ImageAlt" />
+		}
+	</div>
+	<div class="ent_wrap_main2">
+		<div class="m_title">
+			<h3>이달의 SUPER GIFT</h3>
+			<a href="#" class="btn_more" onclick="popBlockUI('layer_serv');return false;"><span>SUPER GIFT 안내</span></a>
+		</div>
+		<div class="sg_box">
+		@if( Model.MainTemplete != null )
+		{
+			<img src="@Model.MainTemplete.ImageUrl" alt="@Model.MainTemplete.ImageAlt" />
+			if( Model.MainTempleteOptions != null && Model.MainTempleteOptions.Count > 0 )
+			{
+			<ul class="lst_op">
+				@for( int j = 0 ; j < Model.MainTempleteOptions.Count ; j++ )
+				{
+				<li>
+					<input type="radio" name="chk_op" id="chk_op@(j+1)" class="input_rdo" value="@Model.MainTempleteOptions[j].Eid"/>
+					<label for="chk_op@(j+1)">@Model.MainTempleteOptions[j].ImageAlt</label>
+				</li>
+				}
+			</ul>
+			}
+
+			if( PageAttr.IsLogin )
+			{
+				if( @Model.IsVip == true )
+				{
+					if( @Model.IsAlreadyApplied)
+					{
+			<a href="#" class="btn_admin" onclick="alert('죄송합니다. 이미 응모하셨습니다.'); return false;">응모하기</a>
+					}
+					else if( Model.EntryStartDate.HasValue && Model.EntryStartDate.Value > DateTime.Now )
+					{
+			<a href="#" class="btn_admin" onclick="alert('@Model.EntryStartDate.Value.ToString( "MM'/'dd HH" ) 시 부터 응모 가능합니다.\n응모기간을 기다려주세요'); return false;">
+				응모하기</a>
+					}
+					else if( Model.EntryEndDate.HasValue && Model.EntryEndDate.Value < DateTime.Now )
+					{
+			<a href="#" class="btn_admin" onclick="alert('안타깝게도 응모 마감되었습니다.\n다음 기회에 참여 해 주세요'); return false;">
+				응모하기</a>
+					}
+					else
+					{
+			<a href="@(Url.Action( "ApplyMainCoupon" ) + "/" + Model.MainTemplete.Eid)" class="btn_admin" onclick='SnaUrlFooter("710200015");return true;' id="btn_admin_auth">응모하기</a>
+					}
+				}
+				else
+				{
+			<a href="#" class="btn_admin" onclick="alert('이달의 쇼핑등급이 SVIP, VIP인 고객만 사은품받기가 가능합니다.\n고객님의 쇼핑등급을 확인해주세요!'); return false;">응모하기</a>
+				}
+			}
+			else
+			{
+			<a href="@(Urls.LoginUrl + "?URL=" + "http://" + Request.Url.Host + Url.Action( "Index" ))" class="btn_admin" onclick="alert('이벤트에 응모하시려면 로그인을 하셔야 합니다.'); return true;">응모하기</a>
+			}
+		}
+	
+		</div>
+		<div class="state_box">
+			<dl>
+				<dt>응모대상 :</dt><dd>@Model.EntryTarget</dd>
+				<dt>응모기간 :</dt><dd>@(Model.EntryStartDate.HasValue ? Model.EntryStartDate.Value.ToString( "MM'/'dd" ) : "")~@(Model.EntryEndDate.HasValue ? Model.EntryEndDate.Value.ToString( "MM'/'dd" ) : "")(1일/1회)</dd>
+				<dt>응모조건 :</dt><dd>@Model.EntryCondition</dd>
+				<dt>당첨안내 :</dt><dd>@Model.WinGuide</dd>
+			</dl>
+			<div class="state">
+				@if( PageAttr.IsLogin && Model.BuyHistory != null )
+		{
+				<h4>[@(DateTime.Today.Month)]월 @Model.HistoryTitle 구매현황</h4>
+				<ul>
+					<li>구매건수 : <strong>@(Model.BuyHistory.Count)</strong>건</li>
+					<li>구매금액 : <strong>@(Model.BuyHistory.TotalPayment.ToString( "#,##0" ))</strong>원</li>
+				</ul>
+				<p>구매현황은 배송완료 상태의 주문내역입니다.</p>
+		}
+		else
+		{
+				<div class="state login">
+					<h4>[@(DateTime.Today.Month)]월 @Model.HistoryTitle 구매현황</h4>
+					<p>로그인 후 확인 가능합니다.</p>
+				</div>
+		}
+			</div>
+		</div>
+		@if( Model.GuideBanners != null )
+	{
+		foreach( BannerT i in Model.GuideBanners )
+		{
+			if(!String.IsNullOrEmpty(i.ImageUrl))
+			{
+		<div class="admin_box">
+			<img src="@i.ImageUrl" alt="@i.ImageAlt" />
+		</div>
+			}
+		}
+	}
+		<div class="admin_box">
+			@*@Html.Raw( Model.SnsHtml )*@
+			@if( PageAttr.IsIphoneApp == false )
+	 {
+						<div class="plaudern_wrap">
+				<div class="plaud_art">
+					<img src="@Model.ShareInfoImage1" alt="" />
+					<!--[D] 대체텍스트 제공 -->
+
+				</div>
+				<div class="plaud_art">
+					<img src="@Model.ShareInfoImage2" alt="" />
+					<h4 class="blind">페이스북 담벼락에 소문내기</h4>
+					<div class="plaud_info">
+						<a href="javascript:;" class="btn_go">
+							<span class="blind">Gmarket</span>
+						</a>
+						<p class="info_txt"><img src="@Model.ShareInfoImage3" alt="@Model.ShareInfoText" /></p>
+					</div>
+					<a href="javascript:SnaUrlFooter('710200016');connectFacebook();" class="btn_plaud"><span class="blind">소문내기</span></a>
+					<p class="blind">작성된 글을 페이스북에 게시 해야만 응모 가능합니다</p>
+					<ul class="blind">
+					<li>입력 완료 시 super gift에 자동 응모됩니다</li>
+					<li>당첨자에게는 별도 안내 예정 (유선 및 이메일)</li>
+					</ul>
+				</div>
+			</div>
+	 }
+		</div>
+	</div>
+	
+	<div class="box_dot_main">
+		<div class="box_exhibit_main01">
+		@if( Model.NoticeHtml != null && Model.NoticeHtml.Count > 0 )
+		{
+			<div class="notice_box">
+				<ul>
+				@foreach( string str in Model.NoticeHtml )
+				{
+					<li>@str</li>
+				}
+				</ul>
+			</div>
+		}
+		</div>
+		@Html.Partial( "Event/_PromotionList" )
+	</div>
+
+    <div class="add_homego add_homego2">
+@if( !PageAttr.IsIphone && !PageAttr.IsIpad && !PageAttr.IsIpod )
+{
+
+	if( PageAttr.IsAndroidApp )
+	{
+		<a href="@(EmbeddedUrlHelper.GetLinkIsEmbedded( "shareurl", Urls.MobileWebUrl + "/SuperGift", "", "슈퍼기프트", "", "", PageAttr ))">공유하기</a>
+	}
+	else
+	{	
+        <a href="javascript:popBlockUI('layer_sns');">공유하기</a>
+	}
+}
+else
+{
+	if( PageAttr.IsIphoneApp )
+	{
+		<a href="@(EmbeddedUrlHelper.GetLinkIsEmbedded( "shareurl", Urls.MobileWebUrl + "/SuperGift", "", "슈퍼기프트", "", "", PageAttr ))">공유하기</a>
+	}
+	else
+	{
+        <a href="javascript:popBlockUI('layer_sns');">공유하기</a>
+	}
+}
+    </div>
+	<div class="share_sns" id="layer_sns">
+		<h4 class="tit">공유하기</h4>
+
+		<div class="sns">
+			<a href="javascript:CheckPc(MobileSnsUtil.snsType().KAKAOTALK);" class="cco" id="SnsKakaoTalk">카카오톡</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().FACEBOOK);" class="face">페이스북</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().TWITTER);" class="twt">트위터</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().KAKAOSTORY);" class="ccos">카카오스토리</a>
+		</div>
+		<a href="#" class="close_sns" onclick="popBlockUI('layer_sns');return false;">닫기</a>
+	</div>	
+
+	<!-- SVIP/VIP 전용서비스 레이어 -->
+	<div class="layer_allsv bef2" id="layer_serv">
+		<img src="@Model.MobileGuidePopupImageUrl" alt=""/>
+		<a href="#" class="lay_clse  noBorder" onclick="popBlockUI('layer_serv');return false;">닫기</a>
+	</div>
+	<!-- // SVIP/VIP 전용서비스 레이어 -->
+
+</div>
+
+@section scriptfiles
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+}
+
+<script type="text/javascript">
+    var ShareTo = function (type) {
+        var dataName = "G마켓 Super Gift";
+        switch (type) {
+            case MobileSnsUtil.snsType().KAKAOTALK:
+                dataName = "Super Gift";
+                break;
+            default:
+                break;
+        }
+        var data = {
+            "name": dataName,
+            "url": "http://mobile.gmarket.co.kr/SuperGift",
+            "title": ""
+        };
+        if (type == "kakaotalk") {
+            KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+        }
+        else {
+            var sender = MobileSnsUtil.sns(type).sender;
+            sender.send(type, new SnsParam(type, data))
+        }
+    }
+
+    $(document).ready(function () {
+        KakaoInit();
+        ShareTo("kakaotalk");
+    });
+
+	function isLogin() {
+		@if( PageAttr.IsLogin )
+	{
+		@Html.Raw( "return true;" )
+	}
+	else
+	{
+		@Html.Raw( "return false;" )
+	}
+	}
+	function connectFacebook() {
+
+		if (!isLogin()) {
+			alert("로그인이 필요합니다.");
+			goGMKTMobileLogin();
+			return false;
+		}
+
+		$.ajax({
+			type: "GET",
+			url: "@Urls.MobileWebUrl/SuperGift/GetCountOfAppliedEidsForShare",
+			success: function (response) {
+				if (response == "0") {
+					feedFb();
+				}
+				else {
+					alert('오늘 이미 참여하셨습니다.');
+				}
+			}
+		});
+	}
+
+	function goGMKTMobileLogin() {
+		var hostName = "m.gmarket.co.kr"; 	//document.domain은 변경가능성이 있기 때문에 쓰지 않음
+		var strDomian = "http://" + hostName;
+		var openerURL = encodeURIComponent(document.URL);  // encodeURIComponent로 인코딩 및 openerURL 추가 2014-05-26
+		location.href = strDomian + "/Login/login_mw.asp?rtnurl=" + openerURL;  // 기존 document.URL 을 openerURL로 변경 2014-05-26
+	}
+
+	function feedFb() {
+
+		FB.init({ appId: "230223200507806", status: true, cookie: true }); //appId는 G마켓 공식 ID
+
+		var callbackFB = function (response) {
+			if (response != undefined) {
+				//var snsId = response.post_id.split("_")[0];
+				//log('post id = '+ response);
+				
+				//앱에서 소문내기 버튼 클릭 시 document.URL 붙어오는 문제가 있어서 임시로 CommonApplyEventPlatformGmarket 함수 호출하지 않고 직접 eventnet으로 넘겨줌.				
+				//CommonApplyEventPlatformGmarket('@Model.EPif', '@Model.ECif', 'N');
+				document.cookie = "ECif" + "=" + escape("@Model.ECif") + "; path=/;domain=gmarket.co.kr";				
+				var openerURL = encodeURIComponent("@Urls.MobileWebUrl/SuperGift");				
+				window.document.location.href = "http://eventnet.gmarket.co.kr/eventplatform/apply?epif=@Model.EPif&groupYn=N&isMobile=Y&openerURL=" + openerURL;  // ���ʿ� �Ķ����� ����(&reload=&password=) 2014-05-26 				
+			} else {
+				//alert("페이스북 게시중 오류가 발생하였습니다.");
+			}
+		}
+
+		var publish = {
+			method: 'feed',
+			message: '@Model.ShareInfoText',
+			name: '한 달에 한번! 특별한 혜택! G마켓 SUPER GIFT',
+			description: (
+				'@Model.ShareInfoText'
+			),
+			link: '@Model.ShareUrl',
+			picture: '@Model.ShareBannerImage'
+		};
+
+		//api app 로그인.
+		fb_try_login(function (response) {
+			//app에 로그인 되어 있으면
+			if (response.status === 'connected') {
+				FB.ui(publish, callbackFB);
+			} else {
+				//fb_mobile_login();
+			}
+		});
+	}
+	function chkLogin() {
+		if (!isLogin()) {
+			alert("로그인이 필요합니다.");
+			goGMKTMobileLogin();
+			return false;
+		}
+	}
+	if($('.input_rdo').length > 0){
+		$('.input_rdo').change(function(){
+			var eid = $(this).val();
+			$('#btn_admin_auth').prop('href', '@(Url.Action( "ApplyMainCoupon" ))/' + eid);
+		});
+		$('.input_rdo').first().click();
+	}
+</script>

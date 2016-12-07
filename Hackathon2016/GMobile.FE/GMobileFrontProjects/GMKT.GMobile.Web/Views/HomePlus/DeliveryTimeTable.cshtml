@@ -1,0 +1,50 @@
+﻿@{
+    ViewBag.Title = "홈플러스 당일배송 점포";
+	Layout = "~/Views/Shared/_ItemLayout.cshtml";
+}
+
+
+<!-- CONTENTS -->
+<div id="contents" class="ctns">
+	<!-- 상품명 -->
+	<div class="goods">
+		<div class="prod_tit prod_tit_v2">
+			<h3>홈플러스 당일배송 점포</h3>
+		</div>		<div class="homeplus_view">			<div id="hplus_dtime" class="layer_hplus plus_time">			</div>		</div>	</div></div>@section Script
+{
+<script id="tmpl_branch_timetable" type="text/x-handlebars-template">
+	<div class="l_wrap">
+		<div class="l_cont">
+			<div class="sub_hd">
+				<strong>배송주소 :</strong> <span class="store_name"> {{branchInfo.shippingAddr.FriendFrontAddress}} {{branchInfo.shippingAddr.FriendBackAddress}} (<em>{{branchInfo.branchNm}}</em>) </span><a href="javascript:gotoAddressBook();" class="btn_white small">변경</a>
+			</div>
+			<div class="time">
+				<h5 class="tit">배송가능시간</h5>
+				<p class="dsc">아래의 배송가능 시간은 현재 시각 기준이며, 주문 시점에 따라 마감될 수 있습니다.</p>
+				<table>
+					<caption>배송가능시간</caption>
+					<colgroup>
+					<col class="cell_1" />
+					<col class="cell_2" />
+					<col class="cell_3" />
+					<col class="cell_4" />
+					<col class="cell_5" />
+					</colgroup>
+					{{renderTimeTable branchInfo.timeTable branchInfo.timeSlot}}
+				</table>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="text/javascript">
+	var CONST_MOBILE_WEB_URL = "@Urls.MobileWebUrl";
+	var CONST_MOBILE_WEB_URL_SECURE = "@Urls.MobileWebUrlSecure";
+	var CONST_ADDRESS_URL = CONST_MOBILE_WEB_URL_SECURE + "/HomePlus/AddressBook?goodsCode=" + "@ViewBag.GoodsCode";
+	$(document).ready(function () {
+		getMyHomePlusBranchTimeTable(false);
+	});	
+</script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/HomePlusController.js"></script>
+<!--script type="text/javascript" src="@Urls.MobileWebUrlSecure/Scripts/HomePlusController.js"></script-->
+}

@@ -1,0 +1,172 @@
+﻿@using GMKT.GMobile.Web.Models;
+@{
+	ViewBag.Title = "G마켓 GIFT CARD";
+}
+@model TokenGateM
+@section css
+{
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrl/320/GiftCard/giftcard.css?v=7"/>
+}
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/giftcard.js?ver=1"></script>
+<script type="text/javascript" language="javascript">
+	//메인>등록하기
+	//메인>종이 G마켓 Gift Card 등록하러 가기>인증하기
+	function chkAuthnXchngGiftCard() {
+		var RegExAuth16code = /^[A-Za-z0-9]{16}$/;
+		var sAuth16code = $.trim($('#giftcard_num').val());
+		if (sAuth16code == "") {
+			$('#giftcard_num').focus();
+			alert("인증번호를 입력해주세요");
+			return;
+		} else if (sAuth16code.length < 16 || true != RegExAuth16code.test(sAuth16code)) {
+			$('#giftcard_num').focus();
+			alert("인증번호를 올바르게 입력해주세요");
+			return;
+		}
+		else {
+			var sAuth16code = $('#giftcard_num').val();
+
+			if (sAuth16code.length == 16 && RegExAuth16code.test(sAuth16code)) {
+				var param = [
+					{ name: 'Auth16code', value: sAuth16code.replace(/-/g, "") }
+					];
+
+				$.ajax({
+					type: 'POST',
+					dataType: "json",
+					url: "/CashBalance/GiftCardAuthentication",
+					data: param,
+					async: false,
+					success: function (result) {
+						if (result != null && result.length != 0) {
+							var TokenM = parseInt(result.TokenMoney);
+
+							if (result.RetCode == -101 || result.RetCode == -102) { //1~2회 오류 입력 시
+								alert("사용할 수 없는 인증번호 입니다. 확인 후 다시 입력해 주세요.");
+							}
+							else if (result.RetCode == -103 || result.RetCode == -104) { //3~4회 오류 입력 시
+								alert("사용할 수 없는 인증번호 입니다. 5회 오입력 시, 사용제한 되오니 주의하시기 바랍니다.");
+								//	alert("사용할 수 없는 인증번호 입니다\n5회 오입력 시 사용제한 되오니 주의하시기 바랍니다.\n현재 오입력 수 : " + (result.RetCode + 100) * (-1) + "회");
+							}
+							else if (result.RetCode == -105) { //5회 오류 입력 시
+								alert("사용할 수 없는 인증번호 입니다. 인증제한 관련 문의사항이 있을 경우, 고객센터(1566-5701) 로 연락주시기 바랍니다.");
+							}
+							else if (result.RetCode == -106) { //6회 오류 입력 시
+								alert("인증번호 5회 입력 오류로 인증이 제한되었습니다.\n고객센터(1566-5701)로 연락주시기 바랍니다.");
+							}
+							else if (result.RetCode == -500) {//최근 5일 내 등록한 선물권 5장 이상 또는 BLACK된 회원
+								alert("등록이 완료되지 않았습니다. 고객센터(1566-5701)로 연락주시기 바랍니다.");
+							}
+							else if (result.RetCode == -1) {
+								alert("이미 인증이 완료된 G마켓 Gift Card입니다.");
+							}
+							else if (result.RetCode == -2) {
+								alert("사용할 수 없는 인증번호 입니다\n확인 후 다시 입력해 주세요.");
+							}
+							else if (result.RetCode < 0) {
+								alert(result.RetReason);
+							}
+							else {
+//								if (confirm("인증 및 현금잔고 전환이 완료 되었습니다. G통장 현금잔고에서 상세내역을 확인하실 수 있습니다. ")) {
+//									parent.location.href = "GiftCard";
+								//								}
+								alert("인증 및 현금잔고 전환이 완료 되었습니다. G통장 현금잔고에서 상세내역을 확인하실 수 있습니다. ");
+								parent.location.href = "GiftCardListRsv";
+							}
+						}
+						else {
+							alert("현금잔고로 전환 도중 오류가 발생했습니다. 전환 결과가 없습니다.");
+						}
+					},
+					error: function (error) {
+						alert("등록이 완료되지 않았습니다.\n고객센터(1566-5701)로 연락주시기 바랍니다.");
+					}
+				});
+			}
+			else {
+				alert("유효하지 않은 GiftCard 일련번호입니다.\n입력값을 확인해 주십시오");
+			}
+		}
+	}
+	$(document).ready(function () {
+		displayLayer("progress_icon", "none");
+		//popPositMid('gc_layer_regist02');	
+		if ("@{@PageAttr.IsLogin}" == "True") {
+
+		}
+		else {
+			document.location.href = "@Urls.LoginUrl";
+		}
+	});
+	</script>
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		<div class="gc_location">
+			<span><a href="GiftCard" style="color:White;" >GIFT CARD</a></span>
+			<span>등록하기</span>
+		</div>
+		
+		<div class="gc_box_cert">
+			<p class="s_tit">인증번호를 입력해 주세요</p>
+			<div class="s_box_input">
+				<div class="full"><input type="text" id="giftcard_num" name="giftcard_num" maxlength="16" class="gc_text" value="@Model.RegistCode" /></div>
+				@if (PageAttr.IsLogin == true)
+		{
+				<a class="gc_btn03 full" href="javascript:void(0);" onclick="javascript:chkAuthnXchngGiftCard();"><span>등록하기</span></a>
+		}
+		else
+		{
+				<a class="gc_btn03 full" href="@Urls.LoginUrl" ><span>등록하기</span></a>
+		}
+			</div>
+			<ul class="gc_list_bul">
+				<li><span>G마켓 Gift Card는 “-”없이 문자와 숫자만 입력해 주세요</span></li>
+				<!--li><span>종이 선물권은 PC에서만 인증 가능합니다.<a class="btn_txt" href="http://gbank.gmarket.co.kr/GiftCard"><span>PC로 이동</span></a></span></li-->
+			</ul>			
+		</div>
+		
+		<!-- 이미 등록된 상품 레이어 -->		
+		<div id="gc_layer_regist01" class="gc_layer gc_lay_reg01">
+			<div class="cont">
+				<p class="s_txt01"><span class="gc_txt_gt02">이미 등록된 상품권 입니다.</span><br />다시 한번 인증번호를 확인해 주세요</p>
+			</div>
+			<a class="btn_close" href="javascript:void(0);" onclick="popPositMid('gc_layer_regist01'); return false;"><span>레이어닫기</span></a>
+		</div>
+		<!-- //이미 등록된 상품 레이어 -->
+		
+		<!-- G캐시 전환 레이어 -->		
+		<div id="gc_layer_regist02" class="gc_layer gc_lay_reg02">
+			<div class="cont">
+				<p class="s_txt01">G마켓에서 바로 사용할 수 있는 <br /><span class="gc_txt_gt02">G캐시로 전환되었습니다!</span></p>
+				<p class="s_txt02">상품 구매 할 때 G캐시를 사용하세요.</p>
+				<div class="gc_set_btn half">
+					<a class="gc_btn04" href="@Urls.MMyGUrl"><span>G캐시 확인</span></a>
+					<a class="gc_btn01" href="@Urls.MItemUrl"><span>쇼핑하기</span></a>
+				</div>
+			</div>
+			<a class="btn_close" href="javascript:void(0);" onclick="popPositMid('gc_layer_regist02'); return false;"><span>레이어닫기</span></a>
+		</div>
+		<!-- //G캐시 전환 레이어 -->		
+	</div>
+	<!-- //CONTENT -->
+@*@section css
+{
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrl/320/GiftCard/giftcard.css?v=7"/>
+}
+
+@section scripts
+{
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/giftcard.js?ver=1"></script>
+	<script type="text/javascript">
+		window.onload = function () {
+			setTimeout(function () {
+				window.scrollTo(0, 1)
+			}, 100);
+		}
+		//		$(document).ready(function () {
+		//			gc_msg_sel();
+		//			gc_terms();
+		//		});
+	</script>
+}*@

@@ -1,0 +1,196 @@
+﻿@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<meta http-equiv="Cache-Control" content="max-age=0" />
+<meta name="format-detection" content="telephone=no" />
+<title>Gmarket</title>
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/join.css" />
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/common.css" />
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/front_v4.js?v=4"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+<script type="text/javascript">
+	window.onload = function () {
+		setTimeout(function () {
+			window.scrollTo(0, 1)
+		}, 100);
+	}
+</script>
+</head>
+<body>
+
+<!-- WRAPPER -->
+<div id="wrap">
+	
+	<!-- SKIP NAVI -->
+	<div class="hp">
+		<a href="#content">본문 바로가기</a>
+	</div>
+	<!-- //SKIP NAVI -->
+
+	<!-- HEADER -->
+	<div class="join_head">
+		<h1><a href="@Urls.MobileWebUrl"><span class="sp_join">Gmarket</span> <span class="txt">회원가입</span></a></h1>
+		<ul class="join_status">
+		<li>1 가입</li>
+		<li class="selected">2 약관동의</li>
+		<li>3 정보입력</li>
+		<li>4 가입완료</li>
+		</ul>
+	</div>
+	<!-- //HEADER -->
+
+	<hr />
+	
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		<form method="post" name="agreeForm" id="agreeForm" action>
+		<input type="hidden" name="hidCustType" id="hidCustType" value="@ViewBag.CustType"> <!--  CustType-->
+		<input type="hidden" name="hidMethodType" id="hidMethodType" value="@ViewBag.MethodType"><!-- MethodType  -->
+		<input type="hidden" name="hidEncData" id="hidEncData" value="@ViewBag.EncData"> <!--  encData-->
+		<input type="hidden" name="hidSeqNo" id="hidSeqNo" value="@ViewBag.SeqNo"><!-- seqNo-->
+		<input type="hidden" name="hidCompanyNo" id="hidCompanyNo" value="@ViewBag.CompanyNo"><!-- 사업자번호-->
+		<input type="hidden" name="hidFromWhere" id="hidFromWhere" value="@ViewBag.FromWhere"><!-- fromWhere -->
+		
+
+		<div class="join_cnt">
+			<div class="agree_cnt">
+				<div class="agree_all">
+					<div class="agree_chkbx">
+						<input type="checkbox" name="all_agree" id="all_agree" class="inp_chk v2">
+						<label for="all_agree" class="chk_label">전체동의</label>
+					</div>
+				</div>
+				<div class="cnt_box">
+					<div class="agr_group">
+						<div class="agree_chkbx">
+							<input type="checkbox" name="agree_chk1" id="agree_chk1" class="inp_chk" onclick="chkAgreeAll()">
+							<label for="agree_chk1" class="chk_label">G마켓 구매회원 약관<strong class="indis"> (필수)</strong></label>
+						</div>
+						<div class="ly_rel" id="ly_rel">
+							<iframe  src="BuyerAgree" frameborder="0" scrolling="no" style="width:100%;height:42px"></iframe>
+						</div>
+					</div>
+					<div class="agr_group">
+						<div class="agree_chkbx">
+							<input type="checkbox" name="agree_chk2" id="agree_chk2" class="inp_chk" onclick="chkAgreeAll()">
+							<label for="agree_chk2" class="chk_label">전자금융서비스 이용약관<strong class="indis"> (필수)</strong></label>
+						</div>
+						<div class="ly_rel" id="ly_rel">
+							<iframe  src="FinanceAgree" frameborder="0" scrolling="no" style="width:100%;height:42px"></iframe>
+						</div>
+					</div>
+					<div class="agr_group">
+						<div class="agree_chkbx">
+							<input type="checkbox" name="agree_chk3" id="agree_chk3" class="inp_chk" onclick="chkAgreeAll()">
+							<label for="agree_chk3" class="chk_label">개인정보 수집 및 이용<strong class="indis"> (필수)</strong></label>
+						</div>
+						<div class="ly_rel" id="ly_rel">
+							<iframe  src="UsePersonalInfoAgree" frameborder="0" scrolling="no" style="width:100%;height:42px"></iframe>
+						</div>
+					</div>
+					<div class="agr_group">
+						<div class="agree_chkbx">
+							<input type="checkbox" name="PersonalInfoTreatAgrYN" id="agree_chk4" class="inp_chk" onclick="chkAgreeAll()">
+							<label for="agree_chk4" class="chk_label">개인정보의 취급위탁<strong class="selection"> (선택)</strong></label>
+						</div>
+						<div class="ly_rel" id="ly_rel">
+							<iframe  src="TreatPersonalInfoAgree" frameborder="0" scrolling="no" style="width:100%;height:42px"></iframe>
+						</div>
+					</div>
+					<div class="agr_group">
+						<div class="agree_chkbx">
+							<input type="checkbox" name="G9JoinYN" id="agree_chk5" class="inp_chk" onclick="chkAgreeAll()">
+							<label for="agree_chk5" class="chk_label">G9 구매회원 약관<strong class="selection"> (선택)</strong></label>
+						</div>
+						<div class="ly_rel" id="ly_rel">
+							<iframe  src="G9BuyerAgree" frameborder="0" scrolling="no" style="width:100%;height:42px"></iframe>
+						</div>
+					</div>
+				</div>
+				<div class="agree_all">
+					<div class="agree_chkbx">
+						<input type="checkbox" name="all_agree2" id="all_agree2" class="inp_chk v2">
+						<label for="all_agree2" class="chk_label">전체동의</label>
+					</div>
+				</div>
+				<ul class="btn_bx">
+				<li><a href="@Urls.MobileWebUrlSecure/SignUp" class="btn btn_gray">처음으로</a></li>
+				<li><input type="button" title="회원가입" value="확인" class="btn btn_blue" onclick="chkAgreeForm()"></li>
+				</ul>
+			</div>
+		</div>
+		</form>
+	</div>
+	<!-- //CONTENT -->
+	<hr />
+
+	<!-- FOOTER -->
+	
+	<!-- //FOOTER -->
+
+</div>
+<!-- //WRAPPER -->
+
+</body>
+</html>
+<script type="text/javascript">
+	function scrollToBottom() {
+		$('html, body').animate({ scrollTop: $(document).height() }, 'slow');
+	}
+
+	$('.agree_all input').click(function () {//전체 체크되는건 front_v4.js에 정의되어있음
+		var chk = $(this).is(':checked'); 
+		if (chk) scrollToBottom();
+	});
+
+	var chkAgreeAll = function () {
+		var chk = $(this).is(':checked');
+		if (!chk) $('.agree_all input').prop('checked', false);
+	}
+
+	var chkAgreeForm = function () {
+
+		if (!$('.agree_chkbx input').eq(1).is(':checked')) {
+			alert("G마켓 구매회원 약관 동의는 필수입니다.");
+			return;
+		}
+
+		if (!$('.agree_chkbx input').eq(2).is(':checked')) {
+			alert("전자금융서비스 이용약관 동의는 필수입니다.");
+			return;
+		}
+
+		if (!$('.agree_chkbx input').eq(3).is(':checked')) {
+			alert("개인정보 수집 및 이용 동의는 필수입니다.");
+			return;
+		}
+
+		if ($("#hidCustType").val() == "PP" || $("#hidCustType").val() == "PC") {
+			if ($("#hidCustType").val() == "PP") {
+				if ($("#hidMethodType").val() == "" || $("#hidEncData").val() == "" || $("#hidSeqNo").val() == "") {
+					return;
+				}
+			}
+			else if ($("#hidCustType").val() == "PC") {
+				if ($("#hidCompanyNo").val() == "") {
+					return;
+				}
+			}
+		} else {
+			console.log("custtype error");
+			return;
+		}
+
+
+		$('#agreeForm').attr('action', 'SignUpForm').submit();
+	}
+
+</script>

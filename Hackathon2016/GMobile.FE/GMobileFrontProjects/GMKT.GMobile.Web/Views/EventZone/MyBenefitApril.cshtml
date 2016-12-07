@@ -1,0 +1,666 @@
+﻿@using System.Web.Mvc.Html;
+@using System.Web.Mvc;
+@using GMKT.GMobile.Web.Models;
+@using GMKT.GMobile.Constant;
+@using GMobile.Data.EventZone;
+@using GMobile.Service.EventZone;
+@using Arche.Data.Voyager;
+@using GMKT.Framework.EnterpriseServices;
+@using System.Text;
+@using Newtonsoft.Json;
+@using GMKT.Framework.Security;
+@using Newtonsoft.Json.Linq;
+@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+
+@helper RenderDownloadButton(int[] couponArray, int index, string grade)
+{
+	if (couponArray != null && couponArray.Length > index)
+	{
+		if (PageAttr.IsLogin)
+		{
+			if (CouponIssuedCheck(couponArray, index) > 0)
+			{
+				<a class="down1">다운완료</a>
+			}
+			else
+			{
+				if (Model != null && false == string.IsNullOrEmpty(Model.ThisGradeChr) && Model.ThisGradeChr.Equals(grade, StringComparison.InvariantCultureIgnoreCase))
+				{
+					<a href="javascript:fnEventApply(arrGradeEid.@grade, @index);" class="down2">다운받기</a>
+				}
+				else
+				{
+					<a href="javascript:fnGradeNotice('@grade');" class="down2">다운받기</a>
+				}
+			}
+		}
+		else
+		{
+			<a href="javascript:goLogin();" class="down2">다운받기</a>
+		}
+	}
+}
+
+@functions {
+	public string GetJsonStringFromAction(string route_url)
+	{
+		try
+		{
+			StringBuilder sb = new StringBuilder();
+			byte[] buf = new byte[1024];
+
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(route_url);
+			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+			Stream stream = response.GetResponseStream();
+			string temp = null;
+			int count = 0;
+
+			do
+			{
+				count = stream.Read(buf, 0, buf.Length);
+
+				if (count != 0)
+				{
+					temp = Encoding.UTF8.GetString(buf, 0, count);
+					sb.Append(temp);
+				}
+			}
+			while (count > 0);
+
+			return sb.ToString().Trim();
+		}
+		catch (Exception ex)
+		{
+
+		}
+
+		return string.Empty;
+	}
+
+	public int CouponIssuedCheck(int[] arr, int index)
+	{
+		if (arr.Length >= (index + 1))
+		{
+			return this.CouponIssuedCheck(arr[index]);
+		}
+
+		return 0;
+	}
+
+	public int CouponIssuedCheck(int eid)
+	{
+		if (PageAttr.IsLogin == true)
+		{
+			try
+			{
+				string eid_crypt = GMKTCryptoLibraryOption.EncodeTo64(GMKTCryptoLibraryOption.DesEncrypt(eid.ToString(), Model.CRYPT_MD5_FOOTER));
+				string json = GetJsonStringFromAction(Urls.MobileWebUrl + "/" + Url.Action("MyBenefit_CouponIssuedCheck") + "?eid=" + eid_crypt + "&cust_no=" + Model.MyProfile.CustNo);
+
+				if (!json.Equals(string.Empty))
+				{
+					JObject o = JObject.Parse(json);
+					if (o != null)
+					{
+
+						return Convert.ToInt32(o["ret_value"].ToString());
+					}
+				}
+			}
+			catch (JsonException)
+			{
+				// 2013-04-24 이윤호
+				// 특정 공격 대비 긴급 수정
+				Response.Write("<script>alert('잘못된 접근입니다.'); location.href='http://mobile.gmarket.co.kr';</script>");
+			}
+		}
+
+		return 0;
+	}
+
+	public string CreateEventCookie(string eid, bool double_true_single_false)
+	{
+		string cust_no = Model.MyProfile.CustNo;
+
+		string s127 = GMKT.Framework.Constant.GMKTConstants.Hex7F;
+		string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+		string s1 = GMKTCryptoLibrary.AesGCryptoEncrypt(
+			time + s127 + eid + s127 + cust_no + s127 + time + s127
+		);
+		string s2 = GMKTCryptoLibraryOption.MD5(s1 + Model.CRYPT_MD5_FOOTER);
+
+		if (double_true_single_false)
+		{
+			return @"""" + s1 + @""", """ + s2 + @"""";
+		}
+		else
+		{
+			return @"'" + s1 + "', '" + s2 + @"'";
+		}
+	}
+
+
+	public DateTime GetLastDayOfMonth(DateTime dtDate)
+	{
+		DateTime dtTo = dtDate;
+		dtTo = dtTo.AddMonths(1);
+		dtTo = dtTo.AddDays(-(dtTo.Day));
+		return dtTo;
+	}
+
+	public string JsReplace(string str)
+	{
+		str = str.Replace(@"\", @"\\");
+		str = str.Replace(@"""", @"\""");
+		str = str.Replace(@"'", @"\'");
+
+		return str;
+	}
+
+	public string HtmlReplace(string str)
+	{
+		str = str.Replace("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", "");
+
+		str = str.Replace("<Br>", "");
+		str = str.Replace("<br>", "");
+		str = str.Replace(@"\n", "");
+		str = str.Replace(@"\r", "");
+		str = str.Replace(@"""", "");
+
+		return str;
+	}
+
+	public string ToJsonCouponArray(JToken t)
+	{
+		string json = string.Format(
+			@"{{'sTitle':'{0}','sImg':'{1}','sEidString':'{2}','sText':'{3}'}}",
+			JsReplace(HtmlReplace(t["banner_title"].ToString())),
+			JsReplace(HtmlReplace(t["banner_url"].ToString())),
+			this.CreateEventCookie(t["eid"].ToString(), true),
+			JsReplace(HtmlReplace(t["banner_text"].ToString()))
+		);
+
+		return json;
+	}
+}
+
+
+@model MyBenefitM
+
+@{
+	string CHR_SVIP = "SV";
+	string CHR_VIP = "VI";
+	string CHR_GOLD = "GO";
+	string CHR_SILVER = "SI";
+	string CHR_NEW = "NE";
+
+	JArray array = Model.CouponCollection;
+
+	int _svip_ = 0, _vip_ = 0, _gold_ = 0, _silver_ = 0, _new_ = 0;
+
+	if (array.Count != 0)
+	{
+		_svip_ = array.Count(x => (x["banner_sub_type"].ToString() == CHR_SVIP));
+		_vip_ = array.Count(x => (x["banner_sub_type"].ToString() == CHR_VIP));
+		_gold_ = array.Count(x => (x["banner_sub_type"].ToString() == CHR_GOLD));
+		_silver_ = array.Count(x => (x["banner_sub_type"].ToString() == CHR_SILVER));
+		_new_ = array.Count(x => (x["banner_sub_type"].ToString() == CHR_NEW));
+	}
+
+	var coupons = new
+	{
+		svip = new int[_svip_],
+		svip_json = new string[_svip_],
+
+		vip = new int[_vip_],
+		vip_json = new string[_vip_],
+
+		gold = new int[_gold_],
+		gold_json = new string[_gold_],
+
+		silver = new int[_silver_],
+		silver_json = new string[_silver_],
+
+		new_ = new int[_new_],
+		new_json = new string[_new_]
+	};
+
+	foreach (JToken t in array.Where(x => (x["banner_sub_type"].ToString() == CHR_SVIP)))
+	{
+		int i = Convert.ToInt32(t["priority"].ToString()) - 1;
+		
+		coupons.svip[i] = Convert.ToInt32(t["eid"].ToString());
+		coupons.svip_json[i] = this.ToJsonCouponArray(t);
+	}
+
+	foreach (JToken t in array.Where(x => (x["banner_sub_type"].ToString() == CHR_VIP)))
+	{
+		int i = Convert.ToInt32(t["priority"].ToString()) - 1;
+		
+		coupons.vip[i] = Convert.ToInt32(t["eid"].ToString());
+		coupons.vip_json[i] = this.ToJsonCouponArray(t);
+	}
+
+	foreach (JToken t in array.Where(x => (x["banner_sub_type"].ToString() == CHR_GOLD)))
+	{
+		int i = Convert.ToInt32(t["priority"].ToString()) - 1;
+		
+		coupons.gold[i] = Convert.ToInt32(t["eid"].ToString());
+		coupons.gold_json[i] = this.ToJsonCouponArray(t);
+	}
+
+	foreach (JToken t in array.Where(x => (x["banner_sub_type"].ToString() == CHR_SILVER)))
+	{
+		int i = Convert.ToInt32(t["priority"].ToString()) - 1;
+		
+		coupons.silver[i] = Convert.ToInt32(t["eid"].ToString());
+		coupons.silver_json[i] = this.ToJsonCouponArray(t);
+	}
+
+	foreach (JToken t in array.Where(x => (x["banner_sub_type"].ToString() == CHR_NEW)))
+	{
+		int i = Convert.ToInt32(t["priority"].ToString()) - 1;
+		
+		coupons.new_[i] = Convert.ToInt32(t["eid"].ToString());
+		coupons.new_json[i] = this.ToJsonCouponArray(t);
+	}
+}
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		<div class="mkt">
+			<div class="rank">
+				<h3>등급별 추가혜택</h3>
+
+@if (PageAttr.IsLogin == false)
+{      
+				<div class="user_wrap">
+					<p class="user">
+						<span class="uw"><span>고객님의 이번 달 등급혜택</span>을 확인하세요!</span>
+					</p>
+					<div class="uw">
+						<p class="txt">이번 달 구매등급 확인하시면<br /><span>다양한 등급별 혜택</span>을 받으실 수 있습니다.</p>
+						<a href="javascript:goLogin();" class="my">나의 구매등급 확인하기</a>
+					</div>
+				</div>
+}
+else
+{
+				<div class="user_wrap" style="height: auto;">
+					<p class="user" style="height: auto; padding-bottom: 10px">
+						<span class="uw"><span class="info">@(Model.MyProfile.CustNm)</span>님의 <span class="info2">@(Model.ThisMonth)</span>월 구매등급은 <span class="info2">@(Model.ThisGradeStr)</span>입니다.</span>
+					</p>
+					<div class="uw">
+						<div class="this_mon_grp">
+							<span class="lv1"><img src="@Urls.MobileImageUrl/640/img_rank_@(Model.ThisGradeStr).png" alt="@(Model.ThisGradeStr)" /></span>
+							<a href="javascript:fnGradeGo('@(Model.ThisGradeStr)');" class="this_mon">이번달 등급혜택 받기</a>
+						</div>
+						<div class="next_mon_grp">						
+							<span class="lv2"><img src="@Urls.MobileImageUrl/640/img_rank_@(Model.NextGradeStr).png" alt="svip" /></span>
+							<p class="next_mon">다음달 <span>@(Model.NextGradeStr)</span>로 상승하시려면<br />추가로 구매건수 <span>@(Model.NextPurchase)</span>건이<br />필요합니다.</p>
+						</div>
+					</div>
+				</div>
+}
+
+				<h4>이달의 전회원 <em>등급별 혜택</em></h4>
+                
+				<!-- 등급별 혜택 SVIP -->
+				<div class="rank_ben svip" id="divSVIP">
+					<div class="lv"><div><img src="@Urls.MobileImageUrl/640/img_rank_svip.png" alt="svip" /></div></div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.SVIPCouponList.Count > 0)
+	{
+							<li>
+								<span><em>할인</em> 혜택</span>
+								<img src="@Model.SVIPCouponList[0].ImageUrl" alt="@Model.SVIPCouponList[0].ImageAlt" />
+								@RenderDownloadButton(coupons.svip, 0, "SV")
+							</li>
+	}
+
+	@if (Model.SVIPCouponList.Count > 1)
+	{
+							<li>
+								<span><em>스마일페이</em> 혜택</span>
+								<img src="@Model.SVIPCouponList[1].ImageUrl" alt="@Model.SVIPCouponList[1].ImageAlt" />
+								@RenderDownloadButton(coupons.svip, 1, "SV")
+							</li>
+	}
+						</ul>
+					</div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.SVIPCouponList.Count > 2)
+	{
+							<li>
+								<span><em>무료반품</em> 혜택</span>
+								<img src="@Model.SVIPCouponList[2].ImageUrl" alt="@Model.SVIPCouponList[2].ImageAlt" class="cpn" />
+								@RenderDownloadButton(coupons.svip, 2, "SV")
+							</li>
+	}
+
+	@if (Model.SVIPCouponList.Count > 3)
+	{
+							<li>
+								<span><em>승급</em> 혜택</span>
+								<img src="@Model.SVIPCouponList[3].ImageUrl" alt="@Model.SVIPCouponList[3].ImageAlt" />
+								@RenderDownloadButton(coupons.svip, 3, "SV")
+							</li>
+	}
+						</ul>
+					</div>
+				</div>
+				<!-- //등급별 혜택 SVIP -->
+
+				<!-- 등급별 혜택 VIP -->
+				<div class="rank_ben vip" id="divVIP">
+					<div class="lv"><div><img src="@Urls.MobileImageUrl/640/img_rank_vip.png" alt="vip" /></div></div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.VIPCouponList.Count > 0)
+	{
+							<li>
+								<span><em>할인</em> 혜택</span>
+								<img src="@Model.VIPCouponList[0].ImageUrl" alt="@Model.VIPCouponList[0].ImageAlt" />
+								@RenderDownloadButton(coupons.vip, 0, "V")
+							</li>
+	}
+
+	@if (Model.VIPCouponList.Count > 1)
+	{
+							<li>
+								<span><em>스마일페이</em> 혜택</span>
+								<img src="@Model.VIPCouponList[1].ImageUrl" alt="@Model.VIPCouponList[1].ImageAlt" />
+								@RenderDownloadButton(coupons.vip, 1, "V")
+							</li>
+	}
+						</ul>
+					</div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.VIPCouponList.Count > 2)
+	{
+							<li>
+								<span><em>무료반품</em> 혜택</span>
+								<img src="@Model.VIPCouponList[2].ImageUrl" alt="@Model.VIPCouponList[2].ImageAlt" class="cpn" />
+                                @RenderDownloadButton(coupons.vip, 2, "V")
+							</li>
+	}
+
+	@if (Model.VIPCouponList.Count > 3)
+	{
+							<li>
+								<span><em>승급</em> 혜택</span>
+								<img src="@Model.VIPCouponList[3].ImageUrl" alt="@Model.VIPCouponList[3].ImageAlt" />
+                                @RenderDownloadButton(coupons.vip, 3, "V")
+							</li>
+	}
+						</ul>
+					</div>
+				</div>
+				<!-- //등급별 혜택 VIP -->
+
+				<!-- 등급별 혜택 GOLD -->
+				<div class="rank_ben gold" id="divGOLD">
+					<div class="lv"><div><img src="@Urls.MobileImageUrl/640/img_rank_gold.png" alt="gold" /></div></div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.GoldCouponList.Count > 0)
+	{
+							<li>
+								<span><em>스마일페이</em> 혜택</span>
+								<img src="@Model.GoldCouponList[0].ImageUrl" alt="@Model.GoldCouponList[0].ImageAlt" />
+								@RenderDownloadButton(coupons.gold, 0, "G")
+							</li>
+	}
+
+	@if (Model.GoldCouponList.Count > 1)
+	{
+							<li>
+								<span><em>무료반품</em> 혜택</span>
+								<img src="@Model.GoldCouponList[1].ImageUrl" alt="@Model.GoldCouponList[1].ImageAlt" />
+                                @RenderDownloadButton(coupons.gold, 1, "G")
+							</li>
+	}
+						</ul>
+					</div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.GoldCouponList.Count > 2)
+	{
+							<li>
+								<span><em>승급</em> 혜택</span>
+								<img src="@Model.GoldCouponList[2].ImageUrl" alt="@Model.GoldCouponList[2].ImageAlt" />
+                                @RenderDownloadButton(coupons.gold, 2, "G")
+							</li>
+	}
+						</ul>
+					</div>
+				</div>
+				<!-- //등급별 혜택 GOLD -->
+
+				<!-- 등급별 혜택 SILVER -->
+				<div class="rank_ben silver" id="divSILVER">
+					<div class="lv"><div><img src="@Urls.MobileImageUrl/640/img_rank_silver.png" alt="silver" /></div></div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.SilverCouponList.Count > 0)
+	{
+							<li>
+								<span><em>스마일페이</em> 혜택</span>
+								<img src="@Model.SilverCouponList[0].ImageUrl" alt="@Model.SilverCouponList[0].ImageAlt" />
+								@RenderDownloadButton(coupons.silver, 0, "S")
+							</li>
+	}
+
+	@if (Model.SilverCouponList.Count > 1)
+	{
+							<li>
+								<span><em>무료반품</em> 혜택</span>
+								<img src="@Model.SilverCouponList[1].ImageUrl" alt="@Model.SilverCouponList[1].ImageAlt"  />
+								@RenderDownloadButton(coupons.silver, 1, "S")
+							</li>
+	}
+						</ul>
+					</div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.SilverCouponList.Count > 2)
+	{
+							<li>
+								<span><em>승급</em> 혜택</span>
+								<img src="@Model.SilverCouponList[2].ImageUrl" alt="@Model.SilverCouponList[2].ImageAlt" />
+                                @RenderDownloadButton(coupons.silver, 2, "S")
+							</li>
+	}
+						</ul>
+					</div>
+				</div>
+				<!-- //등급별 혜택 SILVER -->
+
+				<!-- 등급별 혜택 NEW -->
+				<div class="rank_ben new" id="divNEW">
+					<div class="lv"><div><img src="@Urls.MobileImageUrl/640/img_rank_new.png" alt="new" /></div></div>
+					<div class="cpn_wrap">
+						<ul>
+	@if (Model.NewCouponList.Count > 0)
+	{
+							<li>
+								<span><em>스마일페이</em> 혜택</span>
+								<img src="@Model.NewCouponList[0].ImageUrl" alt="@Model.NewCouponList[0].ImageAlt" />
+								@RenderDownloadButton(coupons.new_, 0, "N")
+							</li>
+	}
+						</ul>
+					</div>
+				</div>
+				<!-- //등급별 혜택 NEW -->
+
+				<!-- 전회원 혜택 -->
+				<div class="mem_ben_wrap" id="divNEW">
+					<p><span>전회원 혜택</span></p>
+					<div class="mem_ben">						
+						<a href="@Urls.MobileWebUrl/EventZone/MyBenefitCoupon"><img src="@Urls.MobileImageUrl/640/img_rank_ben.gif" alt="특별한 2월 할인혜택 최대 10%+12번할인 " /></a>
+					</div>
+				</div>
+				<!-- //전회원 혜택 -->
+
+				<!-- 회원 구매등급 기준 -->
+				<div class="stdr_wrap" id="divNoticeGrade">
+					<div class="stdr">
+						<img src="@Urls.MobileImageUrl/640/img_rank_stdr.png" alt="회원 구매등급 기준을 한눈에 확인하세요" />
+					</div>
+				</div>
+				<!-- //회원 구매등급 기준 -->
+
+				<!-- NOTICE -->
+				<div class="notice_wrap">
+					<div class="notice">
+						<p><em>NOTICE</em> 꼭!확인하세요</p>
+						<ul>
+							<li>당월 구매등급은 이전 3개월간 구매건수 및 누적 구매건수를 반영하여 산정됩니다.</li>
+							<li>발급 및 사용기간은 당월 1일 9시부터 말일 자정까지이며, 월 1회 발급됩니다.</li>
+							<li>할인쿠폰은 바로접속시 사용할 수 있으며, 최대 5천원까지 할인됩니다.</li>
+							<li>할인쿠폰은 상품별 할인을 제외한 타 쿠폰과 중복하여 사용할 수 없습니다.</li>
+							<li>할인쿠폰은 일부 카테고리에 사용이 제한될 수 있습니다.
+								<ul>
+									<li>(기저귀/분유, 물티슈/생리대, 순금/골드바/돌반지, 상품권 등 환금성 카테고리)</li>
+								</ul>
+							</li>
+							<li>스마일페이 슈퍼쿠폰은 삼성,현대, BC카드 결제시 할인쿠폰과 중복하여 사용할 수 있습니다. (타 결제수단 불가)
+
+								<ul>
+									<li>- 스마일페이란? 한번의 카드등록으로 쉽고 빠른 결제가 가능한 간편결제 서비스입니다.</li>
+								</ul>
+							</li>
+							<li>무료반품쿠폰은 단일 주문건에 대해 배송비를 제외한 결제금액이 3만원 이상인 상품을 반품시 사용할 수 있습니다.</li>
+							<li>승급혜택은 구매등급이 상승한 해당월에 제공되며, 발급 후 90일간 유효합니다.</li>
+							<li>승급혜택은 구매등급이 2단계 이상 상승하더라도 상위 혜택만 발급되며, 6개월간 1회 발급됩니다.</li>
+						</ul>
+					</div>
+				</div>
+				<!-- //NOTICE -->
+			</div>
+
+            <!-- 이벤트/쿠폰/혜택 전체보기 (공통) -->
+            <div class="mkt_all_wrap">
+                <div class="mkt_all">
+                    <p>
+                        이벤트/쿠폰/혜택 <span class="all1">전체보기</span></p>
+                    <a href="@Urls.MobileWebUrl/EventZone/MyBenefitHome" class="all2">모두보기</a>
+                </div>
+                <ul>
+                    <li class="mkt_nav1"><a href="@Urls.MobileWebUrl/Pluszone">플러스존</a></li>
+                    <li class="mkt_nav2"><a href="@Urls.MobileWebUrl/EventZone/MyBenefitCoupon">전회원할인</a></li>
+                    <li class="mkt_nav3"><a href="@Urls.MobileWebUrl/EventZone/MyBenefit">등급혜택</a></li>
+                    <li class="mkt_nav4"><a href="@Urls.MobileWebUrl/EventZone/MyBenefitVip">VIP사은품</a></li>
+                    <li class="mkt_nav5"><a href="@Urls.MobileWebUrl/GStamp">G스탬프</a></li>
+                </ul>
+            </div>
+            <!-- //이벤트/쿠폰/혜택 전체보기 (공통) -->
+		</div>
+	</div>
+	<!-- //CONTENT -->
+
+@section scripts
+{
+<script type="text/javascript" src="@Url.Content("~/Scripts/EventZone.js")"></script>
+
+<script type="text/javascript">
+	var arrGradeEid = {};
+@{
+    @:arrGradeEid.SV = [
+    for (int j = 0; j < coupons.svip_json.Length; j++)
+	{       
+        @Html.Raw(coupons.svip_json[j])
+		if (j + 1 != coupons.svip_json.Length)
+		{ @Convert.ToChar(44).ToString() }
+	}
+    @:];
+
+    @:arrGradeEid.V = [
+    for (int j = 0; j < coupons.vip_json.Length; j++)
+	{       
+        @Html.Raw(coupons.vip_json[j])
+		if (j + 1 != coupons.vip_json.Length)
+		{ @Convert.ToChar(44).ToString() }
+	}
+    @:];
+
+    @:arrGradeEid.G = [
+    for (int j = 0; j < coupons.gold_json.Length; j++)
+	{       
+        @Html.Raw(coupons.gold_json[j])
+		if (j + 1 != coupons.gold_json.Length)
+		{ @Convert.ToChar(44).ToString() }
+	}
+    @:];
+
+    @:arrGradeEid.S = [
+    for (int j = 0; j < coupons.silver_json.Length; j++)
+	{       
+        @Html.Raw(coupons.silver_json[j])
+		if (j + 1 != coupons.silver_json.Length)
+		{ @Convert.ToChar(44).ToString() }
+	}
+    @:];
+
+	@:arrGradeEid.N = [
+    for (int j = 0; j < coupons.new_json.Length; j++)
+	{       
+        @Html.Raw(coupons.new_json[j])
+		if (j + 1 != coupons.new_json.Length)
+		{ @Convert.ToChar(44).ToString() }
+	}
+    @:];
+}
+</script>
+
+<script type="text/javascript">
+    window.onload = function () {
+        setTimeout(function () {
+            displayLayer("progress_icon", "none");
+        }, 100);
+    }
+
+    function fnEventApply(obj, i) {
+        if (obj.length <= 0 || i > obj.length) {
+            alert("죄송합니다. 이벤트에 응모할 수 없습니다.");
+            return;
+        }
+
+        try {
+            var str = obj[i].sEidString.split(",");
+            CommonApplyEventPlatform(str[0].replace(/\"/g, ''), str[1].replace(/\"/g, ''));
+        } catch(e) {};
+    }
+
+    function goLogin() {
+    	alert('이벤트에 응모하시려면 로그인을 하셔야 합니다.');
+        document.location.href = "@Urls.LoginUrl";
+    }
+
+    function fnGradeNotice(sGrade) {        
+        if (sGrade == "SV") {
+            sGrade = "SVIP";
+        } else if (sGrade == "V") {
+            sGrade = "VIP";  
+        } else if (sGrade == "G") {
+            sGrade = "GOLD";
+        } else if (sGrade == "S") {
+            sGrade = "SILVER";
+        } else if (sGrade == "N") {
+			sGrade = "NEW";
+        }
+        alert('본 혜택은 ' + sGrade + ' 등급만 받으실 수 있습니다.');
+        $("html, body").animate({ scrollTop: $('#divNoticeGrade').get(0).offsetTop }, 600);        
+    }
+
+    function fnGradeGo(grade) {
+        $("html, body").animate({ scrollTop: $('#div' + grade).get(0).offsetTop }, 600);        
+    }
+</script>
+}

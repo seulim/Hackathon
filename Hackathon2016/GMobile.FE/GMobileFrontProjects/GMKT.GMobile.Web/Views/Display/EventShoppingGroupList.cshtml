@@ -1,0 +1,493 @@
+﻿@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Models;
+
+@using GMKT.Web.Context 
+
+@model EventShoppingGroupModel
+
+@{
+	Layout = "";
+	//ViewBag.Title = "EventShoppingGroupList";
+
+	bool isAdult = false;
+	if (PageAttr.IsLogin)
+	{
+			@* 
+			2013-06-10 이윤호 
+			GMKTWebContext -> GMobileWebContext
+			*@
+		isAdult = BizUtil.IsAdultUser(GMobileWebContext.Current.UserProfile.CustNo);
+	}
+}
+
+<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+@section Css
+{
+
+}
+<script type="text/javascript" src="@Const.GMW_CONTEXT_NM/js/common/jquery-1.7.1.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/category.css" />
+<script type="text/javascript">
+	window.onload = function () {
+		setTimeout(function () {
+		}, 100);
+	}
+</script>
+
+<script type="text/javascript">
+	var szItems = "";
+	var items = @Html.Raw(ViewBag.ScriptData) ;
+	
+</script>
+<script type="text/javascript">
+	$(document).ready(function () {
+		if (items != null && items.SmallGroups.length > 0) {
+			@if (!string.IsNullOrEmpty(ViewBag.SmallGroup))
+	 {
+			@:select_change(@ViewBag.SmallGroup);
+			}
+	 else
+	 {
+			@:select_all();
+			}
+		}
+	});
+
+	function eventApply(str, encStr, groupYn) {		
+		window.location.href = '@Url.Action("CommonApplyEventPlatformGmarketEx", "Display", new { })' + '?str=' + str + '&encStr=' + encStr +
+			'&groupYn=' + groupYn + '&returlUrl=' + escape(document.URL);
+	}
+
+	function select_change(sCode) {
+		$("#goodsGroupFilter").val(sCode);
+
+		for (var i = 0; i < items.SmallGroups.length; i++ ) {
+			var _smallGroupItem = items.SmallGroups[i];
+			var _templeName = _smallGroupItem.Template + '_' + _smallGroupItem.GroupCode + '_' + _smallGroupItem.SmallGroupCode;
+
+			$("#smallGroupTitle_" + _smallGroupItem.SmallGroupCode).hide();
+			if (_smallGroupItem.SmallGroupCode == sCode) {
+				smallGroupConfig(_smallGroupItem);
+				$("#" + _templeName).show();								
+			} else {
+				$("#" + _templeName).hide();
+			}
+		}
+	}
+
+	function select_all(){
+		for (var i = 0; i < items.SmallGroups.length; i++) {
+			var _smallGroupItem = items.SmallGroups[i];
+			var _templeName = _smallGroupItem.Template + '_' + _smallGroupItem.GroupCode + '_' + _smallGroupItem.SmallGroupCode;
+
+			smallGroupConfig(_smallGroupItem);
+			$("#" + _templeName).show();
+		}
+	}
+
+	function smallGroupConfig(smallGroup) {
+		if (smallGroup == null || typeof (smallGroup) == 'undefined') return;
+
+		if (!smallGroup.TitleUseYn) {
+			$("#smallGroupTitle_" + smallGroup.SmallGroupCode).hide();
+		} else {
+			$("#smallGroupTitle_" + +smallGroup.SmallGroupCode).show();
+		}
+
+		if (smallGroup.TitleType == "TEXT") {
+			$("#smallCategoryTitleImage_" + smallGroup.SmallGroupCode).hide();
+			$("#smallCategoryTitle_" + smallGroup.SmallGroupCode).show();
+			$("#txtSmallGroupTitle_" + smallGroup.SmallGroupCode).text(smallGroup.GroupTitle);
+		} else {
+			$("#smallCategoryTitleImage_" + smallGroup.SmallGroupCode).show();
+			$("#smallCategoryTitle_" + smallGroup.SmallGroupCode).hide();
+			$("#txtSmallGroupTitle_" + smallGroup.SmallGroupCode).text("");
+			$("#imgSmallGroupTitle_" + smallGroup.SmallGroupCode).attr("src", smallGroup.TitleImage);
+		}
+	}
+
+</script>
+<!-- WRAPPER -->
+<!-- WRAPPER -->
+<div id="wrap">
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns evt">
+		
+		<!-- BANNER -->	
+		<div class="ban_wrap">
+			<div class="bn_grp ban" id="bnGrp">
+				@if(false == string.IsNullOrEmpty(ViewBag.BannerImgUrl))
+				{
+				<ul>
+					<li>
+						@Html.Raw(ViewBag.BannerImgUrl)
+					</li>
+				</ul>
+				}
+				<img src="@Model.LargeGroup.TitleImage" alt="@Model.LargeGroup.TitleText" />
+			</div>
+		</div>		
+		<!-- //BANNER -->
+			
+		
+		 @foreach (var gp in Model.SmallGroups)
+	 {
+		 var goodsList = Model.GoodsList.Where(a => a.SmallGroupCode == gp.SmallGroupCode).ToList();
+		 int loopCnt = 1;
+	     int rCnt = gp.RowCnt;
+
+		 string _titleTextViewFlag, _titleImageViewFlag;
+		 if ((gp.TitleType.Equals("IMAGE")))
+		 {
+			 _titleTextViewFlag = "none";
+			 _titleImageViewFlag = "";
+		 }
+		 else
+		 {
+			 _titleTextViewFlag = "";
+			 _titleImageViewFlag = "none";
+		 }
+
+		 if (goodsList.Count < 1)
+		 {
+			 continue;
+		 }
+
+		 if(gp.Template.Equals("100") || gp.Template.Equals("101") || gp.Template.Equals("102")){
+		 @:<div class="item_line1" style="background:@Model.LargeGroup.BackgroundColor">
+		 }
+
+		<div class="tit_type" id="smallGroupTitle_@gp.SmallGroupCode">
+			<!-- 이미지형 -->
+			<span class="img_area" id="smallCategoryTitleImage_@gp.SmallGroupCode" style="display:@_titleImageViewFlag;"><img id="imgSmallGroupTitle" src="@gp.TitleImage" alt="" /></span>
+			<!-- 텍스트형 -->
+			@if (gp.Template.Equals("200") || gp.Template.Equals("201"))
+			{
+			<p class="txt_area"  id="smallCategoryTitle_@gp.SmallGroupCode" style="display:@_titleTextViewFlag;"><span class="empty"></span><span class="txt type" id="txtSmallGroupTitle_@gp.SmallGroupCode">@gp.GroupTitle</span></p>
+			}else{
+			<p class="txt_area"  id="smallCategoryTitle_@gp.SmallGroupCode" style="display:@_titleTextViewFlag;"><span class="empty"></span><span class="txt" id="txtSmallGroupTitle_@gp.SmallGroupCode">@gp.GroupTitle</span></p>
+			}
+		</div>
+
+	 if (gp.Template.Equals("100"))
+	 { 
+				@:<div class="item_area horizontal_list" id="@string.Concat(gp.Template, "_", gp.GroupCode, "_", gp.SmallGroupCode)">
+			}
+	 else if (gp.Template.Equals("101"))
+	 { 
+				@:<div class="horizontal_list v3" id="@string.Concat(gp.Template, "_", gp.GroupCode, "_", gp.SmallGroupCode)"><ul>
+		 }
+	 else if (gp.Template.Equals("102"))
+	 {
+				@:<div class="horizontal_list"  id="@string.Concat(gp.Template, "_", gp.GroupCode, "_", gp.SmallGroupCode)"><ul>
+
+		 rCnt = gp.RowCnt * 2;
+	 }
+	 else if (gp.Template.Equals("200"))
+	 { 
+				@:<div class="dnld_bx" id="@string.Concat(gp.Template, "_", gp.GroupCode, "_", gp.SmallGroupCode)">
+		 }
+	 else if (gp.Template.Equals("201"))
+	 { 
+				@:<div class="dnld_bx v2" id="@string.Concat(gp.Template, "_", gp.GroupCode, "_", gp.SmallGroupCode)">
+		 }
+
+	 for (int i = 0; i < goodsList.Count; i++)
+	 {
+		 if (loopCnt > rCnt)
+		 {
+			 break;
+		 }
+
+		 var gdImagePath = "";
+		 var goods = goodsList[i];
+		 if (goods.GdNo.Length > 0)
+		 {
+			 if (string.IsNullOrEmpty(goods.CouponImage) || goods.CouponImage.Length < 1)
+			 {
+				 if (gp.Template.Equals("100"))
+				 {
+					 gdImagePath = BizUtil.GetGoodsImagePath(goods.GdNo, "L");
+				 }
+				 else
+				 {
+					 gdImagePath = BizUtil.GetGoodsImagePath(goods.GdNo, "M");
+				 }
+			 }
+			 else
+			 {
+				 gdImagePath = goods.CouponImage;
+			 }
+		 }
+
+		 string salePercent = "";
+		 string gdUrl = goods.GdUrl;
+		 double nSalePer = 0;
+		 string viewPrice = "";
+		 if (goods.SearchGoodsModel != null)
+		 {
+			 nSalePer = 100 - (Double.Parse(goods.SearchGoodsModel.DiscountPrice.Replace(",", "")) / Double.Parse(goods.SearchGoodsModel.Price.Replace(",", "")) * 100.0);
+			 salePercent = nSalePer.ToString("###");
+
+			 if (!isAdult && goods.SearchGoodsModel.AdultYn.ToLower().Equals("true"))
+			 {
+				 gdUrl = "alert('죄송합니다.\\n성인만 구매 가능한 상품입니다.'); return false;";
+			 }
+
+			 
+			 if (!goods.SearchGoodsModel.Price.Equals(goods.SearchGoodsModel.DiscountPrice))
+			 {
+				 viewPrice = "<span class=\"price\">" + (goods.SearchGoodsModel == null ? "" : goods.SearchGoodsModel.Price) + " 원</span>";
+			 }
+			 viewPrice += "<span class=\"sale_price\"><strong>" + (goods.SearchGoodsModel == null ? "" : goods.SearchGoodsModel.DiscountPrice) + "</strong>원</span>";
+		 }		 
+		 
+	 
+	 if (gp.Template.Equals("100"))
+	 { 
+				<a href="@gdUrl">
+					<span class="img"><img src="@gdImagePath" alt=""></span>
+					<span class="goods_name"><strong>@goods.GdName</strong></span>
+					<span class="goods_info">
+						@if (nSalePer > 0)
+			{
+						<span class="align_l">
+							<span class="sale"><em class="num">@salePercent</em><span class="per">%</span><span>sale</span></span>
+						</span>
+			}
+						<span class="align_l">
+							@Html.Raw(viewPrice)
+						</span>
+					</span>
+				</a>
+	 }
+	 else if (gp.Template.Equals("101"))
+	 {
+
+		 if (i >= goodsList.Count)
+		 {
+			 break;
+		 }					
+				<li>
+					<a class="anchor" href="@goods.GdUrl">
+						<div class="align_l">
+							<span class="thumbnail_wrap">
+								<img class="thumbnail" src="@gdImagePath" alt="" />
+							</span>
+						</div>
+						<div class="align_l r_txt">
+							<span class="goods_name"><strong>@goods.GdName</strong></span>
+							<span class="goods_info">
+								@if (nSalePer > 0)
+				{
+								<span class="align_l">
+									<span class="sale"><em class="num">@salePercent</em><span class="per">%</span><span>sale</span></span>
+								</span>
+				}
+								<span class="align_l">
+									@Html.Raw(viewPrice)
+								</span>
+							</span>
+						</div>
+					</a>
+				</li>
+				{
+					if ((loopCnt + 2) > gp.RowCnt || (i + 1) >= goodsList.Count)
+					{
+						break;
+					}
+
+					i++;
+					goods = goodsList[i];
+					if (goods.GdNo.Length > 0)
+					{
+						//gdImagePath = BizUtil.GetGoodsImagePath(goods.GdNo, "L");
+						if (string.IsNullOrEmpty(goods.CouponImage) || goods.CouponImage.Length < 1)
+						{
+							gdImagePath = BizUtil.GetGoodsImagePath(goods.GdNo, "M");							
+						}
+						else
+						{
+							gdImagePath = goods.CouponImage;
+						}
+					}
+
+					if (goods.SearchGoodsModel != null)
+					{
+						nSalePer = 100 - (Double.Parse(goods.SearchGoodsModel.DiscountPrice.Replace(",", "")) / Double.Parse(goods.SearchGoodsModel.Price.Replace(",", "")) * 100.0);
+						salePercent = nSalePer.ToString("###");
+
+						if (!isAdult && goods.SearchGoodsModel.AdultYn.ToLower().Equals("true"))
+						{
+							gdUrl = "alert('죄송합니다.\\n성인만 구매 가능한 상품입니다.'); return false;";
+						}
+
+                        viewPrice = String.Empty;
+						if (!goods.SearchGoodsModel.Price.Equals(goods.SearchGoodsModel.DiscountPrice))
+						{
+							viewPrice = "<span class=\"price\">" + (goods.SearchGoodsModel == null ? "" : goods.SearchGoodsModel.Price) + " 원</span>";
+						}
+						viewPrice += "<span class=\"sale_price\"><strong>" + (goods.SearchGoodsModel == null ? "" : goods.SearchGoodsModel.DiscountPrice) + "</strong>원</span>";
+					}
+
+				}
+				<li>
+					<a class="anchor" href="@goods.GdUrl">
+						<div class="align_l">
+							<span class="thumbnail_wrap">
+								<img class="thumbnail" src="@gdImagePath" alt="" />
+							</span>
+						</div>
+						<div class="align_l r_txt">
+							<span class="goods_name"><strong>@goods.GdName</strong></span>
+							<span class="goods_info">
+								@if (nSalePer > 0)
+				{
+								<span class="align_l">
+									<span class="sale"><em class="num">@salePercent</em><span class="per">%</span><span>sale</span></span>
+								</span>
+				}
+								<span class="align_l">
+									@Html.Raw(viewPrice)
+								</span>
+							</span>
+						</div>
+					</a>
+				</li>
+	 }
+	 else if (gp.Template.Equals("102"))
+	 {
+				<li>
+					<a class="anchor" href="@goods.GdUrl">
+
+						<span class="thumbnail_wrap">
+							<img class="thumbnail" src="@gdImagePath" alt="" />
+						</span>
+
+						<span class="goods_name"><strong>@goods.GdName</strong></span>
+
+						<span class="goods_info">
+							@if (nSalePer > 0)
+			 {
+							<span class="align_l">
+								<span class="sale"><em class="num">@salePercent</em><span class="per">%</span><span>sale</span></span>
+							</span>
+			 }
+							<span class="align_l">
+								@Html.Raw(viewPrice)
+							</span>
+						</span>
+					</a>
+				</li>
+	 }
+	 else if (gp.Template.Equals("200"))
+	 { 
+					<span class="img size213"><img src="@goods.CouponImage" alt="@goods.GroupTitle" /></span>
+					<a href="javascript:eventApply(@Html.Raw(goods.EidEncrytStr));" class="img size166"><img src="http://pics.gmarket.co.kr/mobile/plan/btn_dwnl.png" alt="다운로드" /></a>
+					<div class="txt_bx">
+						<p>@Html.Raw(goods.CouponDesc.Replace("\n", "<br/>"))</p>
+					</div>
+	 }
+	 else if (gp.Template.Equals("201"))
+	 {
+		 if (i >= goodsList.Count - 1)
+		 {
+			 break;
+		 }	
+
+					<div class="cp_bx">
+						<div class="align_l">
+							<span class="img size290"><img src="@goods.CouponImage" alt="@goods.GroupTitle"></span>
+							<a href="javascript:eventApply(@Html.Raw(goods.EidEncrytStr));" class="img size234"><img src="http://pics.gmarket.co.kr/mobile/plan/btn_dwnl_v2.png" alt="다운로드"></a>
+						</div>
+						@{
+		 i++;
+		 goods = goodsList[i];
+					 	}
+						<div class="align_l">
+							<span class="img size290"><img src="@goods.CouponImage" alt="@goods.GroupTitle"></span>
+							<a href="javascript:eventApply(@Html.Raw(goods.EidEncrytStr));" class="img size234"><img src="http://pics.gmarket.co.kr/mobile/plan/btn_dwnl_v2.png" alt="다운로드"></a>
+						</div>
+					</div>
+					<div class="txt_bx">
+						<p>@Html.Raw(goods.CouponDesc.Replace("\n", "<br/>"))</p>
+					</div>
+
+	 }
+
+	 loopCnt++;
+	 }
+
+	 if (gp.Template.Equals("100") || gp.Template.Equals("200") || gp.Template.Equals("201"))
+	 { 
+				@:</div>
+		 }
+	 else if (gp.Template.Equals("101") || gp.Template.Equals("102"))
+	 { 
+				@:</ul></div>
+		 }
+
+	 if (gp.Template.Equals("100") || gp.Template.Equals("101") || gp.Template.Equals("102"))
+	 {
+		 @:</div>
+		 }
+	 }
+		
+		
+
+		
+
+		<input type="hidden" id="goodsGroupFilter" />
+
+		<script type="text/javascript">
+			//UL_layoutFix2_1(".horizontal_list", true);
+		</script>
+	
+		<!-- PRODUCT ALIGN -->
+		@*<div class="view_type">
+			<div class="view_type_sub">	<!-- 20120823 -->
+				<div class="p_right">
+					<div class="viewmd">
+						<ul>
+							<li><a href="#"><img src="http://image.gmarket.co.kr/Gmarket_Mobile_v2/480/btn_view_img_on.gif" alt="이미지리스트"/></a></li>
+							<li><a href="#"><img src="http://image.gmarket.co.kr/Gmarket_Mobile_v2/480/btn_view_list.gif" alt="리스트"/></a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="p_left">
+					<div class="filter_group">
+						<a href="javascript:;"  id="group_view">그룹보기</a>
+						<div class="box">
+							<ul class="opt_plus">
+							@{
+								int j = 0;
+							}
+							@foreach (var m in Model.SmallGroups)
+							{ 
+							<li>
+								<input type="radio" name="opt_rdo" id="optx@m.SmallGroupCode" class="inp_rdo" />
+								<label for="optx@m.SmallGroupCode" onclick="select_change('@m.SmallGroupCode');">@m.SmallGroupName</label>
+							</li>
+							 j++;
+							}
+							</ul>					
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		*@
+		
+		
+	</div>
+	<!-- //CONTENT -->
+
+</div>
+<!-- //WRAPPER -->
+
+
+
+</div>

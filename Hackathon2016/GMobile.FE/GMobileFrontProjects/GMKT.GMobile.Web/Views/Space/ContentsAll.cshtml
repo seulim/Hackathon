@@ -1,0 +1,58 @@
+﻿@model List<GMKT.GMobile.Data.SpaceContents>
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		<section class="sec_room">
+			<ul class="lst_room">
+				@foreach (var eachContents in Model)
+				{
+					string seletedClass = string.Empty;
+					string seletedSpan = string.Empty;
+					string bannerImg = string.Empty;
+					string landingUrl = string.IsNullOrEmpty(eachContents.ConnectUrl) ? "/Space/ContentsDetail?id=" + eachContents.ContentsSeq.ToString() : eachContents.ConnectUrl;
+					if (@eachContents.ContentsSeq == ViewBag.selectedContentId) {
+						seletedClass = "class=sel";
+						seletedSpan = "<span class='sel_txt sp_room'><em class='blind'>선택한 컨텐츠</em></span>";
+					}
+					if (!string.IsNullOrEmpty(eachContents.BannerImageUrl))
+					{
+						bannerImg = "<img src='" + @eachContents.BannerImageUrl + "' alt='" + @eachContents.GroupName + "' />";
+					}
+		
+					<li @seletedClass>
+						<a href="@landingUrl" class="lnk_prd">
+						<div class="bx_tit">
+							<strong class="tit">@eachContents.Title</strong>
+							<span class="logo">@Html.Raw(bannerImg)</span>
+						</div>
+						<div class="bx_img">
+							<!--[D] 선택한 컨텐츠시 span태그 추가 -->
+							@Html.Raw(seletedSpan)
+							<img src="@eachContents.MainBannerImageUrl" alt="" />
+						</div>
+						</a>
+					</li>
+				}
+			</ul>
+		</section>
+	</div>
+	<!-- //CONTENT -->
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+			setTimeout(function () {
+				if ($("li.sel").length > 0) {
+					scrollToSelected();
+				}
+			}, 100);
+		});
+
+		function scrollToSelected() {
+			if (($(document).height() - $("li.sel a").offset().top) < $(window).height()) {
+				$(window).scrollTop($(document).height());
+			}
+			else {
+				$(window).scrollTop($('li.sel a').offset().top);
+			}
+			//$('html, body').animate({ scrollTop: $("li.selected a").offset().top }, 'fast');
+		}
+	</script>

@@ -1,0 +1,44 @@
+﻿@using GMKT.GMobile.Web.Models;
+@{
+    //ViewData["Title"] = "공지사항";
+
+	string noticeDate = @Model.Notice.RegDt;
+	if (noticeDate != null && !"".Equals(noticeDate) && noticeDate.Length >= 10)
+		noticeDate = noticeDate.Substring(0, 10);
+}
+
+    <script type="text/javascript">
+	    window.onload = function () {
+	        setTimeout(function () {
+	            displayLayer("progress_icon", "none");
+	        }, 100);
+	    }
+
+		$(document).ready(function () {
+			$("div.notice").find("img").css("overflow", "hidden");
+		});
+
+		function goList(nKind) {
+			document.location.href = '@Urls.MobileWebUrl/Etc/NoticeList?nKind=' + nKind;
+		}
+
+	</script>	
+    <hr />
+
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		
+		<div class="notice">
+			<h3>공지사항</h3>
+			<p class="tit">@Model.Notice.Title<span>@noticeDate</span></p>
+			<div class="ct">
+				@Html.Raw(@Model.Notice.Content)
+			</div>
+			<button type="button" class="list_view2" onClick="goList('@Model.queryKind');">목록 보기</button>
+		</div>
+
+	</div>
+	<!-- //CONTENT -->
+
+	<hr />

@@ -1,0 +1,318 @@
+﻿@using System.Web.Mvc.Html;
+@using System.Web.Mvc;
+@using GMKT.GMobile.Web.Models;
+@using GMKT.GMobile.Constant;
+@using GMKT.Web.Context 
+
+@{
+    ViewBag.Title = "MyBenefitHome";
+	string strImgDate;
+	string year = DateTime.Now.Year.ToString();
+	string month = DateTime.Now.Month.ToString();
+	if (month.Length == 1)
+	{
+		month = "0" + month;
+	}
+	strImgDate = year + month;
+
+	DateTime endDay = DateTime.Parse("2014-02");
+	DateTime toDay = DateTime.Parse(DateTime.Now.ToString("yyyy-MM"));
+
+	string imgHomePath = "coupon/img_home_" + strImgDate + ".png";
+	DateTime feb = new DateTime(2014, 2, 1, 0, 0, 0);
+	if (DateTime.Today < feb)
+	{
+		imgHomePath = strImgDate + "/img_home1.png";
+	}
+}
+
+<script type="text/javascript">
+    window.onload = function () {
+        setTimeout(function () {
+            displayLayer("progress_icon", "none");
+        }, 100);
+    }
+
+    var url = "Intent://CreateGServiceShortcut?page=MyBenefitHome#Intent;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;scheme=gmarket;package=com.ebay.kr.gmarket;end";
+    
+    function getAndroidVersion() {
+        var androidVersion = -1; // def value, for non-Android devices
+        var ua = navigator.userAgent.toLowerCase();
+        var androidIndex = ua.indexOf('android');
+
+        if (androidIndex != -1) {
+            var versionStartIndex = androidIndex + 8;
+            var versionEndIndex = ua.indexOf(';', versionStartIndex);
+
+            androidVersion = parseFloat(ua.slice(versionStartIndex, versionEndIndex));
+        }
+
+        return androidVersion;
+    }
+    function checkApplicationInstall() {
+        if (getAndroidVersion() >= 4.3) window.location.href = url;
+        else {
+            var iframe = document.createElement("iframe");
+            iframe.id = "checkframe";
+            iframe.name = "checkframe";
+            iframe.style.width = "0px";
+            iframe.style.height = "0px";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+
+            document.checkframe.location = "gmarket://CreateGServiceShortcut?page=MyBenefitHome";
+            setTimeout("checkApplicationInstall_callback()", 500);
+        }
+    }
+
+    function checkApplicationInstall_callback() {
+        try {
+            
+            var s = document.checkframe.document.body.innerHTML;
+            $("#checkframe").remove();
+        } catch (e) {
+            document.location = "market://details?id=com.ebay.kr.gmarket";
+        }
+    }
+
+    function sendScheme() {
+        
+        var appVersion = checkAppVersion();
+        
+        if (appVersion != '' && parseInt(appVersion) <= 335) {            
+            if (confirm("고객님 G마켓 앱의 업데이트가 필요합니다.") == false) {
+                return;
+            } else {                
+                document.location = "market://details?id=com.ebay.kr.gmarket";
+            }            
+        }
+        else {
+            var iframe = document.createElement("iframe");
+            iframe.id = "checkframe";
+            iframe.name = "checkframe";
+            iframe.style.width = "0px";
+            iframe.style.height = "0px";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+
+            document.checkframe.location = "gmarket://CreateGServiceShortcut?page=MyBenefitHome";
+            setTimeout("checkApplicationInstall_callback2()", 500);           
+        }
+    }
+
+    function checkApplicationInstall_callback2() {
+        try {
+
+            var s = document.checkframe.document.body.innerHTML;
+            $("#checkframe").remove();
+        } catch (e) {
+            
+        }
+    }
+
+    function checkAppVersion() {
+        var sName = "appversion";
+	    var aCookie = document.cookie.split("; ");
+
+	    for (var i = 0; i < aCookie.length; i++) {
+		    var aCrumb = aCookie[i].split("=");
+		    if (sName == aCrumb[0])
+			    return unescape(aCrumb[1]);
+	    }
+	    return null;
+    }
+
+    $(document).ready(function () {
+
+    });
+    
+</script>
+
+<style type="text/css">
+/* 이벤트/쿠폰/혜택 띠배너 반영 */
+/* main_2013.css 제거를 확인 할 수 없음 */
+.ctns .ban_wrap { padding-bottom: 0px; }
+.ctns .mkt .home .ban { margin-top:0px; }
+.ctns .ban_wrap .ban { border-bottom-style:none; }
+</style>
+
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+		
+	
+	<div class="mkt">
+		<div class="home">
+			<h3>이벤트/쿠폰/혜택</h3>
+
+            @if (PageAttr.IsLogin == true)
+            {
+			<!-- 로그인후 -->
+			<div class="user_wrap">
+				<p class="user">
+					@* 
+					2013-06-10 이윤호 
+					GMKTWebContext -> GMobileWebContext
+					*@
+					<span class="uw"><span class="info">@GMobileWebContext.Current.UserProfile.CustName</span>님의 혜택 정보</span>
+				</p>
+				<div class="uw">
+					<div class="month_grp">
+						<p class="month">@DateTime.Now.Month<span>월의 구매등급</span></p>
+						<span class="lv1">	
+														@* 
+														2013-06-10 이윤호 
+														GMKTWebContext -> GMobileWebContext
+														*@				
+                            @switch (GMobileWebContext.Current.UserProfile.BuyerGrade.ToString())
+                            {
+                                case "New":
+                                    <img src="@Urls.MobileImageUrlV2/640/img_rank_new.png" alt="new" />
+                                    break;
+                                case "Silver":
+                                    <img src="@Urls.MobileImageUrlV2/640/img_rank_silver.png" alt="silver" />
+                                    break;
+                                case "Gold":
+                                    <img src="@Urls.MobileImageUrlV2/640/img_rank_gold.png" alt="gold" />
+                                    break;
+                                case "VIP":
+                                    <img src="@Urls.MobileImageUrlV2/640/img_rank_vip.png" alt="vip" />
+                                    break;
+                                case "SVIP":
+                                    <img src="@Urls.MobileImageUrlV2/640/img_rank_svip.png" alt="svip" />
+                                    break;
+                            }                           
+                        </span>
+						<a href="@Urls.MobileWebUrl/EventZone/MyBenefit" class="this_mon">이번달 등급혜택 받기</a>
+					</div>
+					<div class="num_grp">						
+						<ul>               
+							<li>G스탬프 <a href="@Urls.MMyGUrl/GStamp/GStamp?type=event"><span class="num"><span>@String.Format("{0:N0}", Model.MybenefitModel.StickerSum)</span> 장</span></a></li>
+							<li>G마일리지 <a href="@Urls.MMyGUrl/GMileage/GMileage?type=event"><span class="num"><span>@String.Format("{0:N0}", Model.MybenefitModel.MileageSum)</span> 마일</span></a></li>
+							<li>쿠폰 <a href="@Urls.MMyGUrl/Coupon/MyCoupon?type=event"><span class="num"><span>@String.Format("{0:N0}", Model.MybenefitModel.coupon_cnt)</span> 장</span></a></li>
+							<li>현금잔고 <a href="@Urls.MMyGUrl/CashBalance/CashBalance?type=event"><span class="num"><span>@String.Format("{0:N0}", Model.MybenefitModel.EtcMoneySum)</span> 원</span></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<!-- //로그인후 -->
+            }
+            else
+            {         
+			<!-- 로그인전 -->
+			<div class="user_wrap">
+				<p class="user">
+					<span class="uw"><span>고객님의 이번 달 등급혜택</span>을 확인하세요!</span>
+				</p>
+				<div class="uw">
+					<p class="txt">이번 달 구매등급 확인하시면<br /><span>다양한 등급별 혜택</span>을 받으실 수 있습니다.</p>
+					<a href="@Urls.LoginUrl" class="my">나의 구매등급 확인하기</a>
+				</div>
+			</div>
+			<!-- //로그인전 -->
+            } 
+            
+
+<!-- 이벤트/쿠폰/혜택 띠배너 반영 //-->
+@if (Model.BandBannerDisplay)
+{                
+            <!-- 20130618 -->
+            <div class="ban_wrap" style="border-top:1px solid #0096ec;border-bottom:1px solid #d8dbde;background:#e7fbff;">
+	            <div class="ban_sub">
+                    @if (Model.BandBannerLink != string.Empty)
+                    {
+				        <a href="@Model.BandBannerLink"><img src="@Model.BandBannerUrl" alt="@Model.BandBannerTitle" class="ban" /></a>
+                    }
+                    else
+                    {
+                        <img src="@Model.BandBannerUrl" alt="@Model.BandBannerTitle" class="ban" />    
+                    }
+	            </div>
+            </div>
+            <!-- //20130618 -->       			
+}
+<!-- 이벤트/쿠폰/혜택 띠배너 반영 //-->			
+
+			<h4>회원이면 누구나! <em>이달의 회원혜택</em></h4>
+			<div class="sctn_wrap">
+				<div class="sctn">
+					<a href="@Urls.MobileWebUrl/EventZone/MyBenefitCoupon">
+@if( DateTime.Compare( endDay, toDay ) >= 0 )
+{
+						<img src="@Urls.MobileImageUrlV2/640/@imgHomePath" 
+							alt="12월! 회원 누구나 최대 10%+12번 할인" class="img1" />
+}
+else
+{
+						<img src="@Urls.MobileImageUrlV2/640/coupon/anyone_10_p_12_times.png" 
+							alt="12월! 회원 누구나 최대 10%+12번 할인" class="img1" />
+}
+						
+					</a>
+					<a href="@Urls.MobileWebUrl/EventZone/MyBenefit"><img src="@Urls.MobileImageUrlV2/640/img_home2.png" alt="할인 그리고 무료반품은 기본 등급별 추가혜택" class="img1" /></a>
+				</div>
+			</div>
+
+			<h4>매일매일 혜택 100% 증정! <em>모바일 플러스존</em></h4>
+			<div class="sctn_wrap">
+				<div class="sctn">
+					<a href="@Urls.MobileWebUrl/Pluszone"><img src="@Urls.MobileImageUrlV2/640/img_home3.png" alt="11월! 회원 누구나 최대 10%+12번 할인"	class="img2" /></a>
+				</div>
+			</div>
+
+			<h4>VIP위한 특별한 이달의 선물! <em>VIP사은품</em></h4>
+			<div class="sctn_wrap">
+				<div class="sctn">
+					<a href="@Urls.MobileWebUrl/EventZone/MyBenefitVip#pur_wrap"><img src="@Urls.MobileImageUrlV2/640/img_home4.gif" alt="12월! 회원 누구나 최대 10%+12번 할인" class="img1" /></a>
+					<a href="@Urls.MobileWebUrl/EventZone/MyBenefitVip#vip_ent"><img src="@Urls.MobileImageUrlV2/640/img_home5.gif" alt="할인 그리고 무료반품은 기본 등급별 추가혜택" class="img1" /></a>
+				</div>
+			</div>
+
+			<h4>G스탬프로 누리는 다양한 혜택! <em>G스탬프</em></h4>
+			<div class="sctn_wrap">
+				<div class="sctn">
+					<a href="@Urls.MobileWebUrl/GStamp"><img src="@Urls.MobileImageUrlV2/640/img_home6.png" alt="12월! 회원 누구나 최대 10%+12번 할인" class="img1" /></a>
+					<a href="@Urls.MobileWebUrl/GStamp/1"><img src="@Urls.MobileImageUrlV2/640/img_home7.gif" alt="할인 그리고 무료반품은 기본 등급별 추가혜택" class="img1" /></a>
+				</div>
+			</div>
+		</div>
+
+		<!-- 이벤트/쿠폰/혜택 전체보기 (공통) -->
+		<div class="mkt_all_wrap">
+			<div class="mkt_all">
+				<p>이벤트/쿠폰/혜택 <span class="all1">전체보기</span></p>
+				<a href="@Urls.MobileWebUrl/EventZone/MyBenefitHome" class="all2">모두보기</a>
+			</div>
+			<ul>
+				<li class="mkt_nav1"><a href="@Urls.MobileWebUrl/Pluszone">플러스존</a></li>
+				<li class="mkt_nav2"><a href="@Urls.MobileWebUrl/EventZone/MyBenefitCoupon">전회원할인</a></li>
+				<li class="mkt_nav3"><a href="@Urls.MobileWebUrl/EventZone/MyBenefit">등급혜택</a></li>
+				<li class="mkt_nav4"><a href="@Urls.MobileWebUrl/EventZone/MyBenefitVip">VIP사은품</a></li>
+				<li class="mkt_nav5"><a href="@Urls.MobileWebUrl/GStamp">G스탬프</a></li>
+			</ul>
+		</div>
+		<!-- //이벤트/쿠폰/혜택 전체보기 (공통) -->
+		
+        <!--모바일 홈 바로가기-->        
+        @*class="go_homebnr"*@
+		@if (!PageAttr.IsIphone)
+  {
+	  if (PageAttr.IsAndroidApp)
+	  {
+                <div class="go_homebnr"><a onclick="sendScheme()" ><img src="@Urls.MobileImageUrlV2/640/banner/go_home1.jpg" alt="이벤트/쿠폰/혜택 홈화면 바로가기 추가" /></a>
+                </div>      
+	  }
+	  else
+	  {
+			    <div class="go_homebnr"><a onclick="checkApplicationInstall()" ><img src="@Urls.MobileImageUrlV2/640/banner/go_home1.jpg" alt="이벤트/쿠폰/혜택 홈화면 바로가기 추가" /></a>
+                </div>
+              }
+         } 
+	    <!--모바일 홈 바로가기-->
+
+	</div>
+	
+</div>
+<!-- //CONTENT -->
+
+<hr />

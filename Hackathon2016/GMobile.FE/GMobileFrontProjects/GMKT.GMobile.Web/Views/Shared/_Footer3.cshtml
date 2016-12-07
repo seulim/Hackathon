@@ -1,0 +1,12 @@
+﻿@if (PageAttr.ViewFooter == true)
+{
+	<hr />
+
+	<!-- FOOTER -->
+	<div id="foot">
+	</div>
+	<script type="text/javascript">
+		var gmFooter = new GMFooter(@PageAttr.IsMain.ToString().ToLower());
+	</script>
+	<!--// FOOTER -->
+}

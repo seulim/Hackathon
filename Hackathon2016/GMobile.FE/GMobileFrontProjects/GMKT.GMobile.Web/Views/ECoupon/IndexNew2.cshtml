@@ -1,0 +1,557 @@
+﻿@using GMKT.GMobile.Data;
+@using GMKT.GMobile.Web.Models;
+@*@model ECouponHome*@
+@model GMKT.GMobile.Web.Controllers.ECouponController.ECouponHomeEx
+
+@section Css {
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/etc.css" />
+	@*<link rel="stylesheet" type="text/css" href="@Urls.StyleUrl/320/etc_2014.css" />*@
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/main.css" />
+} 
+
+	<!-- CONTENT -->
+	<div id="content" class="ecpn">
+		
+
+		<!-- BANNER -->	
+		<div class="ban_wrap ecoupon">
+			<div class="bn_grp ban" id="bnGrp" style="height:140px;">
+				<ul>
+	@foreach (ECouponBanner banner in Model.Banner)
+	{
+					<li><a href="@GlobalFunction.GetSnaUrl(true, "716800001", banner.LinkUrl)"><img src="@banner.BannerImageUrl" alt="@banner.EventName" /></a></li>
+	}
+				</ul>
+			</div>
+			<div id="bnTurn" class="bn_eturn" style="display:none;">
+				<button type="button" id="prev" class="prev" onclick="gallery1.prev();return false;"><span></span></button>
+				<button type="button" id="next" class="next" onclick="gallery1.next();return false;"><span></span></button>
+			</div>
+			<div id="bnIndex12" class="bn_eindex">
+	@for (var i = 0; i < Model.Banner.Count; i++)
+	{
+		<p class="@if (i == 0) {<text>selected</text>}"></p>
+	}
+			</div>
+		</div>
+		<!-- //BANNER -->
+		
+		<div class="direct_brand">
+			<ul class="@if(Model.Brand != null && Model.Brand.Count == 5) {<text>full</text>}"><!-- [D]리스트 갯수가 5개일때 class="full"추가-->
+	@foreach(ECouponBrand brand in Model.Brand)
+	{
+				<li><a href="@GlobalFunction.GetSnaUrl(true, "716800001", Urls.MobileWebUrl+"/ECoupon/Brand?categoryCode="+brand.CategoryCode+"&brandcode="+brand.BrandCode)"><img src="@brand.LogoImageUrl" alt="@brand.BrandName"></a></li>
+	}
+			</ul>
+		</div>
+
+		<section class="bx_sect sec1">
+			<h4>HOT</h4>
+			<div class="lst_ecpn_prd  noarrow">
+            <div id="lst_ecpn2">
+				<ul class="bx_slide">
+	@foreach(ECouponItem item in Model.HotItem)
+	{
+					<li>
+						<a href="@GlobalFunction.GetSnaUrl(true, "716800001", item.VipUrl)">
+							<img src="@item.ImgUrl" alt="상품이미지" class="prdimg">
+							<p class="name">@item.ItemName</p>
+							<p class="price">
+		@if(item.DiscountRate != "0")
+		{
+								<strong><span class="blind">할인률</span>@item.DiscountRate%</strong>
+								<span><del><span class="blind">정가</span>@item.OriginalPrice</del><em><span class="blind">할인가</span>@item.Price</em></span>
+		}
+		else
+		{
+								<span><em><span class="blind">판매가</span>@item.Price</em></span>
+		}
+							</p>
+						</a>
+					</li>
+	}
+				</ul>
+            </div>
+			</div>
+			
+			<ul class="ecpn_cate">
+	@foreach(ECouponCategory category in Model.Category)
+	{
+				<li class="@category.IconCss"><a href="@GlobalFunction.GetSnaUrl(true, "716800001", Urls.MobileWebUrl+"/ECoupon/BrandLp?categoryCode="+category.CategoryCode)">@category.CategoryName</a></li>
+	}
+			</ul>
+		</section>
+
+		<section class="bx_sect sec2">
+			<h4>BEST</h4>
+			<div class="lst_ecpn_prd" id="lst_best">				
+				
+					<ul class="prod_list_gallery">
+	@if(Model.BestCategory != null && Model.BestCategory.Count > 0)
+	{
+		foreach(ECouponItem item in Model.BestCategory[0].Items)
+		{
+					<li>
+						<a href="@GlobalFunction.GetSnaUrl(true, "716800001", item.VipUrl)">
+							<span class="bu_rank">@item.Priority</span>
+							<img src="@item.ImgUrl" alt="상품이미지" class="prdimg">
+							<p class="name">@item.ItemName</p>
+							<p class="price">
+			@if (item.DiscountRate != "0")
+   {
+								<strong><span class="blind">할인률</span>@item.DiscountRate%</strong>
+								<span><del><span class="blind">정가</span>@item.OriginalPrice</del><em><span class="blind">할인가</span>@item.Price</em></span>
+   }
+   else
+   {
+								<span><em><span class="blind">판매가</span>@item.Price</em></span>
+   }
+							</p>
+						</a>
+					</li>
+        }
+
+    }
+					</ul>
+				
+				<div class="slt_btn_all"><a class="btn_all" id="selectBestCategory">e쿠폰 전체</a>
+					<ul>
+                    
+	@foreach (ECouponCategory category in Model.BestCategory)
+ {
+						<li id="best_cate_@category.CategoryCode"><a href="javascript:selectBestCategory('@category.CategoryCode', '@category.CategoryName');">@category.CategoryName</a></li>
+ }
+	 				</ul>
+				</div>
+			</div>
+		</section>
+       
+		<a href="#" class="btn_top_main">Top으로 이동</a>
+		<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+       
+		@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "ecoupon", ShareFcdCode = "716800002", ShortcutFcdCode = "716800003", TargetUrl = string.Empty, Title = string.Empty })
+	</div>
+	<!-- //CONTENT -->
+
+<script id="best-item-template" type="text/x-handlebars-template">
+{{#each Items}}
+<li>
+	<a onclick="ShareAndShortcutSendFcdCode('716800001');" href="{{VipUrl}}">
+		<span class="bu_rank">{{Priority}}</span>
+		<img src="{{ImgUrl}}" alt="상품이미지" class="prdimg">
+		<p class="name">{{ItemName}}</p>
+		<p class="price">
+		{{#ifOver 0 DiscountRate}}
+			<strong><span class="blind">할인률</span>{{DiscountRate}}%</strong>
+			<span><del><span class="blind">정가</span>{{OriginalPrice}}</del><em><span class="blind">할인가</span>{{Price}}</em></span>
+		{{else}}
+			<span><em><span class="blind">판매가</span>{{Price}}</em></span>
+		{{/ifOver}}
+		</p>
+	</a>
+</li>
+{{/each}}
+</script>
+@section scripts
+{
+<script type="text/javascript">
+	/* 이미지 높이값 고정 */
+	$(window).on("resize", function () {
+		setImgHeight();
+	});
+	function setImgHeight() {
+		var $bnr_img = $('#bnGrp a img');
+		$bnr_img.height($bnr_img.width() * 0.5656); //0.5656 : 배너 가로세로 비율
+	}
+	setImgHeight();
+	/* //이미지 높이값 고정 */
+
+	var	gallery1,
+		el,
+		i,
+		page,
+		dots1 = document.querySelectorAll('#bnTurn button'),
+		dots12 = document.querySelectorAll('#bnIndex12 p');
+	/* HTML 파싱 */
+	var bnGrpList1 = $("#bnGrp li");
+
+	function loadingBanner () {
+		if (1 < bnGrpList1.length) {
+
+			var bnGrpListAtag1 = [];
+
+		    // 시작포인트 랜덤 -> 우선순위순으로
+		    var index1 = 0;
+            //		var randomPage1 = Math.floor(Math.random() * (bnGrpList1.length));
+            //		for (var j = randomPage1; j < bnGrpList1.length; j++, index1++) {
+            //			bnGrpListAtag1[index1] = bnGrpList1[j].innerHTML;
+            //		}
+            //		if (randomPage1 > 0) {
+            //			for (var j = 0; j < randomPage1; j++, index1++) {
+            //				bnGrpListAtag1[index1] = bnGrpList1[j].innerHTML;
+            //			}
+            //		}
+		    for (var j = 0; j < bnGrpList1.length; j++, index1++) {
+			    bnGrpListAtag1[index1] = bnGrpList1[j].innerHTML;
+		    }
+
+			var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+			/* //HTML 파싱 */
+
+			gallery1 = new SwipeView('#bnGrp', {
+				numberOfPages: bnGrpListAtag1.length,
+				hastyPageFlip: true,
+				flickTime: 1000
+			});
+
+			// Load initial data
+			for (i = 0; i < 3; i++) {
+
+				if (1 == bnGrpListAtag1.length) {
+					page = i == 0 || 2 ? bnGrpListAtag1.length - 1 : i - 1;
+				}
+				else {
+					page = i == 0 ? bnGrpListAtag1.length - 1 : i - 1;
+				}
+				el = document.createElement('span');
+				el.innerHTML = bnGrpListAtag1[page];
+				gallery1.masterPages[i].appendChild(el)
+
+				el.width = bnGrpListAtag1[page].width;
+				el.height = bnGrpListAtag1[page].height;
+				el.onload = function () { this.className = ''; }
+			}
+
+			gallery1.onFlip(function () {
+				var el,
+					upcoming,
+					i;
+
+				for (i = 0; i < 3; i++) {
+					upcoming = gallery1.masterPages[i].dataset.upcomingPageIndex;
+
+					if (upcoming != gallery1.masterPages[i].dataset.pageIndex) {
+						el = gallery1.masterPages[i].querySelector('span');
+						el.innerHTML = bnGrpListAtag1[upcoming];
+					}
+				}
+				document.querySelector('#bnIndex12 .selected').className = '';
+				dots12[gallery1.pageIndex].className = 'selected';
+                setImgHeight();//140307추가 
+			});
+
+			$('#bnTurn').show();
+			flicking("bnGrp", "prev", "next");
+
+		} else if (1 == bnGrpList1.length) {
+
+			var bnGrpListAtag1 = [];
+
+			for (var j = 0; j < bnGrpList1.length; j++) {
+				bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+			}
+			var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+
+			var elSpan = document.createElement('span');
+			elSpan.innerHTML = globalBnGrpListAtag1;
+			document.querySelector('#bnGrp').appendChild(elSpan); 
+
+			flicking("bnGrp", "prev", "next");
+		}
+	}
+</script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.bxslider.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+<script type="text/javascript">
+	//Handlebar Helpers
+	function registerECouponHelpers() {
+		Handlebars.registerHelper('ifOver', ifOver);
+	}
+
+	function ifOver(base, val, option) {
+		if (val > base)
+			return option.fn(this);
+		else
+			return option.inverse(this);
+	}
+
+	var bestCategory = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.BestCategory));
+
+	$(document).ready(function () {
+		/* landing Banner */
+		var em = eModule
+            , apps = em.apps
+            , landing = apps.landing;
+
+		landing.init({
+			pageName: 'Ecoupon',
+			landingType: '@Model.LandingBanner.Type',
+			imageUrl: '@Model.LandingBanner.ImageUrl',
+			description: '@Model.LandingBanner.Description',
+			campaign: '@Model.Campaign.Name',
+			medium: '@Model.Campaign.Medium',
+			mediumSource: '@Model.Campaign.MediumSource',
+			mediumContent: '@Model.Campaign.MediumContent',
+			term: '@Model.Campaign.Keyword'
+		});
+
+		$("#lay_notice").on('click', '#goToApp', function (e) {
+			e.preventDefault();
+			landing.installApp();
+		}).on('click', '#landingClose', function (e) {
+			e.preventDefault();
+			landing.close();
+		});
+		/* landing Banner */
+
+		loadingBanner();
+		registerECouponHelpers();
+
+		KakaoInit();
+		ShareTo("kakaotalk");
+	});
+
+	function selectBestCategory(categoryCode, categoryName) {
+		$("#selectBestCategory").text(categoryName);
+		var template = Handlebars.compile($('#best-item-template').html());
+		var selectedCategory = bestCategory.filter(function(cate){
+			return cate.CategoryCode == categoryCode;
+		});
+
+		if(selectedCategory !== undefined && selectedCategory.length > 0) {
+			$('#lst_best > ul').html(template(selectedCategory[0]));
+		}		
+	}
+
+	var ShareTo = function (type) {
+		var dataName = "G마켓 e쿠폰";
+		switch (type) {
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "G마켓 e쿠폰";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name": dataName,
+			"url": "@Urls.MobileWebUrl" + "/ecoupon",
+			"title": ""
+		};
+
+		if (type == "kakaotalk") {
+			KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+		}
+		else {
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data));
+		}
+	}
+
+	var url = "Intent://CreateGService_Shortcut?page=ecoupon#Intent;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;scheme=gmarket;package=com.ebay.kr.gmarket;end";
+	function getAndroidVersion() {
+		var androidVersion = -1; // def value, for non-Android devices
+		var ua = navigator.userAgent.toLowerCase();
+		var androidIndex = ua.indexOf('android');
+
+		if (androidIndex != -1) {
+			var versionStartIndex = androidIndex + 8;
+			var versionEndIndex = ua.indexOf(';', versionStartIndex);
+
+			androidVersion = parseFloat(ua.slice(versionStartIndex, versionEndIndex));
+		}
+
+		return androidVersion;
+	}
+
+	function checkApplicationInstall() {
+		if (getAndroidVersion() >= 4.3) window.location.href = url;
+		else {
+			var iframe = document.createElement("iframe");
+			iframe.id = "checkframe";
+			iframe.name = "checkframe";
+			iframe.style.width = "0px";
+			iframe.style.height = "0px";
+			iframe.style.display = "none";
+			document.body.appendChild(iframe);
+
+			document.checkframe.location = "gmarket://CreateGService_Shortcut?page=ecoupon";
+			setTimeout("checkApplicationInstall_callback()", 500);
+		}
+	}
+
+	function checkApplicationInstall_callback() {
+		try {
+
+			var s = document.checkframe.document.body.innerHTML;
+			$("#checkframe").remove();
+		} catch (e) {
+			document.location = "market://details?id=com.ebay.kr.gmarket";
+		}
+	}
+
+	function sendScheme() {
+
+		var appVersion = checkAppVersion();
+
+		if (appVersion != '' && parseInt(appVersion) < 340) {
+			if (confirm("고객님 G마켓 앱의 업데이트가 필요합니다.") == false) {
+				return;
+			} else {
+				document.location = "market://details?id=com.ebay.kr.gmarket";
+			}
+		}
+		else {
+			var iframe = document.createElement("iframe");
+			iframe.id = "checkframe";
+			iframe.name = "checkframe";
+			iframe.style.width = "0px";
+			iframe.style.height = "0px";
+			iframe.style.display = "none";
+			document.body.appendChild(iframe);
+
+			document.checkframe.location = "gmarket://CreateGService_Shortcut?page=ecoupon";
+			setTimeout("checkApplicationInstall_callback2()", 500);
+		}
+	}
+
+	function checkApplicationInstall_callback2() {
+		try {
+
+			var s = document.checkframe.document.body.innerHTML;
+			$("#checkframe").remove();
+		} catch (e) {
+
+		}
+	}
+
+	function checkAppVersion() {
+		var sName = "appversion";
+		var aCookie = document.cookie.split("; ");
+
+		for (var i = 0; i < aCookie.length; i++) {
+			var aCrumb = aCookie[i].split("=");
+			if (sName == aCrumb[0])
+				return unescape(aCrumb[1]);
+		}
+		return null;
+	}
+
+	(function () {
+		GMobile = {};
+		GMobile.FromWhereType = {
+			AndroidApp: 1,
+			iOSApp: 2,
+			Web: 3
+		};
+
+		GMobile.UserAgent = function () {
+			if (GMobile.UserAgent.prototype._singletonInstance) {
+				return GMobile.UserAgent.prototype._singletonInstance;
+			}
+
+			GMobile.UserAgent.prototype._singletonInstance = this;
+
+			var regex = new RegExp("MobileApp/(.+)\s*\\((.+)\s*;\s*(.+)\s*;\s*(.+)\s*\\)");
+
+			var indexOfSchemaVersion = 1;
+			var indexOfOS = 2;
+			var indexOfVersion = 3;
+			var indexOfIdentifier = 4;
+
+			this.getFromWhere = function () {
+				if (typeof navigator !== "undefined" && navigator != null && typeof navigator.userAgent === "string") {
+					var matches = regex.exec(navigator.userAgent);
+
+					if (matches != null && matches.length > indexOfOS) {
+						var os = matches[indexOfOS];
+
+						if (os !== undefined) {
+							os = os.trim().toLowerCase();
+
+							if (os === "android") {
+								return GMobile.FromWhereType.AndroidApp;
+							} else if (os === "ios") {
+								return GMobile.FromWhereType.iOSApp;
+							}
+						}
+					}
+				}
+
+				return GMobile.FromWhereType.Web;
+			};
+		};
+
+		GMobile.UserAgent.getInstance = function () {
+			return new GMobile.UserAgent();
+		};
+
+		GMobile.fromWhere = GMobile.UserAgent.getInstance().getFromWhere();
+		GMobile.isApp = (GMobile.fromWhere == GMobile.FromWhereType.AndroidApp || GMobile.fromWhere == GMobile.FromWhereType.iOSApp);
+		if (GMobile.isApp) {
+			$('a.btn_top_main').remove();
+		}
+
+		//CookieUtils
+		var CookieUtils = {};
+
+		CookieUtils.setCookie = function (name, value) {
+			document.cookie = name + '=' + encodeURIComponent(value) + ';domain=.gmarket.co.kr;path=/';
+		}
+
+		CookieUtils.getCookie = function (name) {
+			var cname = name + '=';
+			var ca = document.cookie.split(';');
+			for (var i = 0; i < ca.length; i++) {
+				var c = ca[i];
+				while (c.charAt(0) == ' ') c = c.substring(1);
+				if (c.indexOf(name) == 0) return decodeURIComponent(c.substring(cname.length, c.length));
+			}
+			return '';
+		}
+
+		var Promotion = function (eventStartDate, eventEndDate, cookieName) {
+			this.cookieName = cookieName;
+			var startDate = new Date(eventStartDate);
+			var endDate = new Date(eventEndDate);
+			this.isEventTime = (new Date() > startDate) && (new Date() < endDate);
+		};
+		
+		Promotion.prototype.setEventHandler = function () {
+			var _this = this;
+
+			$('#btn_clse_pro').on('click', function () {
+				$('#event_layer').hide();
+			});
+
+			$('#btn_nvrdisp_pro').on('click', function () {
+				$('#event_layer').hide();
+				CookieUtils.setCookie(_this.cookieName, "N");
+			});
+		};
+
+		Promotion.prototype.render = function (callback) {
+			if (this.isRenderable()) {
+				$('#event_layer').show();
+				if (typeof callback === 'function') {
+					callback.apply(this);
+				}
+			}
+		};
+
+		Promotion.prototype.isRenderable = function () {
+			var isRender = CookieUtils.getCookie(this.cookieName);
+
+			return (isRender == '' || isRender != 'N') && this.isEventTime;
+		};
+		
+		Promotion = new Promotion("2015-04-09", "2015-04-10 17:00", "ecouponpromotion");
+		Promotion.render(Promotion.setEventHandler);
+	} ());
+</script>
+
+}

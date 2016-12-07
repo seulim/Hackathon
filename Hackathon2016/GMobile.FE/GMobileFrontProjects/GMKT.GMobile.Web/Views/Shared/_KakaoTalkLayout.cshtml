@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+    <title>@ViewBag.Title</title>
+    <meta http-equiv="content-Type" content="text/html; charset=euc-kr" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache" />
+    <meta name="format-detection" content="telepohone=no" />
+    <link rel="shortcut icon" href="http://image.gmarket.co.kr/favicon/gmarket.ico"/>
+    <link rel="apple-touch-icon-precomposed" href="http://image.gmarket.co.kr/Gmarket_Mobile_new/Mobile_icon.png" />
+    @*<link rel="stylesheet" type="text/css" href="@Urls.ScriptUrl/css/mobile/kakaotalk/mobile.css" />*@
+		<style type="text/css">
+			html{height:100%;}
+			body{height:100%;background:#FFFFFF;overflow-x:hidden;-webkit-user-select:none;-webkit-text-size-adjust:none;text-align:center;letter-spacing:-1px}
+			body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,select,textarea,p,blockquote,th,td,legend,button{margin:0;padding:0;color:#333;font-family:'Malgun Gothic','Droid Sans','Apple-Gothic','애플고딕','Tahoma',dotum,'돋움',gulim,'굴림',sans-serif;font-weight:bold;font-size:16px;line-height: 1.25em;-webkit-text-size-adjust:none;}/*사파리 회전시 폰트 크기 고정하기*/
+			form,fieldset,img{border:0}
+			h1{font-size:19px;color:#222;padding:50px 0 22px;display:inline-block;border-bottom:1px solid #eee}
+			.txt{font-size:13px;color:#999;line-height:17px;padding:20px 0 15px;font-weight:normal}
+			.noti{font-size:15px;color:#505966;font-weight:normal}
+		</style>
+    <script type="text/javascript" src="@Urls.ScriptUrl/_Net/js/jquery-1.8.2.min.js"></script>
+    @*<script type="text/javascript" src="@Const.GMW_CONTEXT_NM/js/common/jquery-1.7.1.min.js"></script>*@
+
+    <script type="text/javascript">
+		 //URL 입력 창 자동 숨김 기능 설정
+        window.onload = function () {
+            setTimeout( function () {
+                window.scrollTo(0, 1)
+            }, 100);
+        }
+
+        var _ContentUrls = @ContentUrlHelper.GetJsDefs()
+	</script>
+    
+    @RenderSection("head", false)
+	
+</head>
+<body>
+	@RenderBody()
+</body>
+</html>

@@ -1,0 +1,146 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_320.cshtml";
+    string pCache = this.GetPCache();
+}
+@using GMKT.GMobile.Data;
+@using GMKT.GMobile.Web.Models;
+@model ECouponBrandLpModel
+@section Css {
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/etc.css" />
+}
+
+<!-- WRAPPER -->
+<div id="wrap">
+
+	<!-- CONTENT -->
+	<div id="content" class="ecpn">
+		<div class="ecpn_state">
+			<h3><a href="/Ecoupon">e쿠폰</a></h3>
+			<h4 class="cur"><a href="#"><span>@Model.CategoryName</span></a><!--[D] class="cur" 페이지 해당카태고리-->
+				<ul>
+                    @{
+                        foreach (ECouponCategoryModel category in Model.CategoryInfoList)
+                        {
+				    <li id="li_category" data-categorycode="@category.CategoryCode"><a href="/Ecoupon/BrandLp?categoryCode=@category.CategoryCode">@category.CategoryName</a></li>
+                        }
+                    }
+				</ul>
+			</h4>
+		</div>
+
+		<div class="brand_list">
+			<ul class="lst">
+                @{
+                    foreach(ECouponLPModel brand in Model.BrandList)
+                    {
+				<li><a href="/ecoupon/brand?categoryCode=@Model.CategoryCode&brandcode=@brand.BrandCode"><img src="@brand.BrandImageUrl" alt="@brand.BrandName"><span class="name">@brand.BrandName</span></a></li>
+                    }
+                }
+			</ul>
+			<a href="#" class="btn_more" onclick="moreList(); return false;">목록 더보기</a>
+		</div>
+   @if (!PageAttr.IsAndroidApp && !PageAttr.IsIphoneApp)
+   {
+		<a href="#" class="btn_top_main btn_top_bar">Top으로 이동</a>
+   }
+	</div>
+	<!-- //CONTENT -->
+</div>
+<!-- //WRAPPER -->
+
+<script id="list-template" type="text/x-handlebars-template">
+{{#each BrandList}}
+    <li><a href="{{LinkURL}}"><img src="{{LogoImageUrl}}" alt="{{BrandName}}"><span class="name">{{BrandName}}</span></a></li>
+{{/each}}
+</script>
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        try {
+            displayLayer("progress_icon", "none");
+        }
+        catch (e) { }
+
+        //네비게이터 초기화
+        categoryNaviInit();
+        
+        //목록더보기 초기화
+        if (parameters.needMoreButton()) {
+		    $('.btn_more').show();
+	    }
+		else {
+            $('.btn_more').hide();
+		}
+    });
+
+    function categoryNaviInit() {
+        $('div .ecpn_state').find('#li_category').each(function (index, element) {
+            if ($(element).data('categorycode') == @Model.CategoryCode)
+            {
+                   $(element).addClass('cur');
+            }
+        });
+    }
+
+    //paging 관련 함수 시작
+    var parameters = function(){};
+    parameters.defaultParameters = {
+        categoryCode : @Model.CategoryCode,
+        pageIndex : 1,
+        pageSize : 100
+    }
+
+    parameters.totalSize = @Model.TotalSize;
+
+    parameters.setTotalSize = function(size){
+       parameters.totalSize = size; 
+    }
+
+    parameters.setPageIndex = function(){
+        parameters.defaultParameters.pageIndex = parameters.getPageIndex() + 1; 
+    }
+
+    parameters.getPageIndex = function(){
+        return parameters.defaultParameters.pageIndex;
+    }
+
+    parameters.needMoreButton = function(){
+        return parameters.defaultParameters.pageSize *  parameters.defaultParameters.pageIndex < parameters.totalSize;
+    }
+
+    //목록더보기
+    var moreList = function(){
+        parameters.setPageIndex();
+        displayMoreList("/ecoupon/GetBrandLpListMore");
+    }
+
+    var displayMoreList = function(url){
+        $.ajax({
+		    type: 'GET',
+		    url: url,
+		    data: parameters.defaultParameters,
+		    //contentType: "application/x-www-form-urlencoded",
+		    xhrFields: {
+			    withCredentials: true
+		    },
+		    success: function (result) {
+                parameters.setTotalSize(result.Data.TotalSize);
+
+			    var source = $('#list-template').html();
+			    var template = Handlebars.compile(source);
+			    $('.lst').append(template(result.Data));
+			    if (parameters.needMoreButton()) {
+				    $('.btn_more').show();
+			    }
+			    else {
+                    $('.btn_more').hide();
+			    }
+		    }
+	    });
+    }
+    //paging 관련 함수 끝
+
+</script>
+

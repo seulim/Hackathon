@@ -1,0 +1,191 @@
+﻿@using GMKT.GMobile.Data;
+@using GMKT.GMobile.Data.Search;
+@using GMKT.GMobile.Constant;
+
+@model GMKT.GMobile.Web.Controllers.CategoryController.LandingBannerModel
+
+@section Css
+{
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/cpplpsrp.css?v=1" />
+}
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/cpplpsrp.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/swiper.min.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=20160728"></script>
+
+@if (ViewBag.isBizOn != null && ViewBag.isBizOn == "Y")
+{
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/bizon.css" />
+}
+
+<!-- 
+	지마켓 모바일 헤더/푸터에서 사용된
+	Handlebars.js 라이브러리 사용( 참고 http://handlebarsjs.com/) 
+-->
+<script id="best-item-template" type="text/x-handlebars-template">
+<div class="mbest_wrap">
+	<div class="mbest_intit">
+		<p class="more_txt">이런 상품은 어떠세요?</p>
+		<h3 class="mbest_tit">모바일 베스트</h3>
+		<a href="@Urls.MobileWebUrl/Best" class="btn_more">더보기</a>
+	</div>
+	<ul class="mbest_lst">
+	{{#each this}}
+		<li>
+			<a href="{{LinkURL}}">
+				<span class="rank">{{inc @@index}}</span>
+				<div class="img_bx">
+					<img src="{{printImage this @@index}}" alt="">
+				</div>
+				<div class="info_bx {{#unless DiscountPrice}}no_sale{{/unless}}">
+					<strong class="tit">{{#if BrandNameTag}}{{BrandNameTag}}</br>{{/if}}{{GoodsName}}</strong>
+					<div class="price_box">
+						{{#if DiscountPrice}}
+						<span class="per_price"><span class="blind">정가</span>{{addCommas SellPrice}}</span>
+						{{/if}}
+						<strong class="price"><span class="blind">할인가</span>{{addCommas DispPrice}}</strong>
+					</div>
+					{{#isFreeShipping this}}
+					<span class="ico_del">무료배송</span>
+					{{/isFreeShipping}}
+					{{#if this.IsTpl}}
+					<span class="ico_smart">스마트배송</span>
+					{{/if}}
+				</div>
+			</a>
+		</li>
+	{{/each}}
+	</ul>
+	<div class="btn_box"><a href="@Urls.MobileWebUrl/Best" class="btn_more2">모바일 베스트 더보기</a></div>
+</div>
+</script>
+
+<script language="javascript">
+function registerHelpers() {
+	// 조건 helper
+	Handlebars.registerHelper('isFreeShipping', isFreeShipping);
+	
+	// 일반 helper
+	Handlebars.registerHelper('addCommas', addCommas);
+	Handlebars.registerHelper('printImage', printImage);
+	Handlebars.registerHelper("inc", function (value, options) {
+		return parseInt(value) + 1;
+	});
+}
+
+function isFreeShipping(item, opts) {
+	if (item.DeliveryInfo === '무료배송')
+		return opts.fn(this);
+	else
+		return opts.inverse(this);
+}
+
+function addCommas(nStr) {
+	nStr += '';
+	x = nStr.split('.');
+	x1 = x[0];
+	x2 = x.length > 1 ? '.' + x[1] : '';
+	var rgx = /(\d+)(\d{3})/;
+	while (rgx.test(x1)) {
+		x1 = x1.replace(rgx, '$1' + ',' + '$2');
+	}
+	return x1 + x2;
+}
+
+function printImage(item, index) {
+
+	var imgSrc = '';
+	
+	imgSrc = item.ImageURL || item.ImageUrl;
+
+	if (imgSrc == null || imgSrc == '')
+		return defaultImage;
+
+	return imgSrc;
+}
+
+function displayBestForNoResult() {
+	$.ajax({
+		type: 'GET',
+		data: {
+			pageSize: 10
+		},
+		dataType: 'json',
+		url: "/Search/GetBest100Items",
+		contentType: "application/json",
+		xhrFields: {
+			withCredentials: true
+		},
+		success: function (result) {
+			if (result && result.length) {
+				var source = $('#best-item-template').html();
+				var template = Handlebars.compile(source);
+				$('#itemEmptyDiv').after(template(result));
+				$("img.thumbnail").lazyload();
+				$(window).trigger('resize');
+			}
+		},
+		error: function (result) {
+		}
+	});
+}
+
+$(document).ready(function () {
+	registerHelpers();
+	displayBestForNoResult();
+});
+</script>
+
+@{
+	string css = "ctns";
+
+	if (PageAttr.IsIphone)
+	{
+		css = "ctns ios";
+	}
+	else
+	{
+		css = "ctns";
+	}
+
+	string wrapCss = "";
+	if ("LP".Equals(ViewBag.menuName))
+	{
+		wrapCss = "case";
+	}
+}
+
+@if(ViewBag.isDepartmentStore == null)
+{
+	@Html.Raw("<div id='content' class='" + css + "'>");
+}
+    @if (ViewBag.type == "1")
+    {
+        <div class="mw_none type2"  id="itemEmptyDiv">
+			<h4>"<span class="keyword">@ViewBag.primeKeyword</span>"에 대한 검색결과가 없습니다.</h4>
+		</div>
+    }
+    else
+    {
+        <div class="mw_wrap @wrapCss">					
+		    <div class="mw_contbx">
+			    <div class="mw_none type2" id="itemEmptyDiv">			
+				    <h4>검색하신 ‘<span class="keyword">@ViewBag.primeKeyword</span>’에 대한 검색결과는 <span class="keyword">현재</span> 제공하지 않습니다.
+				    <br /><br />고객님의 양해를 구합니다.</h4>				
+			    </div>				
+		    </div>
+	    </div>
+    }
+	
+@if (!PageAttr.IsApp)
+{
+	<a href="#" class="btn_top_main">Top으로 이동</a>
+}
+	<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+@if(ViewBag.isDepartmentStore == null)
+{
+Html.Raw("</div>");
+}

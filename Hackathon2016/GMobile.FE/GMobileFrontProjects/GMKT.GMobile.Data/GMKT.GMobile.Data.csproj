@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{48295CEC-B091-41B0-A337-236E510F66EA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GMKT.GMobile.Data</RootNamespace>
+    <AssemblyName>GMKT.GMobile.Data</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ArcheFxV2, Version=2.0.0.0, Culture=neutral, PublicKeyToken=e71c4c3da1b66f9a, processorArchitecture=MSIL" />
+    <Reference Include="ConnApi.Client, Version=1.1.0.0, Culture=neutral, PublicKeyToken=a9e3faefbed5f85e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ConnApi.Client.1.2.0\lib\net40\ConnApi.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Nova.Thrift">
+      <HintPath>..\..\Assemblies\Nova.Thrift.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Thrift, Version=0.9.2.0, Culture=neutral, PublicKeyToken=a9e3faefbed5f85e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\ApacheThriftS.0.9.2\lib\Thrift.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Ad\AdApiDac.cs" />
+    <Compile Include="Ad\AdDataT.cs" />
+    <Compile Include="Ad\ILandingBannerEntityT.cs" />
+    <Compile Include="Ad\ILandingBannerSearch.cs" />
+    <Compile Include="Ad\LandingBannerApiDac.cs" />
+    <Compile Include="Ad\LandingBannerType.cs" />
+    <Compile Include="Ad\SponsorLinkApiDac.cs" />
+    <Compile Include="Ad\SponsorLinkDataT.cs" />
+    <Compile Include="ApiResponseBase.cs" />
+    <Compile Include="Basket\BasketDac.cs" />
+    <Compile Include="BestItem\BestItemApiDac.cs" />
+    <Compile Include="BestItem\BestItemEntityT.cs" />
+    <Compile Include="BizOn\BizOnApiDac.cs" />
+    <Compile Include="BizOn\BizOnT.cs" />
+    <Compile Include="CategoryInfoT.cs" />
+    <Compile Include="Category\CategoryApiDac.cs" />
+    <Compile Include="Category\CategoryEntityT.cs" />
+    <Compile Include="Common\G9GateEntity.cs" />
+    <Compile Include="Common\MobileCommonEntity.cs" />
+    <Compile Include="Common\PushAgreementEntityT.cs" />
+    <Compile Include="DepartmentStore\DepartmentStoreApiDac.cs" />
+    <Compile Include="DepartmentStore\DepartmentStoreMainT.cs" />
+    <Compile Include="Event\Board\BoardContentEntityT.cs" />
+    <Compile Include="Event\Board\BoardContentResultCode.cs" />
+    <Compile Include="Event\Board\BoardContentSearch.cs" />
+    <Compile Include="Event\Board\BoardEntityT.cs" />
+    <Compile Include="Event\Board\DataAndSize.cs" />
+    <Compile Include="Common\DrawerApiDac.cs" />
+    <Compile Include="Common\MobileAPIDacBase.cs" />
+    <Compile Include="Common\MobileAPIHelper.cs" />
+    <Compile Include="Common\MobileApiResponseEntity.cs" />
+    <Compile Include="Common\MobileCommonApiDac.cs" />
+    <Compile Include="CustomerCenterDac.cs" />
+    <Compile Include="DangolPolicyT.cs" />
+    <Compile Include="Delivery\DeliveryApiDac.cs" />
+    <Compile Include="Delivery\DeliveryData.cs" />
+    <Compile Include="ECouponDac.cs" />
+    <Compile Include="ECouponT.cs" />
+    <Compile Include="ECoupon\ECouponApiDac.cs" />
+    <Compile Include="ECoupon\ECouponEntityT.cs" />
+    <Compile Include="Event\Board\BoardContentApiDac.cs" />
+    <Compile Include="Event\Board\BoardApiDac.cs" />
+    <Compile Include="EventV2\CommonDataT.cs" />
+    <Compile Include="EventV2\CouponzoneApiDac.cs" />
+    <Compile Include="EventV2\CouponzoneDataT.cs" />
+    <Compile Include="EventV2\NavigationDataT.cs" />
+    <Compile Include="EventV2\PluszoneApiDac.cs" />
+    <Compile Include="EventV2\PluszoneDataT.cs" />
+    <Compile Include="EventV2\CardPointDac.cs" />
+    <Compile Include="EventV2\CardPointEntityT.cs" />
+    <Compile Include="EventV2\EventCommonDac.cs" />
+    <Compile Include="EventV2\EventCommonEntityT.cs" />
+    <Compile Include="EventV2\GreenCarpetApiDac.cs" />
+    <Compile Include="EventV2\GreenCarpetEntityT.cs" />
+    <Compile Include="EventV2\GStampGMileageApiDac.cs" />
+    <Compile Include="EventV2\GStampGMileageEntityT.cs" />
+    <Compile Include="G9Gate\G9GateApiDac.cs" />
+    <Compile Include="GameListDac.cs" />
+    <Compile Include="GameListT.cs" />
+    <Compile Include="GBank.Entity.cs" />
+    <Compile Include="GBankDac.cs" />
+    <Compile Include="GoodsInfoDac.cs" />
+    <Compile Include="GoodsInfoT.cs" />
+    <Compile Include="HomePlus\HomePlusApiDac.cs" />
+    <Compile Include="HomePlus\HomePlusData.cs" />
+    <Compile Include="Home\MobileHomeApiDac.cs" />
+    <Compile Include="Home\MobileHomeEntityT.cs" />
+    <Compile Include="JaehuIdDac.cs" />
+    <Compile Include="JaehuT.cs" />
+    <Compile Include="KakaoTalkServiceT.cs" />
+    <Compile Include="KakaoTalkServiceDac.cs" />
+    <Compile Include="Login\LoginDac.cs" />
+    <Compile Include="Login\LoginT.cs" />
+    <Compile Include="Login\LoginApiDac.cs" />
+    <Compile Include="Login\LoginData.cs" />
+    <Compile Include="Look\LookApiDac.cs" />
+    <Compile Include="Look\LookData.cs" />
+    <Compile Include="Look\LookV2Data.cs" />
+    <Compile Include="Mart\MartApiDac.cs" />
+    <Compile Include="Mart\MartT.cs" />
+    <Compile Include="Member\MemberApiDac.cs" />
+    <Compile Include="Member\MemberData.cs" />
+    <Compile Include="Member\PolicyDac.cs" />
+    <Compile Include="Member\PolicyEntityT.cs" />
+    <Compile Include="Member\RegistrationApiDac.cs" />
+    <Compile Include="Member\RegistrationEntityT.cs" />
+    <Compile Include="Member\SmileCashApiDac.cs" />
+    <Compile Include="MobilePlan\MobilePlanApiDac.cs" />
+    <Compile Include="MobilePlan\MobilePlanEntityT.cs" />
+    <Compile Include="PartnerDac.cs" />
+    <Compile Include="PartnerT.cs" />
+    <Compile Include="PluszoneAttendanceT.cs" />
+    <Compile Include="EventzoneDac.cs" />
+    <Compile Include="PlusZone\PlusZoneApiDac.cs" />
+    <Compile Include="PlusZone\PlusZoneEntityT.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="OptionApplyT.cs" />
+    <Compile Include="EventzoneBannerT.cs" />
+    <Compile Include="GStampIssueT.cs" />
+    <Compile Include="EventStickerT.cs" />
+    <Compile Include="EventzoneGiftT.cs" />
+    <Compile Include="EventWinnerT.cs" />
+    <Compile Include="SearchDisplayT.cs" />
+    <Compile Include="SearchKeywordRedirectDac.cs" />
+    <Compile Include="SearchKeywordRedirectT.cs" />
+    <Compile Include="SearchLogDac.cs" />
+    <Compile Include="Search\SearchApiDac.cs" />
+    <Compile Include="Search\SearchAPIEntityT.cs" />
+    <Compile Include="Search\SmartFinderData.cs" />
+    <Compile Include="Search\SmartFinderApiDac.cs" />
+    <Compile Include="SellerDac.cs" />
+    <Compile Include="SellerShop\SellerShopApiDac.cs" />
+    <Compile Include="SellerShop\SellerShopData.cs" />
+    <Compile Include="SellerT.cs" />
+    <Compile Include="SellerAdDac.cs" />
+    <Compile Include="SellerAdT.cs" />
+    <Compile Include="FaqListT.cs" />
+    <Compile Include="ShopBest\ShopBestApiDac.cs" />
+    <Compile Include="ShopBest\ShopBestData.cs" />
+    <Compile Include="ShopCategoryDac.cs" />
+    <Compile Include="ShopCategoryT.cs" />
+    <Compile Include="ShopDac.cs" />
+    <Compile Include="ShopDisplayT.cs" />
+    <Compile Include="ShopNewsDac.cs" />
+    <Compile Include="ShopNewsT.cs" />
+    <Compile Include="SmartDelivery\SmartDeliveryApiDac.cs" />
+    <Compile Include="SmartDelivery\SmartDeliveryEntityT.cs" />
+    <Compile Include="Sns\KaKaoStoryApiDac.cs" />
+    <Compile Include="Sns\KaKaoStoryAPIEntityT.cs" />
+    <Compile Include="Space\SpaceApiDac.cs" />
+    <Compile Include="Space\SpaceData.cs" />
+    <Compile Include="SuperDeal\SuperDealApiDac.cs" />
+    <Compile Include="SuperDeal\SuperDealEntityT.cs" />
+    <Compile Include="EventV2\SuperGiftDac.cs" />
+    <Compile Include="EventV2\SuperGiftEntityT.cs" />
+    <Compile Include="Tour\TourApiDac.cs" />
+    <Compile Include="Tour\TourData.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\GMKT.Common\GMKTBizComponents\Member\GMKT.Component.Member.csproj">
+      <Project>{42DA768E-5562-4CA5-B248-349CF2EB742B}</Project>
+      <Name>GMKT.Component.Member</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GMKT.Common\GMKTFramework\GMKT.Framework.csproj">
+      <Project>{7C73406A-702E-4E37-A6C6-9871B98A19A7}</Project>
+      <Name>GMKT.Framework</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GMKT.Common\GMKTWeb\GMKT.Web.csproj">
+      <Project>{4822605f-b628-413e-a69d-76291f7a6ab9}</Project>
+      <Name>GMKT.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GMobile.Common\GMKT.GMobile\GMKT.GMobile.csproj">
+      <Project>{BEBAC800-052C-4EB5-983E-81BBCBCEDCDB}</Project>
+      <Name>GMKT.GMobile</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\GMobile.Common\GMobileDataProjects\GMobile.Data.Voyager\GMobile.Data.Voyager.csproj">
+      <Project>{94B4F0A0-9A8D-4655-819C-F3D52427AA35}</Project>
+      <Name>GMobile.Data.Voyager</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

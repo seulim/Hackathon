@@ -1,0 +1,170 @@
+﻿@using GMKT.GMobile.Data;
+@model GMKT.GMobile.Web.Models.SuperDealModel
+@{
+	Layout = "~/Views/Shared/_Layout_SuperDeal.cshtml";
+}
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+	<div class="hotdeal_cont">
+		<div class="mbest_wrap">
+			<!-- super_deal_sub -->
+			<div class="super_deal super_deal_sub">
+			@GlobalFunction.GetSuperDealCategory(Model.ThemeCategory, ViewBag.DispType, ViewBag.GroupNo, ViewBag.SubNo)
+			<div class="bx_sdeal">
+						<ul class="lst_prd" id="list_superdeal">
+						@{ var i = 0;
+         string FcdProduct = "";
+         string FcdStore = "";
+         string FcdBottom = "";
+         string FcdZZim = "";
+         string FcdShare = "";
+         string FcdCut = "";
+         if(ViewBag.DispType == "2")
+         {
+             if(ViewBag.CateIndex == "0")
+             {
+                 FcdProduct = "716000062";
+                 FcdStore = "716000064";
+                 FcdBottom = "716000064";
+                 FcdZZim = "716000063";
+                 FcdShare = "716000065";
+                 FcdCut = "716000066";
+             }
+             else if (ViewBag.CateIndex == "1")
+             {
+                 FcdProduct = "716000068";
+                 FcdStore = "716000070";
+                 FcdBottom = "716000070";
+                 FcdZZim = "716000069";
+                 FcdShare = "716000071";
+                 FcdCut = "716000072";
+             }
+             else
+             {
+                 FcdProduct = "716000074";
+                 FcdStore = "716000076";
+                 FcdBottom = "716000076";
+                 FcdZZim = "716000075";
+                 FcdShare = "716000077";
+                 FcdCut = "716000078";
+             }
+         }else
+         {
+             FcdProduct = "716000080";
+             FcdStore = "716000082";
+             FcdBottom = "716000082";
+             FcdZZim = "716000081";
+             FcdShare = "716000083";
+             FcdCut = "716000084";
+         }
+                        }
+							@foreach (GMKT.GMobile.Data.HomeMainItem item in Model.ThemeItems)
+							{
+									if (i < 20)
+									{
+										@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, false, Urls.MobileImageUrlV2,FcdProduct,false,FcdStore,FcdBottom,FcdZZim,false,false)
+									}
+									else
+									{
+										@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, true, Urls.MobileImageUrlV2, FcdStore, false, FcdStore,FcdBottom, FcdZZim, false, false)
+									}
+				
+									i++;
+							}
+						</ul>
+					</div>
+			</div>			</div>	@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "superdeal", ShareFcdCode = FcdShare, ShortcutFcdCode = FcdCut })
+	
+
+	
+	@if (!PageAttr.IsAndroidApp && !PageAttr.IsIphoneApp)
+ {
+	<a onclick="javascript:;" class="btn_top_bar">Top으로 이동</a>
+ }
+
+</div>
+<!-- //CONTENT -->
+<script type="text/javascript">
+	var MWebUrl = "@ViewBag.MWebUrl";
+</script>
+@section scripts
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=20160728"></script>
+
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/swiper.min.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/PdsLogSender.js"></script>
+<!--script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/masonry.pkgd.min.js"></!--script-->
+
+<script type="text/javascript">
+	this.SuperDealUtil = {};
+	var selectDispType = "@ViewBag.DispType";
+	var selectGroupNo = "@ViewBag.GroupNo";
+	window.onload = function () {
+		
+	}
+	$(function () {
+		masonryUpdate();
+
+	});
+
+
+	$(document).ready(function () {
+		$(".superdeal_lazy").lazyload({
+			effect: "fadeIn",
+			threshold: 400
+		});
+	
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+		//스토어
+	
+		KakaoInit();
+		ShareTo("kakaotalk");
+
+
+	});
+	var masonryUpdate = function () {
+
+		//$('.lst_prd').masonry({
+		//	// options
+		//	itemSelector: '.box',
+		//	percentPosition: true
+		//});
+
+	}
+	var ShareTo = function (type) {
+		var dataName = "G마켓 슈퍼딜";
+		switch (type) {
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "슈퍼딜";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name": dataName,
+			"url": "@Urls.MobileWebUrl" + "/SuperDeal",
+			"title": ""
+		};
+
+		if (type == "kakaotalk") {
+			KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+		}
+		else {
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data))
+		}
+	}
+
+
+</script>
+}
+</div>

@@ -1,0 +1,111 @@
+﻿@using GMKT.GMobile.Web.Models;
+@{
+    ViewBag.Title = "자주묻는질문";
+
+	string CateCd = (Request["catecd"] == null ? "" : Request["catecd"]);
+	string type = Request["type"];
+	string search = (Request["search"] == null ? "" : Request["search"]);
+	
+	if (CateCd == "" && search == "")
+	{
+		ViewBag.Title = "자주묻는질문 BEST";
+	}
+}
+
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrl/320/etc_2013_12.css" />
+
+ <script type="text/javascript">
+ 	window.onload = function () {
+ 		setTimeout(function () {
+ 			displayLayer("progress_icon", "none");
+ 		}, 100);
+ 	}
+
+ 	$(document).ready(function () {
+ 		$("div.notice").find("img").css("overflow", "hidden");
+ 	});
+
+ 	function ListMove() {
+		var catecd = "@CateCd";
+		var search = "@search";
+		var type = "@type";
+
+ 		if (type == "faqlist") {
+ 			if (catecd != "") {
+ 				location.href = '@Urls.MobileWebUrl/customercenter/FaqList?catecd=' + catecd;
+ 			}
+ 			else if(search != "") {
+ 				location.href = '@Urls.MobileWebUrl/customercenter/FaqSearch?search=' + encodeURIComponent(search);
+ 			}
+ 			else {
+				location.href = '@Urls.MobileWebUrl/customercenter/FaqList';
+ 			}
+ 		}
+		else {    
+ 			if (catecd == "") {
+ 				location.href = '@Urls.MobileWebUrl/customercenter';
+ 			}
+ 			else {
+ 				location.href = '@Urls.MobileWebUrl/customercenter/?catecd=' + catecd;
+ 			}
+		}
+ 	}
+
+ 	// 연관FAQ 클릭시 ReadCount 증가시킴
+ 	function fnRelFaqReadCnt(seq) {
+ 		$(".ct").each(function (index) {
+ 			if ($(this).css('display') == "none" && $(this).attr('id') == "re_" + seq) {
+ 				$.ajax({
+ 					type: 'POST',
+ 					dataType: 'json',
+ 					url: "/CustomerCenter/SetFaqReadCount",
+ 					data: {
+ 						"seq": seq
+ 					},
+ 					success: function (result) {
+
+ 					},
+ 					error: function (result) {
+ 						alert("오류가 발생했습니다.");
+ 					}
+ 				});
+ 			}else{
+				return;
+			}
+ 		});
+ 	}
+ </script>	
+    <hr />	
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		
+		<div class="notice">
+			<h3>모바일 고객센터> @ViewBag.Title</h3>
+			<p class="tit2">@Model.FaqDetail.title</p>
+			<div class="ct">
+				@Html.Raw(@Model.FaqDetail.contents)
+			</div>
+			<h4 class="faq_tit">연관 FAQ 보기</h4>
+			<ul class="faq_lst">
+			
+			@foreach (var item in Model.FaqRelList)
+			{			
+			<li>
+				<a href="#" onclick="fnRelFaqReadCnt('@item.seqNo')" class="qa">@item.title</a>
+				<div class="ct" id="re_@item.seqNo">
+					<p>@Html.Raw(@item.contents)</p>
+				</div>
+			</li>
+			}
+			</ul>
+			<button type="button" class="list_view2" onClick="ListMove();">목록 보기</button>
+			<div class="re_inqbx">
+				<p class="re_txt">궁금증이 해결되지 않았다면?</p>
+				<a href="@Urls.MMyGUrl/Question/CustomerQuestion" class="btn_tight">문의하기 등록</a>
+			</div>
+		</div>
+
+	</div>
+	<!-- //CONTENT -->
+
+	<hr />

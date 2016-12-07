@@ -1,0 +1,393 @@
+﻿@functions 
+{	
+	// 클릭율 분석을 위해 메인페이지만 링크 수정
+	public static string GetSnaUrl(bool isMain, string fcd, string url)
+	{
+		if (isMain == true)
+		{
+			return "http://sna.gmarket.co.kr/?fcd=" + fcd + "&url=" + Server.UrlEncode(url);
+		}
+		else
+		{
+			return url;
+		}
+	}
+
+	/// <summary>
+	/// 구매 수량을 text로 변경한다.
+	/// </summary>
+	/// <param name="buycount"></param>
+	/// <returns></returns>
+	public static string GetBuyCount(int BuyCount)
+	{
+        
+        string buyCount = "";
+        //<span class=\"num\">@buyCount</span> @if(buyCount!="new"){@("구매")}
+
+        if (BuyCount == 0)
+        {
+            buyCount = "<p class=\"sp_sdeal tx_buy tx_new\"><span class=\"num\">NEW</span></p>";
+        }
+
+        else if (BuyCount >= 10000)
+        {
+            buyCount = string.Format("<p class=\"sp_sdeal tx_buy\"><span class=\"num\">{0}만<span class=\"plus\">+</span></span>구매</p>", (BuyCount / 10000).ToString());
+        }
+        else
+        {
+            buyCount = "<p class=\"sp_sdeal tx_buy\"><span class=\"num\">" + BuyCount.ToString("#,##0") + "</span>구매</p>";
+        }
+
+        return buyCount;
+	}
+
+	/// <summary>
+	/// 배송 
+	/// </summary>
+	/// <param name="type"></param>
+	/// <returns></returns>
+	public static IHtmlString GetDeliveryTagType(GMKT.GMobile.Data.DeliveryTagType type)
+	{
+		IHtmlString str;
+		switch(type)
+		{
+			case GMKT.GMobile.Data.DeliveryTagType.Smart:
+				str = new HtmlString("<span class=\"bx_tag\"><span class=\"tx_c\">스마트</span>배송</span>");
+				break;
+			case GMKT.GMobile.Data.DeliveryTagType.Free:
+				str = new HtmlString("<span class=\"bx_tag\">무료배송</span>");
+				break;
+			case GMKT.GMobile.Data.DeliveryTagType.Homeplus:
+				str = new HtmlString("<span class=\"bx_tag\">당일배송</span>");
+				break;
+			default:
+			str = new HtmlString("");
+			break;
+		}
+		return str;
+		
+	}
+
+	/// <summary>
+	/// 슈퍼딜 상품
+	/// </summary>
+	/// <returns></returns>
+    public static IHtmlString GetSuperDealItem(GMKT.GMobile.Data.HomeMainItem item, bool IsMain, bool IsLazy, string MobileImageUrlV2, string fcd = "704800001", bool IsSfc = false, string StoreFcd = "716000045", string BottomFcd = "716000046", string ZZimFcd = "716000044",bool IsSFCFirst=false,bool IsThemeLnk=true)
+	{
+			var li = new System.Web.Mvc.TagBuilder("li");
+			li.AddCssClass("box");
+
+			string linkURL = GlobalFunction.GetSnaUrl(IsMain, fcd, item.LinkUrl);
+			System.Text.StringBuilder builder = new System.Text.StringBuilder();
+
+			string buyCount = "";
+			if (item.IsSoldOut)
+			{
+				 linkURL = "javascript:;";
+			}
+
+			buyCount = GlobalFunction.GetBuyCount(item.BuyCount);
+			builder.Append("<div class=\"bx_prd\">");
+            if (IsSfc && IsSFCFirst)
+                {
+                    builder.Append("<div class=\"info_shop\">");
+                    builder.AppendFormat("<a href=\"{0}\" onclick=\"javascript:SnaUrlFooter('{4}');\" class=\"tx_shop\">{1}<strong>{2}</strong> <span>{3}</span></a>"
+                                    , "http://mobile.gmarket.co.kr/Display/SpecialShopping?lcId=&sid=137982"
+                                    , "<img src=\"" + GMKT.GMobile.Util.Urls.MobileImagePics + "/mobile/deal/deal_samsung.png\" width=\"24\" height=\"24\" alt=\"\">"
+                                    , "삼성가족 전용상품관"
+                                    , ""
+                                    , "7145100007");
+                    builder.Append("</div>");		
+                }				
+				if (item.IsStoreInfo)
+				 {
+                     string strStoreHtml = string.Empty;
+                    if(item.StoreSpecialType){
+                        //당일배송일때
+						strStoreHtml = "<a href=\"{0}\" onclick=\"javascript:sendPDSLogFromEliment(this);SnaUrlFooter('{4}');\" class=\"tx_shop\" data-pdslog='{5}'>{1}<strong>{2} <span>{3}</span></strong> </a>";
+                        
+                    }else{
+						strStoreHtml = "<a href=\"{0}\" onclick=\"javascript:sendPDSLogFromEliment(this);SnaUrlFooter('{4}');\" class=\"tx_shop\" data-pdslog='{5}'>{1}<strong>{2}</strong> <span>{3}</span></a>";
+                    }
+					builder.Append("<div class=\"info_shop\">");
+                    builder.AppendFormat(strStoreHtml
+									,item.BrandServiceStoreLnkUrl
+									,string.IsNullOrEmpty(item.BrandServiceStoreImageUrl)?"":string.Format("<img src=\"{0}\" width=\"24\" height=\"24\" alt=\"\">",item.BrandServiceStoreImageUrl)
+									,item.BrandServiceStoreText
+									,item.BrandServiceStoreSubText
+                                    , StoreFcd
+									,item.PdsLogServiceShopJson
+									);
+					builder.Append("</div>");				
+				 }
+
+				builder.AppendFormat("<a href=\"{0}\" class=\"btn_prod\" onclick=\"javascript:sendPDSLogFromEliment(this);\" data-pdslog='{1}'>", linkURL, item.PdsLogItemJson);	
+				
+               
+				    if(IsLazy)
+				    {
+                            if(item.IsSoldOut){
+                                builder.AppendFormat("<div class=\"thmb\"><img class=\"superdeal_lazy\" src=\"{0}/640/superdeal_loading.png\" data-original=\"{1}\" /><div class=\"sold_out\"><span class=\"sp_sdeal\">품절되었습니다.</span></div></div>"
+                                   , MobileImageUrlV2, item.ImageUrl);
+                            }else{
+
+                                builder.AppendFormat("<div class=\"thmb\"><img class=\"superdeal_lazy\" src=\"{0}/640/superdeal_loading.png\" data-original=\"{1}\" /></div>"
+								    ,MobileImageUrlV2,item.ImageUrl);
+                            }
+
+				    }
+				    else
+				    {
+                         if(item.IsSoldOut){
+                             builder.AppendFormat("<div class=\"thmb\"><img src=\"{0}\" alt=\"\"><div class=\"sold_out\"><span class=\"sp_sdeal\">품절되었습니다.</span></div></div>", item.ImageUrl);
+                            }else{
+						     builder.AppendFormat("<div class=\"thmb\"><img src=\"{0}\" alt=\"\"></div>",item.ImageUrl);	
+                         }
+				    }
+               
+				builder.Append("<div class=\"info\">");	
+				builder.AppendFormat("<h4 class=\"tit\">{0}</h4>",item.ItemTitle);	
+				builder.Append("<p class=\"tx_price\">");		
+				
+
+				if (item.IsSoldOut)
+				{
+                    builder.Append("<span class=\"dsc\">SOLD OUT</span>");		
+					
+				}
+				else
+				{
+                    if (item.DiscountPrice == "가입상품")
+                    {
+                        builder.Append("<span class=\"dsc\">가입상품</span>");		
+                    }else{
+                            
+						if(item.DiscountRate > 0)
+						{
+								builder.AppendFormat("<span class=\"sale\">{0}<span>%</span></span>",item.DiscountRate);		
+					
+						}
+                       
+                        if(int.Parse(item.DiscountPrice.Replace(",","")) < 1000000){
+						    builder.AppendFormat("<span class=\"price\"><span class=\"blind\">판매가</span>{0}<span class=\"tx\">원</span></span>",item.DiscountPrice);		
+                        }else{
+                            builder.AppendFormat("<span class=\"price price_v2\"><span class=\"blind\">판매가</span>{0}<span class=\"tx\">원</span></span>", item.DiscountPrice);		
+                        }
+                        if (item.OriginalPrice != "" && item.DiscountRate > 0)
+                        {
+                            builder.AppendFormat(" <del class=\"price2\"><span class=\"blind\">기존가</span>{0}원</del>", string.IsNullOrEmpty(item.OriginalPrice)?item.Price:item.OriginalPrice);
+                        }
+                        }
+						
+				}
+					builder.Append("</p>");
+                    if(item.IsSoldOut){
+                        builder.Append("<div class=\"tag_area\" style=display:none>");
+                    }else{
+					    builder.Append("<div class=\"tag_area\">");
+                    }
+
+        //Tag 노출수
+                    int numTagCount = 1;
+        //Tag Max노출 수
+                    int numTaxMaxCount = 2;
+                    
+                if(IsSfc){ //SFC일때는 최대 3개까지 노출
+                    numTaxMaxCount = 3;
+                }
+
+                if (IsSfc && numTagCount <= numTaxMaxCount)
+                    {//sfc몰일때
+                        builder.Append("<span class=\"bx_tag\"><span class=\"tx_c\">삼성</span>전용특가</span>");
+                        numTagCount++;
+                    }
+
+                int numDeliverty = 0;
+				if (item.IsTourInfo && !string.IsNullOrEmpty(item.TourShopServiceStoreText) && numTagCount <= numTaxMaxCount)
+				 {
+						builder.AppendFormat("<span class=\"bx_tag\">{0}</span>",item.TourShopServiceStoreText);
+                        numDeliverty++;
+                        numTagCount++;
+									
+				 }
+                if (numTagCount <= numTaxMaxCount && numDeliverty == 0)
+                {
+                    builder.Append(GlobalFunction.GetDeliveryTagType(item.DeliveryType));
+                    numTagCount++;
+                }
+                int numSmaile = 0;
+                if (item.IsSmaileCash && numTagCount <= numTaxMaxCount)
+                {
+                    builder.AppendFormat("<span class=\"bx_tag\">스마일캐시 <span class=\"tx_c\"><span class=\"num\">{0}</span>원 적립</span></span>", item.SmileCashPoint.ToString("#,##0"));
+                    numSmaile++;
+                    numTagCount++;
+                }
+                if (item.IsDeptOnly && !string.IsNullOrEmpty(item.DeptServiceStoreText) && numTagCount <= numTaxMaxCount && numSmaile == 0)
+				 {
+						builder.AppendFormat("<span class=\"bx_tag\">{0}</span>",item.DeptServiceStoreText);
+                        numTagCount++;
+							
+				 }
+				
+					builder.Append("</div>");			
+					builder.Append("<div class=\"u_area\">");
+                    if(!item.IsSoldOut){
+                        builder.AppendFormat("<button type=\"button\" class=\"sp_sdeal btn_zzim\" goodscode=\"{0}\" onclick=\"javascript:sendPDSLogZZIMFromHome('{0}','{3}');SnaUrlFooter('{1}');\" isSoldOut=\"{2}\">찜하기</button>", item.GoodsCode, ZZimFcd, item.IsSoldOut, IsMain ? "200000246" : "200000266");							
+                   
+                    
+					    builder.Append(buyCount);	
+                    }		
+					builder.Append("</div>");		
+					builder.Append("</div>");		
+					builder.Append("</a>");
+
+
+                    if (item.BottomRelContents == "THEME" && !string.IsNullOrEmpty(item.ThemeNm) && !string.IsNullOrEmpty(item.MainExposeThemeNm) && IsThemeLnk == true)
+				 {
+					 builder.AppendFormat("<a href=\"{0}\" onclick=\"javascript:sendPDSLogFromEliment(this);SnaUrlFooter('{3}');\" class=\"btn_etc\" data-pdslog='{4}'><strong>{1}</strong> {2}</a>"
+									,item.MainExposeThemeUrl
+									,item.ThemeNm
+									,item.MainExposeThemeNm
+									,BottomFcd
+									,item.PdsLogContentsJson
+									);		
+									
+				 }
+				if (item.BottomRelContents == "SALE")
+				 {
+					 builder.AppendFormat("<a href=\"{0}\" class=\"btn_etc\" onclick=\"javascript:sendPDSLogFromEliment(this);SnaUrlFooter('{3}');\" data-pdslog='{4}'>{1} <strong>{2}</strong><span class=\"sp_sdeal ico_cpn\">쿠폰받기</span></a>"
+								,item.CouponUrl
+								,item.ExposeText1
+								,item.ExposeText2
+								,BottomFcd
+								,item.PdsLogContentsJson
+								);
+									
+				 }
+				 builder.Append("</div>");
+		li.InnerHtml = builder.ToString();
+		return new HtmlString(li.ToString());
+	}
+
+	/// <summary>
+	/// 슈퍼딜 카테고리
+	/// </summary>
+	/// <returns></returns>
+	public static IHtmlString GetSuperDealCategory(List<GMKT.GMobile.Data.SuperDealCategory> category,string DispType,string GroupNo,string SubNo)
+	{
+		System.Collections.Generic.List<GMKT.GMobile.Data.SuperDealSubCategory> selectCategory = new List<GMKT.GMobile.Data.SuperDealSubCategory>();
+
+		var divRoot = new System.Web.Mvc.TagBuilder("div");
+		divRoot.AddCssClass("sub_cate");
+		var div = new System.Web.Mvc.TagBuilder("div");
+		div.AddCssClass("sdeal_cate sdeal_cate_v2");
+		var ul = new System.Web.Mvc.TagBuilder("ul");
+		ul.AddCssClass("lst_cate");
+	
+	 System.Text.StringBuilder builder = new System.Text.StringBuilder();
+		//추천메뉴
+	 string selected = "";
+	 if(string.IsNullOrEmpty(GroupNo) || GroupNo == "0"){
+		 selected = "class=selected";
+	 }
+
+     builder.AppendFormat(@"<li {0}><a href=""/SuperDeal/"" onclick=""javascript:sendPDSLogFromEliment(this);SnaUrlFooter('716000049');"" data-pdslog='{1}'><div class=""inner""><img src=""//pics.gmarket.co.kr/mobile/deal/super_cate.png"" alt=""""></div>추천</a></li>", selected, "{\"AreaCode\":\"200000309\",\"AreaType\":\"Link\",\"Parameter\":{\"category_group_no1\":\"0\",\"category_group_no2\":\"0\",\"ASN\":\"0\"}}");
+     string CateIndex = "";
+        
+		if(category.Count > 0){
+            int cateNo = 0;
+            int areaASN = 0;    
+            string cateFcd = "";
+			foreach(var cate in category)
+			{
+                areaASN++;
+				selected = "";
+				if (cate.CategoryNo.ToString() == GroupNo && cate.CategoryType.ToString() == DispType)
+				{
+					selected = "class=selected";
+                    selectCategory = cate.SubCategory;
+                    CateIndex = cateNo.ToString();
+				}
+                if(cate.CategoryType == 2)
+                {
+                    switch(cateNo)
+                    {
+                        case 0: cateFcd = "716000050";
+                            break;
+                        case 1: cateFcd = "716000051";
+                            break;
+                        case 2: cateFcd = "716000052";
+                            break;
+                        default: cateFcd = "716000052";
+                            break;
+                    }
+                    cateNo++;
+                }
+                else{
+                    cateFcd = "716000053";
+                }
+                builder.AppendFormat("<li GroupNo=\"{0}\" DispType=\"{1}\" {2}><a href=\"{3}\" onclick=\"javascript:sendPDSLogFromEliment(this);SnaUrlFooter('{6}');\" data-pdslog='{7}'><div class=\"inner\"><img src=\"{4}\" alt=\"\"></div>{5}</a></li>"
+					,cate.CategoryNo
+					,cate.CategoryType
+					,selected
+                    , "/SuperDeal/SuperDealThemeList?DispType=" + cate.CategoryType + "&GroupNo=" + cate.CategoryNo + "&SubNo=0&CateIndex=" + cateNo
+					,cate.IconMobile
+					,cate.CategoryName
+                    , cateFcd
+                    , "{\"AreaCode\":\"200000309\",\"AreaType\":\"Link\",\"Parameter\":{\"DispType\":\":" + cate.CategoryType + "\",\"category_group_no1\":\"" + cate.CategoryNo + "\",\"category_group_no2\":\"0\",\"ASN\":\"" + areaASN + "\"}}"
+                    );
+			}
+
+		}
+	ul.InnerHtml = builder.ToString();
+	div.InnerHtml = ul.ToString();
+  //  div.InnerHtml += "<button type=\"button\" class=\"btn_more\" onclick=\"javascript:SnaUrlFooter('716000054');\"><span class=\"sp_sdeal\">더보기</span></button>";
+	//div.InnerHtml+="<button type=\"button\" class=\"btn_clse\">닫기</button>";
+    divRoot.InnerHtml = "<div class='ly_sub ly_sub_fix'><div class='sub_cate_wrap'>" + div.ToString() + "<button type=\"button\" class=\"btn_more\" onclick=\"javascript:sendPDSLogFromEliment(this);SnaUrlFooter('716000054');\" data-pdslog='{\"AreaCode\":\"200000309\",\"AreaType\":\"Utility\"}'><span class=\"sp_sdeal\">더보기</span></button><button type=\"button\" class=\"btn_clse\">닫기</button>" + "</div>";
+
+    if (selectCategory.Count > 0)
+	{
+		var subdiv = new System.Web.Mvc.TagBuilder("div");
+		subdiv.AddCssClass("subtab_wrap");
+		subdiv.InnerHtml = "<div class=\"sdeal_cate sdeal_cate_sub\"><ul class=\"lst_cate\">";
+
+		System.Text.StringBuilder subbuilder = new System.Text.StringBuilder();
+		selected = "";
+		if (SubNo == "0" || SubNo == "")
+		{
+			selected = "class=selected";
+		}
+        subbuilder.AppendFormat("<li {0}><a onclick=\"sendPDSLogFromEliment(this);\" data-pdslog='{4}' href=\"/SuperDeal/SuperDealThemeList?DispType={1}&GroupNo={2}&SubNo=0&CateIndex={3}\">전체</a></li>"
+            , selected, DispType, GroupNo, CateIndex, "{\"AreaCode\":\"200000309\",\"AreaType\":\"Link\",\"Parameter\":{\"DispType\":\"" + DispType + "\",\"category_group_no1\":\"" + GroupNo + "\",\"category_group_no2\":\"0\",\"ASN\":\"0\"}}");
+        int areasubASN = 0;
+        foreach (var sub in selectCategory)
+		{
+            areasubASN++;
+			selected = "";
+			if (sub.CategoryNo.ToString() == SubNo)
+			{
+				selected = "class=selected";
+			}
+
+            subbuilder.AppendFormat("<li {0}><a onclick=\"sendPDSLogFromEliment(this);\" data-pdslog='{6}' href=\"/SuperDeal/SuperDealThemeList?DispType={1}&GroupNo={2}&SubNo={3}&CateIndex={5}\">{4}</a></li>"
+			, selected
+			, DispType
+			, GroupNo
+			, sub.CategoryNo
+			, sub.CategoryName
+            , CateIndex
+            , "{\"AreaCode\":\"200000309\",\"AreaType\":\"Link\",\"Parameter\":{\"DispType\":\"" + DispType + "\",\"category_group_no1\":\"" + GroupNo + "\",\"category_group_no2\":\"" + sub.CategoryNo + "\",\"ASN\":\"" + areasubASN + "\"}}");
+		}
+		subbuilder.Append("</ul>");
+		subbuilder.Append("</div>");
+
+		subdiv.InnerHtml += subbuilder.ToString();
+
+		divRoot.InnerHtml += subdiv.ToString();
+	}
+
+
+    return new HtmlString(divRoot.ToString() + "</div>");
+	
+	}
+}

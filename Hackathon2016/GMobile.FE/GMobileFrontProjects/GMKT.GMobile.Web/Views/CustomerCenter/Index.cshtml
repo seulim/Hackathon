@@ -1,0 +1,327 @@
+﻿@using GMKT.GMobile.Web.Models;
+@model FaqModel
+@{
+    //ViewData["Title"] = "고객센터 메인";
+		
+	if (!string.IsNullOrEmpty(Request["catecd"]))
+	{
+		Model.DefaultCd = Request["catecd"];
+	}
+	int FaqNum = 1;	
+}
+
+<script type="text/javascript" src="@Urls.MobileWebUrl/js/common/front.js?v=1"></script>
+
+<script type="text/x-jscript-tmpl" id="notice_bar_item_template">
+	<li>
+		<span>공지사항</span>
+		<a href="http://sna.gmarket.co.kr/?fcd=704000005&url=@Urls.MobileWebUrl/Etc/NoticeDetail?seq={{Seq}}">
+		{{Title}}</a>
+	</li>
+</script>
+
+<script type="text/javascript">
+    window.onload = function () {
+
+        setTimeout(function () {
+            displayLayer("progress_icon", "none");
+        }, 100);
+
+		var catecd = "@Model.DefaultCd";
+		if ( catecd != "")
+		{ 
+			$("#bestView").show();
+    		$("#FaqView").show();
+    	}
+    	else {
+    		$("#bestView").hide();
+    		$("#FaqView").hide();
+    	}
+    }
+
+    $(function () {
+    	var search = $("#txtSearch");
+    	var searchClick = $("#searchClick");
+
+    	$("#searchDel").click(
+		function () { search.val(''); SearchDelChk(); });
+
+    	search.keydown(function () {
+    		if (event.keyCode == "13") {
+    			searchClick.click();
+    		}
+    	});
+    	search.focus(function () { SearchBoxChange('on'); });
+    	search.blur(function () { SearchBoxChange('off'); });
+
+    	// 질문 검색시 자주묻는질문 페이지로 이동.
+    	searchClick.click(
+		function () {
+			var search = $("#txtSearch").val();
+
+			if (search != "" && search != "undefined" && search != null) {
+
+				//location.href = "http://sna.gmarket.co.kr/?fcd=704000014&url=@Urls.MobileWebUrl/customercenter/FaqSearch?search=" + encodeURIComponent(search);
+				//위 url로 검색어 전달시 한글검색어 인코딩 깨짐 현상으로 인해 아래 링크로 변경
+				location.href = "@Urls.MobileWebUrl/customercenter/FaqSearch?search=" + encodeURIComponent(search);
+
+			}
+			else {
+				alert('검색어를 입력해주세요');
+			}
+		});
+    });	
+    
+
+    var curCateCd = "@Model.DefaultCd";
+
+    function FaqList(cateCd) {
+
+    	$("#hidCateCd").val(cateCd);
+    	$("#li" + curCateCd).removeAttr("class");
+    	$("#li" + cateCd).addClass("on");
+
+    	var _FaqList = $('#FaqList');
+    	_FaqList.html('');
+//    	$("#empty").show();
+    	$("#bestView").show();
+    	$("#FaqView").show();
+    	$("#spSearch").html("자주 묻는 질문");
+
+    	$.ajax({
+    		type: 'POST',
+    		dataType: 'json',
+    		url: "/CustomerCenter/GetFaqList",
+    		data: {
+    			"cateCd": cateCd,
+    			"search": "",
+    			"pageIndex": 1,
+				"type": 1
+    		},
+    		success: function (result) {
+    			curCateCd = result.DefaultCd;
+
+    			if (result.Items.length == 0) {
+    				_FaqList.html('');
+    				return;
+    			}
+
+    			//$("#empty").hide();
+
+    			for (var i = 0; i < result.Items.length; i++) {
+    				var _item = result.Items[i];
+    				_FaqList.append("<li><a href=\"javascript:fnFaqDetail('" + _item.seqNo + "');\"><span class=\"num\">" + _item.rnum + "</span>" + _item.title + "</a></li>");
+    			}
+    		},
+    		error: function (result) {
+    			alert("오류가 발생했습니다.");
+    		}
+    	});
+
+    	switch (cateCd) {
+    		case '301':
+    			fcdCall('704000007');
+    			break;
+    		case '302':
+    			fcdCall('704000008');
+    			break;
+    		case '303':
+    			fcdCall('704000009');
+    			break;
+    		case '304':
+    			fcdCall('704000010');
+    			break;
+    		case '305':
+    			fcdCall('704000011');
+    			break;
+    		case '306':
+    			fcdCall('704000012');
+    			break;
+    		default:
+    			break;
+    	}
+    }
+
+	// 질문 클릭시 질문 상세 보여주기.
+	function fnFaqDetail(seq) {
+		location.href = "@Urls.MobileWebUrl/customercenter/FaqDetail?seq=" + seq + "&catecd=" + curCateCd;
+	}
+
+	function fnFaqListMove(type) {
+		if (type == "best") {
+			location.href = "http://sna.gmarket.co.kr/?fcd=704000013&url=@Urls.MobileWebUrl/customercenter";
+		}
+		else {
+
+			var cateCd = $("#hidCateCd").val();
+
+			location.href = "@Urls.MobileWebUrl/customercenter/FaqList?cateCd=" + cateCd;
+		}		
+	}
+
+	jQuery(document).ready(function () {
+		loadNotice('ALL');
+
+		// BEST faq list
+		fcdCall('704000013');
+	});
+
+	function loadNotice(kind) {
+
+		var params = { nKind: kind, pageNo: 1 };
+
+		$('#ntc').empty();
+
+		jQuery.ajax({
+			type: "POST",
+			url: "@Urls.MobileWebUrl/Etc/NoticeListJson",
+			dataType: "json",
+			data: params,
+			crossDomain: true,
+			success: function (data) {
+
+				if (data == null || data == 'undefined') return;
+				
+				$('#ntc').render({
+					template: 'notice_bar_item_template',
+					model: data.Items
+				});
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+
+			}
+		});
+
+	}
+
+	function SearchBoxChange(val) {
+		
+		if (val == "on") {
+			$("#spSearch").hide();
+			$("#divSearch").attr("class", "inpt full");
+			$("#searchDel").show();
+		}
+		else {
+			$("#spSearch").show();
+			$("#divSearch").attr("class", "inpt");
+
+			SearchDelChk();	
+		}
+	}
+
+	function SearchDelChk()
+	{
+		var search = $("#txtSearch").val();
+
+		if (search != "" && search != "undefined" && search != null) {
+			$("#searchDel").show();
+			$("#spSearchText").attr("style", "");		
+		}
+		else {
+			$("#searchDel").hide();
+			$("#spSearchText").attr("style", "padding-right:0;");
+		}
+	}
+
+	function fcdCall( code ) {
+
+		try {
+
+			var jqxhr = $.get("http://sna.gmarket.co.kr/?fcd=" + code, function () {
+			})
+			.done(function () {
+			})
+			.fail(function () {
+			})
+			.always(function () {
+			});
+
+		}
+		catch (ex) {
+			alert( ex.message );
+		}
+	}
+
+</script>
+
+<!-- CONTENTS -->
+<div id="contents" class="cts">
+	<div class="cstm_ct">
+		<h3 class="tit">모바일 고객센터 홈</h3>
+		<div class="of_ques">
+			<span id="spSearch" class="of_tx">자주 묻는 질문 BEST</span>
+			<div class="inpt" id="divSearch"><span class="inpt_wp" id="spSearchText" style="padding-right:0;"><input type="text" id="txtSearch" placeholder="질문을 입력하세요" /><a href="javascript:" id="searchDel" class="del" style="display:none;">검색어 삭제</a></span><a href="javascript:" class="btn_qus" id="searchClick"><span>질문검색</span></a></div>
+		</div>
+
+		<ul class="tab_ques">
+	@foreach (var item in Model.FaqCategoryList)
+	{ 
+				<li id="li@(@item.cd)" @if (item.cd == Model.DefaultCd)
+		{ <text>class="on"</text> }><a href="javascript:FaqList('@item.cd');">@item.cdNm</a></li>
+	}
+		</ul>
+		<div class="ques_listw">
+			<ul class="ques_list" id="FaqList">
+	@foreach (var item in Model.Items)
+	{
+				<li><a href="javascript:fnFaqDetail('@item.seqNo');"><span class="num">@FaqNum</span>@item.title</a></li>
+	 
+		FaqNum++;
+	}
+			</ul>
+			@*<div id="empty" style="display:none;">데이터없음</div>*@
+
+			<div class="more">
+				<a href="javascript:fnFaqListMove('best');" id="bestView"  class="fir_que">BEST 다시보기</a><!--131219-->
+				<a href="javascript:fnFaqListMove('faq');" id="FaqView">자주 묻는 질문 더보기</a>
+			</div>	
+		</div>
+
+		<a href="http://sna.gmarket.co.kr/?fcd=704000002&url=@Urls.MMyGUrl/Question/CustomerQuestion" class="btn_tight">@ViewBag.CCName 고객센터에 문의</a>
+			
+		<div class="wbtn_list">
+			<span class="wp">
+				<a href="http://sna.gmarket.co.kr/?fcd=704000003&url=@Urls.MMyGUrl/Question/QuestionList">답변확인</a>
+			</span>
+			<span class="wp">
+				<a href="http://sna.gmarket.co.kr/?fcd=704000004&url=@Urls.MobileWebUrl/Event/EventList">당첨확인</a>
+			</span>
+		</div>
+
+		<div class="ntc">
+			<ul id="ntc">
+			</ul>
+
+			<a href="http://sna.gmarket.co.kr/?fcd=704000006&url=@Urls.MobileWebUrl/Etc/NoticeList?nKind=ALL" class="ntc_more">더보기</a>
+		</div>
+		<script type="text/javascript">
+		//<![CDATA[
+			rolling("ntc");
+		//]]>
+		</script> 
+
+		<div class="call_cs">
+			<a href="#" onclick="popBlockUI('layer_cnnt');fcdCall('704000001');return false;">
+				<em>@ViewBag.CCCallText</em>
+				<span class="info">@ViewBag.CCNumber (월~금 09:00~18:00)</span>
+			</a>
+		</div>
+		<!--layer-->
+		<div class="layer_cnnt" id="layer_cnnt">
+			<div class="wrp_ques">
+				<p class="cal_ques">
+					<strong class="qus">전화연결을 하시겠습니까?</strong>
+					@ViewBag.CCName 모바일 고객센터<br />
+					@ViewBag.CCNumber<br />
+					<span class="cal_time">(월~금 09:00~18:00)</span>
+				</p>
+				<div class="wbtn_lists">
+					<span class="wp"><a href="#" onclick="popBlockUI('layer_cnnt');return false;">취소</a></span>
+					<span class="wp"><a href="tel:@ViewBag.CCNumber" class="sky" >예</a></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<input type="hidden" id="hidCateCd" value="@Model.DefaultCd" />
+<!--// CONTENTS -->

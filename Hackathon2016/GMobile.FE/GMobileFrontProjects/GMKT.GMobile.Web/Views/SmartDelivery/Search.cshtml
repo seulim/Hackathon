@@ -1,0 +1,565 @@
+﻿@{
+	ViewBag.Title = "Smart Delivery - Gmarket";
+}
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/cpplpsrp.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/SmartDeliveryBiz.js"></script>
+
+<!-- 
+	지마켓 모바일 헤더/푸터에서 사용된
+	Handlebars.js 라이브러리 사용( 참고 http://handlebarsjs.com/) 
+-->
+
+
+<!-- 
+	검색 결과 리스트 아이템 template (갤러리뷰, 리스트뷰, 이미지뷰 공통으로 사용)
+-->
+<script id="item-template" type="text/x-handlebars-template">
+<ul class="{{printItemCSSStyle}}">
+{{#each Item}}
+	<li seq='{{@@index}}' moreImageCnt='{{LargeImageList.length}}'>		
+		<a href="{{LinkURL}}">
+			<span class="img_box">
+				<img id="itemImage" data-original="{{printImage this @@index}}" 
+					src="@Urls.MobileImageUrlV2/640/img_none.jpg"  
+					onError="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" 
+					alt="" class="thumbnail">
+			</span>
+			<span class="txt_box">
+				<strong class="prd_tit">{{GoodsName}}</strong>
+				<span class="price_box">
+
+					{{#ifNotZero DiscountRate}}
+
+					<strong class="per_price"><span class="blind">할인율</span>{{DiscountRate}}<span class="per">%</span></strong>
+					<span class="origin_price"><span class="blind">정가</span>{{OriginalPrice}}</span>
+					<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>
+					
+					{{else}}
+					
+					<span class="origin_price" ></span>
+					<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>						
+					
+					{{/ifNotZero}}
+
+				</span>
+				{{#if SubdivYN}}
+				<span class="option_bx">
+					<span class="opt_type">소량포장</span>
+				</span>
+				{{/if}}
+			</span>
+		</a>
+
+		{{#ifOverOne LargeImageList.length}} {{! View Style 이 Image 뷰 스타일일 때만 해당되는 큰 이미지 페이징}}
+
+		<div class="page_area" style="{{printLargeImageVisibility}}">
+			<a href="javascript:showPreviousImage('{{@@index}}');" class="btn_prev" style="display:none">
+				<span class="sp_mw">이전 이미지</span>
+			</a>
+			<a href="javascript:showNextImage('{{@@index}}')" class="btn_next">
+				<span class="sp_mw">다음 이미지</span>
+			</a>
+			<div class="sp_mw page_box">
+				<span class="pag" id="moreImageIndex">1</span> / <span class="pag2">{{LargeImageList.length}}</span>
+			</div>
+		</div>
+
+		{{/ifOverOne}}
+	</li>
+{{/each}}
+</ul>
+
+{{printPaging this}}
+
+</script>
+
+<!-- 
+	카테고리 레이어의 아이템 template
+-->
+<script id="category-template" type="text/x-handlebars-template">
+
+	<ul class="slide_lst">
+
+		{{printParentCategories this}}
+
+		{{#ifDisplayCategoryList ScIdName Category.length}}
+
+		{{#each Category}}
+		<li class='low'>
+			<a href="javascript:selectCategory('{{CategoryLevel}}', '{{CategoryId}}');search(false);" class="inp_box">
+				<strong class="tit">{{CategoryNm}}<span>{{addCommas CategoryCount}}</span></strong>
+				<span class="sp_mw arr"></span>
+			</a>
+		</li>
+		{{/each}}
+
+		{{/ifDisplayCategoryList}}
+
+	</ul>
+
+</script>
+
+<!-- 
+	브랜드 리스트 아이템 template
+-->
+<script id="brand-template" type="text/x-handlebars-template">
+	
+	<ul class="slide_lst">
+		{{#each BrandFinderList}}
+		<li brandNo="{{BrandNo}}">
+			<div class="img_box">
+				<img src="{{BrandonSubImg}}" width="40" height="15" alt="{{BrandName}}" />
+			</div>
+			<div class="inp_box">
+				<input type="checkbox" id="chk_{{BrandNo}}" class="inp_chk" />
+				<label for="chk_{{BrandNo}}" class="tit">{{BrandName}}<span>{{addCommas BrandCount}}</span></label>
+			</div>
+		</li>
+		{{/each}}
+	</ul>
+
+</script>
+
+<script language="javascript">
+	var searchEx = {
+		isSmartDeliveryShop: @(ViewBag.isSmartDeliveryShop != null ? ViewBag.isSmartDeliveryShop.ToString().ToLower() : "false")
+	}
+
+	// 최초 로딩시 req param 정보들.(리셋할때 필요함)
+	var defaultReqParams = { menuName:"@ViewBag.menuName", primeKeyword: '@ViewBag.keyword', moreKeyword: '',
+		lcId: '@ViewBag.lcId', mcId: '@ViewBag.mcId', scId: '@ViewBag.scId', sortType: '',
+		minPrice : 0, maxPrice : 0, pageNo : 1, pageSize: 30, brandList : '', sellCustNo : '', 
+		isSmartDelivery : 'Y', isSmallPacking : '@ViewBag.isSmallPacking', searchEx: searchEx
+	};
+
+	// 중간중간 검색 조건들을 변경할때, 변경 req param 정보를 유지하기 위함 값.
+	var reqParams = { menuName: "@ViewBag.menuName", primeKeyword: '@ViewBag.keyword', moreKeyword: '',
+		lcId: '@ViewBag.lcId', mcId: '@ViewBag.mcId', scId: '@ViewBag.scId', sortType: '',
+		minPrice: 0, maxPrice: 0, pageNo: 1, pageSize: 30, brandList: '', sellCustNo: '',
+		isSmartDelivery: 'Y', isSmallPacking: '@ViewBag.isSmallPacking', searchEx: searchEx
+	};
+	
+	// req param 를 초기 정보로 리셋
+	function initReqParams()
+	{
+		// clone
+		reqParams = jQuery.extend(true, {}, defaultReqParams);
+	}
+
+	var menuName = "@ViewBag.menuName";
+	// 응답 데이터를 갖고 있는 전역변수
+	var returnData = null;
+
+	// 현재 뷰 스타일 저장(Gallery,List,Image)
+	var currentViewStyle = '';
+	
+	var defaultImage = '@Urls.MobileImageUrlV2/640/img_none.jpg';
+
+	var adultDefaultImage = '@(Urls.MobileImageUrlV2 + GMKT.GMobile.Constant.Const.ADULT_IMAGE_210.Replace("images/", string.Empty))';
+
+	var bFirstLoading = true;
+	
+	jQuery(document).ready(function () {   
+		// 출력할 함수들을 등록한다.
+		registerHelpers();
+
+		// reqParam 으로 ajax 요청
+		search(true);
+	});
+
+	function displaySlideOrderInfo() {
+		var sType = reqParams.sortType;
+		if (sType != undefined) {
+			if (sType == '' || sType == 'ACCURACY_LQS' || sType == 'SELL_POINT_INFO' || sType == 'PREMIUM_RANK_LQS') {
+				$(".tab_slide .btn_info").show();
+			} else {
+				$(".tab_slide .btn_info").hide();
+			}
+		}
+	}
+
+	function sendFcdCode(type, index) {
+		var fcdCode = "";
+
+		if (menuName == "LP") {
+			switch (type) {				
+				case "FILTER":
+					if (index == 0) {
+						fcdCode = "711400001";
+					} else if (index == 1) {
+						fcdCode = "711400002";
+					} else if (index == 2) {
+						fcdCode = "711400003";
+					} else if (index == 3) {
+						fcdCode = "711400004";
+					} else if (index == 4) {
+						fcdCode = "711400005";
+					} else {
+						fcdCode = "";
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		else if (menuName == "SRP") {
+			switch (type) {			
+				case "FILTER":
+					if (index == 0) {
+						fcdCode = "711500001";
+					} else if (index == 1) {
+						fcdCode = "711500002";
+					} else if (index == 2) {
+						fcdCode = "711500003";
+					} else if (index == 3) {
+						fcdCode = "711500004";
+					} else if (index == 4) {
+						fcdCode = "711500005";
+					} else {
+						fcdCode = "";
+					}
+					break;
+				default:
+					break;
+			}
+		}
+
+		if (fcdCode != undefined && fcdCode != null && fcdCode != "") {
+			$.get("http://sna.gmarket.co.kr/?fcd=" + fcdCode);
+		}
+	}
+
+	function search( bShowLoading ) {
+		//SmartDelivery SearchAPI에서 가격대 검색 지원하지 않아 소량포장 LP만 해당 API 사용 
+		var url = "@ViewBag.menuName" == "SPP" ? "/SmartDelivery/SearchJson" : "/Search/SearchJson";
+
+		try {
+
+			if ( bShowLoading )
+				startLoading();
+
+			$.ajax({
+	    		type: 'POST',
+	 			dataType: 'json',
+	 			url: url,
+	 			data: JSON.stringify(reqParams),
+	 			contentType: "application/json",	 			
+				xhrFields: {
+					withCredentials: true
+				},
+	 			success: function (result) {
+					
+					// 전역변수로 저장해둔다.
+					returnData = result;
+
+					if ( typeof returnData === 'undefined' || null === returnData ) return;
+
+					// 키워드 redirection. 지정한 키워드redirection
+					if ( typeof returnData.SrpRedirectionUrl != 'undefined' && 
+						returnData.SrpRedirectionUrl != null && returnData.SrpRedirectionUrl != '' )
+					{
+						document.location.href = returnData.SrpRedirectionUrl;
+						return;
+					}
+
+					if ( bShowLoading )
+						endedLoading();
+
+					// 결과 출력
+					displaySearchResult();
+
+					bFirstLoading = false;
+    			},
+	    		error: function (result) {
+
+					if ( bShowLoading )
+						endedLoading();
+	    		}
+    		});
+			
+		}
+		catch (ex) {
+			alert(ex.Message);
+		}
+	}
+
+	function displaySearchResult()
+	{
+		if ( currentViewStyle == '' )
+		{
+			// view style 을 지정하지 않았을때. 기본 style(Gallery) 로 세팅한다.
+			currentViewStyle = 'Gallery';
+		}
+
+		// LP 의 경우 카테고리 hierarchy 를 보여준다.
+		displayCategoryInfo();		
+
+		// 검색결과를 출력한다.
+		displayItemList();
+
+		// 결과내 카테고리를 출력한다.
+		displayCategory();
+
+		// 브랜드 리스트를 출력한다.
+		displayBrandList();
+
+		// 검색 조건 활성화
+		toggleSearchOption();
+	}
+</script>
+
+@{
+	string css = "ctns";
+
+	if (PageAttr.IsIphone)
+	{
+		css = "ctns ios";
+	}
+	else
+	{
+		css = "ctns";
+	}
+
+	string wrapCss = "";
+	if ("LP".Equals(ViewBag.menuName))
+	{
+		wrapCss = "case";
+	}
+}
+
+<div id="content" class="@css">
+	@Html.Partial("_SmartDeliveryHeader")
+	<div class="mw_wrap smart_wrap @wrapCss">
+	@if ("SRP".Equals(ViewBag.menuName))
+	{
+		<div class="tab_box no_p">
+			<ul class="mw_tab">
+				<li class="selected">
+					<span class="mall_box">@ViewBag.keyword</span><span class="result_txt"><span class="mall_txt">검색결과</span><span class="num" id="TotalGoodsCount"></span></span>
+				</li>
+			</ul>
+		</div>
+	}
+	@if ("SPP".Equals(ViewBag.menuName))
+	{
+		<div class="tab_box no_p">
+			<ul class="mw_tab">
+				<li class="selected">
+					<span class="mall_box">소량포장 상품 모아보기</span>
+				</li>
+			</ul>
+		</div>
+	}
+	@if ("LP".Equals(ViewBag.menuName))
+	{
+		<h2 class="kind_tit kind_tit2">
+			<span class="cate_txt" id="lcIdName">@ViewBag.lcIdName</span>
+			<span class="sp_mw" id="mcIdNameArrow" style="display:none">&gt;</span>
+			<span class="cate_txt" id="mcIdName" style="display:none"></span>
+			<span class="sp_mw" id="scIdNameArrow" style="display:none">&gt;</span>
+			<span class="cate_txt" id="scIdName"  style="display:none"></span>
+		</h2>
+	}
+		<div class="mw_contbx">
+			<div class="cate_tab" id="searchOptionDiv" style="display:none">
+				<ul>
+				<li id="tb_btn_category">
+					<a href="#" onclick="javascript:sendFcdCode('FILTER',0);">카테고리</a>
+					<div class="tab_slide" style="display:none">
+						<h3>카테고리</h3>
+						<div class="slide_area cate_box" id="wrapper">
+							<div class="scroll_box" id="categoryDiv">
+									
+							</div>
+						</div>
+						<button type="button" class="btn_close"><span class="sp_mw"></span>닫기</button>
+					</div>
+				</li>
+				<li id="tb_btn_brand">
+					<a href="#" onclick="javascript:sendFcdCode('FILTER',1);">브랜드</a>
+					<div class="tab_slide" style="display:none">
+						<h3>브랜드</h3>
+						<div class="mw_none" id="brandEmptyDiv" style="display:none">
+							<h4>검색된 브랜드가 없습니다.</h4>
+							<p>검색어 또는 카테고리를 변경해서<br>다시 검색해주세요.</p>
+							<span class="sp_mw">Gmarket</span>
+						</div>
+						<div class="slide_area brand_box" id="wrapper2">
+							<div class="scroll_box" id="brandListDiv">
+									
+							</div>
+						</div>
+						<div class="btn_area" id='brand_btn_area'>
+							<button type="reset" class="btn_reset" onclick="deselectBrands();">초기화</button><button type="button" class="btn_srh" onclick="brandSearch();">검색</button>
+						</div>
+						<button type="button" class="btn_close"><span class="sp_mw"></span>닫기</button>
+					</div>
+				</li>
+				<li id="tb_btn_sort">
+					<a href="#" onclick="javascript:sendFcdCode('FILTER',2);displaySlideOrderInfo();">정렬순</a>
+					<div class="tab_slide" style="display: block; right: -300px;">
+						<h3>정렬순</h3>
+						<div class="slide_area align_box" id="wrapper3">
+							<div class="scroll_box">
+								<ul class="slide_lst" id="sortOption">
+@if ("SRP".Equals(ViewBag.menuName))
+{ 
+								<li class="selected" id='ACCURACY_LQS'>
+									<a href="javascript:selectSortOption('ACCURACY_LQS');search(true);" class="inp_box">
+										<strong class="tit">G마켓랭크순</strong>
+										<span class="sp_mw arr"></span>
+									</a>
+								</li>
+}
+else if ("LP".Equals(ViewBag.menuName) || "SPP".Equals(ViewBag.menuName))
+{
+								<li class="selected" id='PREMIUM_RANK_LQS'>
+									<a href="javascript:selectSortOption('PREMIUM_RANK_LQS');search(true);" class="inp_box">
+										<strong class="tit">G마켓랭크순</strong>
+										<span class="sp_mw arr"></span>
+									</a>
+								</li>
+}
+								<li id='SELL_POINT_INFO'>
+									<a href="javascript:selectSortOption('SELL_POINT_INFO');search(true);" class="inp_box">
+										<strong class="tit">판매인기순</strong>
+										<span class="sp_mw arr"></span>
+									</a>
+								</li>
+								<li id='DISCOUNT_PRICE_DESC'>
+									<a href="javascript:selectSortOption('DISCOUNT_PRICE_DESC');search(true);" class="inp_box">
+										<strong class="tit">할인액높은순</strong>
+										<span class="sp_mw arr"></span>
+									</a>
+								</li>
+								<li id='SELL_PRICE_ASC'>
+									<a href="javascript:selectSortOption('SELL_PRICE_ASC');search(true);" class="inp_box">
+										<strong class="tit">가격낮은순</strong>
+										<span class="sp_mw arr"></span>
+									</a>
+								</li>
+								<li id='SELL_PRICE_DESC'>
+									<a href="javascript:selectSortOption('SELL_PRICE_DESC');search(true);" class="inp_box">
+										<strong class="tit">가격높은순</strong>
+										<span class="sp_mw arr"></span>
+									</a>
+								</li>
+								<li id='CON_POINT_DESC'>
+									<a href="javascript:selectSortOption('CON_POINT_DESC');search(true);" class="inp_box">
+										<strong class="tit">상품평순</strong>
+										<span class="sp_mw arr"></span>
+									</a>
+								</li>
+								<li id='NEW'>
+									<a href="javascript:selectSortOption('NEW' );search(true);" class="inp_box">
+										<strong class="tit">신규상품순</strong>
+										<span class="sp_mw arr"></span>
+									</a>
+								</li>
+								</ul>
+								<button type="button" class="btn_info"><span class="sp_mw"></span>안내</button>
+								<div class="ly_info" style="display: none;">
+									<strong class="ly_tit"><span class="sp_mw"></span>G마켓랭크순</strong>
+									<p>상품의 판매실적을 기반으로 하여, 서비스점수, 프로모션 활동 등을 산정한 점수의 합산으로 정렬됩니다.</p>
+									<p>*플러스 상품은 광고구매에 의한 전시 영역입니다.</p>
+									<p>*포커스 상품은 유료 부가서비스 구매 상품에 대해 G마켓 랭크순으로 정렬됩니다.</p>
+									</br>
+									<strong class="ly_tit"><span class="sp_mw"></span>판매인기순</strong>
+									<p>최근 3일간의 구매자수와 구매금액을 기반으로 정렬 됩니다.</p>
+								</div>
+							</div>
+						</div>
+						<button type="button" class="btn_close"><span class="sp_mw"></span>닫기</button>
+					</div>
+				</li>
+				<li id="tb_btn_detail">
+					<a href="#" onclick="javascript:sendFcdCode('FILTER',3);">상세검색</a>
+					<div class="tab_slide" style="display: block; right: -300px;">
+						<h3>상세검색</h3>
+						<div class="slide_area search_box" id="wrapper4" style="overflow: hidden;">
+							<div class="scroll_box">
+@if("SPP" == ViewBag.menuName)
+{
+								<form action="">
+									<fieldset>
+									<legend>결과 내 검색 영역</legend>
+										<label for="srh">결과 내 검색</label>
+										<span class="inp">
+											<input type="text" id="scKeyword" value="">
+											<button type="button" class="sp_mw" onclick="$('#scKeyword').val('');">검색어 삭제</button>
+										</span>
+									</fieldset>
+								</form>
+}
+else
+{
+								<h4 class="blind">혜택별 검색</h4>
+								<ul class="slide_lst">
+									<li>
+										<div class="inp_box">
+											<input type="checkbox" id="smallPacking" class="inp_chk">
+											<label for="smallPacking" class="tit">소량포장 상품만 보기</label>
+										</div>
+									</li>
+								</ul>
+								<form action="">
+									<fieldset>
+									<legend>결과 내 검색 영역</legend>
+										<label for="srh">결과 내 검색</label>
+										<span class="inp">
+											<input type="text" id="scKeyword" value="">
+											<button type="button" class="sp_mw" onclick="$('#scKeyword').val('');">검색어 삭제</button>
+										</span>
+									</fieldset>
+									<fieldset>
+									<legend>가격대 검색 영역</legend>
+										<label for="srh2">가격대 검색</label>
+										<div class="compare">
+											<span class="inp"><input type="number" id="minPrice" title="최소 가격입력"></span>
+											<span class="arr">~</span>
+											<span class="inp"><input type="number" id="maxPrice" title="최대 가격입력"></span>
+										</div>
+									</fieldset>
+								</form>	
+}					
+							</div>
+						</div>
+						<div class="btn_area">
+							<button type="reset" class="btn_reset" onclick="resetDetailSearchOption();">초기화</button><button type="button" class="btn_srh" onclick="detailSearch(true);">검색</button>
+						</div>
+						<button type="button" class="btn_close"><span class="sp_mw"></span>닫기</button>
+					</div>
+				</li>
+				<li class="last">
+					<a href="#" onclick="javascript:changeViewStyle();sendFcdCode('FILTER',4);">
+						<span class="sp_mw ico_view" style="display:none">갤러리뷰</span>
+						<span class="sp_mw ico_view2">리스트뷰</span>
+						<span class="sp_mw ico_view3" style="display:none">이미지뷰</span>
+					</a>
+				</li>
+				</ul>
+			</div>
+
+			<div class="dimmed" style="display: none; opacity: 1;"></div>
+			
+			<div class="mw_none" style="display:none" id="itemEmptyDiv">
+				<h4>검색결과가 없습니다.</h4>
+				<p>검색어가 올바른지 재확인 하신 후<br>정확하게 다시 입력해주세요.</p>
+				<span class="sp_mw">Gmarket</span>
+			</div>
+
+			<div class="mw_none" style="display:none" id="itemLoading">
+				<h4>로딩중입니다....</h4>
+				<p>잠시만 기다려 주십시오.</p>
+				<span class="sp_mw">Gmarket</span>
+			</div>
+
+			<!-- 아이템 결과 리스트 -->
+			<div class="kind_artwrap"></div>
+			<!--// 아이템 결과 리스트 -->
+		</div>
+	</div>
+</div>

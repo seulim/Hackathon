@@ -1,0 +1,229 @@
+﻿@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Models;
+
+@using GMKT.Web.Context 
+
+@model DisplayModel
+@{
+    //ViewData["Title"] = "SpecialShopping";
+    // 성인여부 체크
+    // Login 시 Adult 체크
+    bool isAdult = false;
+    if (PageAttr.IsLogin)
+    {
+			@* 
+			2013-06-10 이윤호 
+			GMKTWebContext -> GMobileWebContext
+			*@
+			isAdult = BizUtil.IsAdultUser(GMobileWebContext.Current.UserProfile.CustNo);
+		}
+}
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.MobileWebUrl/js/common/front.js"></script>
+
+<script type="text/javascript">
+	window.onload = function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+			//document.getElementById("contents").scrollIntoView();
+		}, 100);
+		GNB_layoutFix("#gnbList");
+
+		/* landing Banner */
+		var em = eModule
+            , apps = em.apps
+            , landing = apps.landing;
+
+		landing.init({
+			pageName: 'SpecialShopping',
+			landingType: '@Model.LandingBanner.Type',
+			imageUrl: '@Model.LandingBanner.ImageUrl',
+			description: '@Model.LandingBanner.Description',
+			campaign: '@Model.Campaign.Name',
+			medium: '@Model.Campaign.Medium',
+			mediumSource: '@Model.Campaign.MediumSource',
+			mediumContent: '@Model.Campaign.MediumContent',
+			term: '@Model.Campaign.Keyword'
+		});
+
+		$("#lay_notice").on('click', '#goToApp', function (e) {
+			e.preventDefault();
+			landing.installApp();
+		}).on('click', '#landingClose', function (e) {
+			e.preventDefault();
+			landing.close();
+		});
+		/* landing Banner */
+	}
+
+	function visibilityLayer(type) {
+		if (type == "image") {
+			document.getElementById("listDiv").className = "horizontal_list";
+			UL_layoutFix(".horizontal_list", true);
+			document.getElementById("btnViewImg").src = "@Urls.MobileImageUrlV2/480/btn_view_img_on.gif";
+			document.getElementById("btnViewList").src = "@Urls.MobileImageUrlV2/480/btn_view_list.gif";
+		} else {
+			UL_layoutUnFix(".horizontal_list", true);
+			document.getElementById("btnViewImg").src = "@Urls.MobileImageUrlV2/480/btn_view_img.gif";
+			document.getElementById("btnViewList").src = "@Urls.MobileImageUrlV2/480/btn_view_list_on.gif";
+			document.getElementById("listDiv").className = "vertical_list";
+		}
+	}
+</script>
+
+	<hr />
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+    <input type="hidden" name="sid" id="sid" value="@Model.sid" />
+
+@if (string.IsNullOrEmpty(@Model.Plan.MobileBannerImageUrl))
+{
+		<!-- SPECIAL TITLE -->
+		<p class="spcl_tit9">@Model.Plan.Title</p> 
+		<!-- //SPECIAL TITLE -->
+}
+
+		<!-- BANNER -->	
+		<div class="ban_wrap">
+			<div class="bn_grp ban" id="bnGrp">
+
+@if (!string.IsNullOrEmpty(@Model.Plan.MobileBannerImageUrl))
+{
+				<ul>
+					<li>
+						@Html.Raw(@Model.Plan.MobileBannerImageUrl)
+					</li>
+				</ul>
+}
+else
+{
+    if (string.IsNullOrEmpty(Model.Plan.BannerUrl) == false)
+    { 
+				<div class="plan_top_banner"> 
+					<span class="banner"><img src="@Model.Plan.BannerUrl" width="198" height="83" alt="" /></span>
+					<span class="category"></span>
+					<span class="title"></span>
+				</div>
+    }
+}
+
+			</div>
+		</div>		
+		<!-- //BANNER -->
+
+@if (@Model.totalCount > 0)
+{		
+		<!-- 기존소스 -->
+		<!-- PRODUCT ALIGN -->
+		<div class="view_type">
+			<div class="view_type_sub">	<!-- 20120823 -->
+				<div class="p_right">
+					<div class="viewmd">
+						<ul>
+							<li><a href="#" onClick="visibilityLayer('image');return false; "><img src="@Urls.MobileImageUrlV2/480/btn_view_img_on.gif" alt="이미지리스트" id="btnViewImg" /></a></li>
+							<li><a href="#" onClick="visibilityLayer('list');return false;"><img src="@Urls.MobileImageUrlV2/480/btn_view_list.gif" alt="리스트" id="btnViewList" /></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- VERTICAL LIST -->
+		<div class="horizontal_list" id="listDiv">
+			<ul id="dataListAjax">
+@{
+	foreach (var item in Model.Items)
+	{
+		string goodsImagePath = "";
+		string linkUrl = Urls.MItemWebURL + "/Item?goodscode=" + item.gd_no;
+		string onClickStr = "";
+		if (item.adult_yn.Equals("Y"))
+		{
+			if (PageAttr.IsAdultUse && PageAttr.IsLogin)
+			{
+				goodsImagePath = BizUtil.GetGoodsImagePath(item.gd_no.ToString(), "M2");
+			}
+			else if (PageAttr.IsLogin && !isAdult) // 미성년자
+			{
+				goodsImagePath = Model.listView.Equals("H") ? Const.ADULT_IMAGE_210 : Const.ADULT_IMAGE_210;
+				onClickStr = "alert('죄송합니다.\\n성인만 구매 가능한 상품입니다.'); return false;";
+			}
+			else if (PageAttr.IsLogin && !PageAttr.IsAdultUse && isAdult)  // 성인이지만 성인인증 절차 필요
+			{
+				goodsImagePath = Model.listView.Equals("H") ? Const.ADULT_IMAGE_210 : Const.ADULT_IMAGE_210;
+				linkUrl = "/Common/AdultGoodsViewAgree?goodsNo=" + @item.gd_no;
+			}
+			else if (!PageAttr.IsLogin) // Login 필요
+			{
+				goodsImagePath = Model.listView.Equals("H") ? Const.ADULT_IMAGE_210 : Const.ADULT_IMAGE_210;
+				linkUrl = ConstDef._GMW_LOGIN_AD_URL + "?rtnurl=" + HttpUtility.UrlEncode(linkUrl) + "&adultUseLoinCheck=Y";
+			}
+			else
+			{
+				goodsImagePath = BizUtil.GetGoodsImagePath(item.gd_no.ToString(), "M2");
+			}
+		}
+		else
+		{
+			goodsImagePath = BizUtil.GetGoodsImagePath(item.gd_no.ToString(), "M2");
+		}  
+				<li>
+					<a class="anchor" href="@linkUrl" onclick="@onClickStr">
+						<span class="thumbnail_wrap">
+							<img class="thumbnail" src="@goodsImagePath" alt="" onerror="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" />
+						</span>
+						<span class="goods_name">@item.gd_nm</span>
+						<span class="goods_info">
+        @if (item.discount_price == 0)
+				{
+							<span class="price" style="text-decoration:none;">&nbsp;</span>
+							<span class="sale_price">@CurrencyUtil.ToMoney((@item.sell_price - @item.discount_price).ToString(), true)</span>
+				}
+				else
+				{
+							<span class="price">@CurrencyUtil.ToMoney(@item.sell_price.ToString(), true)</span>
+							<span class="sale_price">@CurrencyUtil.ToMoney((@item.sell_price - @item.discount_price).ToString(), true)</span>
+				}
+
+        @if (item.delivery_info.Equals("무료"))
+				{
+							<span class="free">무료배송</span>
+				}
+				else if (Char.IsNumber(item.delivery_info, 0))
+				{
+							<span class="fee">배송비 @item.delivery_info</span>
+				}
+				else
+				{
+							<span class="pay">@Html.Raw(@item.delivery_info.Replace("디지털쿠폰<br/>(방문사용)", "e쿠폰"))</span>
+				}
+						</span>
+					</a>
+				</li>
+	}
+}
+			</ul>
+
+@{
+	if (@Model.pageNo != 0)
+	{
+		string customParam = "lcId=" + Model.lcId + "&sid=" + Model.sid;
+        
+        @GMobileHelper.PagingUp(Model.pageNo, 10, Model.totalCount, 10, Urls.MobileWebUrl + "/Display/SpecialShopping", "pageNo", "|", customParam);
+	}    
+}
+
+		</div>
+		<!--// VERTICAL LIST -->
+		<!-- //기존소스 -->
+
+        <script type="text/javascript">
+        	UL_layoutFix(".horizontal_list", true);
+	    </script>
+}
+	</div>
+	<!-- //CONTENT -->
+
+	<hr />

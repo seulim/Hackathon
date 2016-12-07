@@ -1,0 +1,202 @@
+﻿@model GMKT.GMobile.Web.Models.ShopListPageModel
+@using GMKT.GMobile.Data.ShopBest;
+@{
+	Layout = "";
+}
+@foreach( ShopAndItems i in Model.ShopAndItems )
+{
+<div class="sb-shop-container">
+	<div class="slider__viewport">
+		<!-- 샵정보 -->
+		<div class="sb-shop slider__item slider__item--cover">
+			<div class="sb-shop__info">
+				<div class="sb-shop__intro">
+					<a href="@(Urls.MobileWebUrl)/Shop/@i.Shop.ShopUrl" class="sb-shop__hlink" onclick="_ubLog('4-1', _ubLogActEnum.click); return true;">
+						<span class="sb-shop__img"><img src="@i.Shop.ShopRepImagePath" alt="@i.Shop.ShopName"/></span>
+						@if( Model.HasRank )
+						{
+						<span class="sb-shop__rank"><em class="ico_rank ico_rank_@(i.Rank)">@i.Rank</em></span>
+						}
+					</a>
+					<span class="sb-shop__share">
+					@if( PageAttr.IsLogin )
+					{
+						if( i.IsFavorite )
+						{
+						<a href="#" onclick="favoriteShopAjaxCallGate($(this), '@i.Shop.SellCustNo'); return false;" class="sb-shop__share-favorite"><span class="on">관심매장</span></a>
+						}
+						else
+						{
+						<a href="#" onclick="_ubLog('4-3', _ubLogActEnum.click); favoriteShopAjaxCallGate($(this), '@i.Shop.SellCustNo'); return false;" class="sb-shop__share-favorite"><span>관심매장</span></a>
+						}
+					}
+					else
+					{
+						<a href="@(Urls.LoginUrl)?URL=@Request.Url.ToString()" onclick="alert('로그인 하셔야 합니다.'); return true;" class="sb-shop__share-favorite"><span>관심매장</span></a>	
+					}
+						<a href="@(Urls.MobileWebUrl)/Shop/@i.Shop.ShopUrl" class="sb-shop__share-shortcut"><span>샵 바로가기</span></a>
+					</span>
+				</div>
+				<div class="sb-shop__txt">
+					<p class="sb-shop__logo">
+					@if( String.IsNullOrEmpty( i.Shop.ShopLogoPath ) )
+					{
+						<span class="sb-shop__logo-txt">@i.Shop.ShopName</span>
+					}
+					else
+					{
+						<img src="@i.Shop.ShopLogoPath" alt="@i.Shop.ShopName" />
+					}
+					</p>
+					<p class="sb-shop__content">@i.Shop.ShopIntroContent</p>
+					<p class="sb-shop__link"><a href="@(Urls.MobileWebUrl)/Shop/@i.Shop.ShopUrl" class="button--sbest sb-shop_button-link" onclick="_ubLog('4-1', _ubLogActEnum.click); return true;">미니샵 바로가기</a></p>
+				</div>
+			</div>
+		</div>
+		<!-- //샵정보 -->
+		<!-- 상품 2개씩 묶음 -->
+		@if( i.Items != null && i.Items.Count > 0)
+		{
+			for( int j = 0; j < i.Items.Count; j += 2 )
+			{
+		<div class="sb-items slider__item-group">
+			<div class="sb-item sb-item_prev slider__item">
+				<div class="sb-item__info">
+					<div class="sb-item__intro">
+						<a href="@(Urls.MItemUrl)?goodscode=@i.Items[j].GoodsCode" class="sb-item__hlink" onclick="_ubLog('4-2', _ubLogActEnum.click); return true;">
+							<span class="sb-item__img"><img src="@(i.Items[j].ImageURL)" alt="@i.Items[j].GoodsName" onerror="this.src='@i.Items[j].AltrnativeImageUrl'" /></span>
+						</a>
+						<span class="sb-item__share">
+							<a href="#" onclick="_ubLog('4-4', _ubLogActEnum.click); favoriteItemAjaxCallGate($(this), '@i.Items[j].GoodsCode'); return false;" class="sb-item__share-favorite"><span>관심상품</span></a>
+							<a href="@(Urls.MItemUrl)?goodscode=@i.Items[j].GoodsCode" class="sb-item__share-shortcut" onclick="_ubLog('4-2', _ubLogActEnum.click); return true;"><span>상품 바로가기</span></a>
+						</span>
+					</div>
+					<div class="sb-item__txt">
+						<p class="sb-item__logo"><a href="@(Urls.MobileWebUrl)/Shop/@i.Shop.ShopUrl" class="txt_logo">@i.Shop.ShopName</a></p>
+						<p class="sb-item__content"><a href="@(Urls.MItemUrl)?goodscode=@i.Items[j].GoodsCode" onclick="_ubLog('4-2', _ubLogActEnum.click); return true;">@i.Items[j].GoodsName</a></p>
+						<p class="sb-item__price"><strong class="selling_price"><em>@((i.Items[j].SellPrice - i.Items[j].DiscountPrice).ToString( "#,###" ))</em>원</strong></p>
+						@if( i.Items[j].Delivery.DeliveryInfo == "무료")
+						{
+						<p class="sb-item__dv"><img src="@(Urls.MobileImagePics)/mobile/corner/shopbest/ico_free_ship.gif" width="37" height="14" alt="무료배송"/></p>
+						}
+					</div>
+				</div>
+			</div>
+				@if( i.Items.Count > j + 1 )
+				{
+			<div class="sb-item sb-item_next slider__item">
+				<div class="sb-item__info">
+					<div class="sb-item__intro">
+						<a href="@(Urls.MItemUrl)?goodscode=@i.Items[j + 1].GoodsCode" class="sb-item__hlink">
+							<span class="sb-item__img"><img src="@i.Items[j + 1].ImageURL" alt="@i.Items[j + 1].GoodsName" onerror="this.src='@i.Items[j + 1].AltrnativeImageUrl'"/></span>
+						</a>
+						<span class="sb-item__share">
+							<a href="#" onclick="favoriteItemAjaxCallGate($(this), '@i.Items[j + 1].GoodsCode'); return false;" class="sb-item__share-favorite"><span>관심매장</span></a>
+							<a href="@(Urls.MItemUrl)?goodscode=@i.Items[j + 1].GoodsCode" class="sb-item__share-shortcut"><span>상품 바로가기</span></a>
+						</span>
+					</div>
+					<div class="sb-item__txt">
+						<p class="sb-item__logo"><a href="@(Urls.MobileWebUrl)/Shop/@i.Shop.ShopUrl" class="txt_logo">@i.Shop.ShopName</a></p>
+						<p class="sb-item__content"><a href="@(Urls.MItemUrl)?goodscode=@i.Items[j + 1].GoodsCode">@i.Items[j + 1].GoodsName</a></p>
+						<p class="sb-item__price"><strong class="selling_price"><em>@((i.Items[j + 1].SellPrice - i.Items[j + 1].DiscountPrice).ToString( "#,###" ))</em>원</strong></p>
+						@if( i.Items[j].Delivery.DeliveryInfo == "무료")
+						{
+						<p class="sb-item__dv"><img src="@(Urls.MobileImagePics)/mobile/corner/shopbest/ico_free_ship.gif" width="37" height="14" alt="무료배송"/></p>
+						}
+					</div>
+				</div>
+			</div>	
+			 }
+		</div>
+			}
+		}
+		<!-- //상품 2개씩 묶음 -->
+	</div>
+	<a href="javascript:;" class="btn_slide slider__control_prev">이전 보기</a>
+	<a href="javascript:;" class="btn_slide slider__control_next">다음 보기</a>
+</div>
+}
+@if( Model.RenderScript )
+{
+	<script type="text/javascript">
+		var favoriteShopAjaxCallGate = function ($element, sellCustNo) {
+			var callback, url;
+			if ($element.find('span.on').length > 0) {
+				callback = deleteFavoriteShopCallback;
+				url = '/ShopBest/RemoveFavoriteShop/' + sellCustNo;
+			}
+			else {
+				callback = setFavoriteShopCallback;
+				url = '/ShopBest/SetFavoriteShop/' + sellCustNo;
+			}
+			ajaxCall($element, url, 'POST', callback);
+		}
+
+		var favoriteItemAjaxCallGate = function ($element, sellCustNo) {
+			var callback, url;
+			callback = setFavoriteItemCallback;
+			url = '/ShopBest/SetFavoriteItem/' + sellCustNo;
+			ajaxCall($element, url, 'POST', callback);
+		}
+
+		var setFavoriteShopCallback = function (result, $element) {
+			if (result.code) {
+				switch (result.code) {
+					case 'Y':
+						$element.find('span').addClass('on');
+						alert('관심매장으로 등록되었습니다.');
+						break;
+					case 'X':
+						$element.find('span').addClass('on');
+						alert('이미 관심매장으로 등록되있습니다.');
+						break;
+					default:
+						alert('관심매장 등록에 실패하였습니다');
+						break;
+				}
+			}
+		}
+
+		var setFavoriteItemCallback = function (result, $element) {
+			if (result.code) {
+				switch (result.code) {
+					case '1':
+						alert('관심상품으로 등록되었습니다.');
+						break;
+					default:
+						alert('관심상품 등록에 실패하였습니다');
+						break;
+				}
+			}
+		}
+
+		var deleteFavoriteShopCallback = function (result, $element) {
+			if (result.code) {
+				var code = result.code.match(/\:\d/)[0];
+				switch (code) {
+					case ':1':
+						$element.find('span').removeClass('on');
+						alert('관심매장이 삭제되었습니다.');
+						break;
+					default:
+						alert('관심매장 삭제에 실패하였습니다');
+						break;
+				}
+			}
+		}
+
+		var ajaxCall = function ($element, url, method, callback) {
+			$.ajax({
+				type: method,
+				url: url,
+				dataType: "json",
+				error: function (request, status, error) {
+					// TODO 
+				},
+				success: function (result) {
+					callback(result, $element);
+				}
+			});
+		}
+	</script>
+}

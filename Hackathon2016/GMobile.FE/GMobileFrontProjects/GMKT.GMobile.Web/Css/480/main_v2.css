@@ -1,0 +1,154 @@
+@charset "euc-kr";
+
+.ctns .ban_wrap{padding:0 0 16px 0;}
+.ctns .ban_wrap .ban{border-bottom:1px solid #d2d5d9;}
+
+.ctns .mjr_bnf_wrap{height:53px;margin:0 9px 0 9px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_mservice.gif") repeat-x left top;background-size:1px 54px;-webkit-background-size:1px 54px;}
+.ctns .mjr_bnf{height:53px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_mservice_right.gif") no-repeat right top;background-size:3px 54px;-webkit-background-size:3px 54px;}
+.ctns .mjr_bnf ul{height:53px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_mservice_left.gif") no-repeat left top;background-size:3px 54px;-webkit-background-size:3px 54px;}
+.ctns .mjr_bnf ul li{position:relative;float:left;width:25%;height:52px;padding:1px 0 0 0;}
+.ctns .mjr_bnf ul .bnf1{width:24%;}
+.ctns .mjr_bnf ul .bnf2{width:27%;}
+.ctns .mjr_bnf ul .bnf3{width:25%;}
+.ctns .mjr_bnf ul .bnf4{width:24%;}
+.ctns .mjr_bnf ul li a{display:block;height:50px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_mservice_mid.gif") no-repeat right top;background-size:2px 51px;-webkit-background-size:2px 51px;}
+.ctns .mjr_bnf ul li:last-child a{background:none;}
+.ctns .mjr_bnf ul li .new{position:absolute;top:-7px;right:-8px;width:24px;height:26px;font-size:0;z-index:10;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat -125px -104px;background-size:249px 191px;-webkit-background-size:249px 191px;}
+.ctns .mjr_bnf ul li a .bnf{display:block;height:33px;padding:17px 0 0 0;color:#444;font-size:1.05em;text-align:center;letter-spacing:-1px;}
+.ctns .mjr_bnf ul li a .bnf span{display:inline-block;padding:0 2px 0 0;}
+.ctns .mjr_bnf ul li a .bnf img{display:inline-block;width:102px;margin:-2px 4px 0 0;vertical-align:top;}
+
+.ctns .mbl_sp_wrap{height:52px;margin:-1px 9px 0 9px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_mservice.gif") repeat-x left top;background-size:1px 53px;-webkit-background-size:1px 53px;}
+.ctns .mbl_sp_wrap .mbl_sp{overflow:hidden;height:52px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_mservice_right.gif") no-repeat right top;background-size:3px 53px;-webkit-background-size:3px 53px;}
+.ctns .mbl_sp_wrap .msp1{float:left;width:25%;height:34px;padding:18px 0 0 0;text-align:center;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_mservice_left.gif") no-repeat left top;background-size:3px 53px;-webkit-background-size:3px 53px;}
+.ctns .mbl_sp_wrap .msp1 .tit{width:90px;height:16px;}
+.ctns .mbl_sp_wrap .msp2{position:relative;float:left;width:75%;padding:14px 0 0 0;color:#444;font-size:1.125em;font-weight:normal;letter-spacing:-1px;white-space:nowrap;text-overflow:ellipsis;}
+.ctns .mbl_sp_wrap .msp2 .hot{width:42px;height:24px;vertical-align:top;}
+.ctns .mbl_sp_wrap .msp2 .txt{margin:0 7px;line-height:1.3em;}
+.ctns .mbl_sp_wrap .msp2 .txt span{color:#458edd;}
+.ctns .mbl_sp_wrap .msp2 .play{position:absolute;top:17px;right:14px;width:19px;height:19px;}
+
+.ctns .sctn_tit{padding:0 0 25px 0;}
+.ctns .sctn_tit .tit_grp{overflow:hidden;height:51px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_sctn_tit.gif") repeat-x left top;background-size:1px 51px;-webkit-background-size:1px 51px;}
+.ctns .sctn_tit h3{display:inline-block;height:37px;padding:14px 0 0 12px;font-size:1.25em;letter-spacing:-1px;}
+.ctns .sctn_tit .more{display:inline-block;float:right;width:70px;height:33px;padding:18px 11px 0 11px;color:#959595;font-size:1.125em;font-weight:normal;line-height:15px;letter-spacing:-2px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bu_arr1.png") no-repeat 61px 18px;background-size:5px 15px;-webkit-background-size:9px 15px;}
+
+.ctns .gd_srs{margin:18px 0 0 0;padding:0 0 18px 0;}
+.ctns .gd_srs h3 span{display:inline-block;position:relative;margin:0 0 0 11px;width:76px;padding:1px 0 0 20px;color:#3786ef;font-size:0.875em;font-weight:normal;letter-spacing:0;vertical-align:top;}
+.ctns .gd_srs h3 span:before{content:"";display:inline-block;position:absolute;top:3px;left:0;width:17px;height:17px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat -108px -104px;background-size:249px 191px;-webkit-background-size:249px 191px;}
+
+.ctns .gmk_best{position:relative;padding:0;}
+.ctns .gmk_best ol{overflow:hidden;height:480px;padding:0 2px 0 4px;}
+.ctns .gmk_best ol li{float:left;width:33.3%;height:225px;margin:8px 0 15px 0;text-align:center;}
+.ctns .gmk_best ol li:last-child{float:left;width:33.4%;}
+.ctns .gmk_best ol li a{position:relative;display:block;width:150px;height:75px;margin:0 auto;padding:150px 0 0 0;}
+.ctns .gmk_best ol li img{position:absolute;top:0;left:0;width:148px;height:148px;border:1px solid #d2d2d2;}
+.ctns .gmk_best ol li .num{display:block;position:absolute;top:0;left:0;width:33px;height:36px;padding:5px 0 0 0;color:#fff;font-size:1.3em;line-height:1.2em;z-index:10;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bg_num.png") no-repeat left top;background-size:33px 41px;-webkit-background-size:33px 41px;}
+.ctns .gmk_best ol li .tit{overflow:hidden;display:block;height:38px;padding:6px 0 0 0;color:#6e6e6e;font-size:1.05em;font-weight:normal;text-align:left;letter-spacing:-1px;line-height:19px;}
+.ctns .gmk_best ol li .prc{display:block;padding:3px 0 0 0;color:#121212;font-size:1.4em;text-align:center;letter-spacing:-1px;}
+.ctns .gmk_best ol li .prc span{font-size:0.75em;}
+
+.ctns .mbl_plan{position:relative;margin:28px 0 0 0;padding:0;}
+.ctns .mbl_plan ul li{width:100%;height:149px;border-bottom:1px solid #d8dadd;}
+.ctns .mbl_plan ul li:last-child{border-bottom:0;}
+.ctns .mbl_plan ul li a{display:block;position:relative;height:120px;padding:29px 0 0 213px;}
+.ctns .mbl_plan ul li img{position:absolute;top:8px;left:8px;width:192px;height:132px;}
+.ctns .mbl_plan ul li .tit{overflow:hidden;display:inline-block;max-height:47px;min-height:20px;margin:0 0 6px 0;padding:0 15px 0 0;color:#353535;font-size:1.4em;letter-spacing:-1px;line-height:24px;}
+.ctns .mbl_plan ul li .desc{overflow:hidden;display:block;height:36px;padding:1px 15px 0 0;color:#6d6d6d;font-weight:normal;letter-spacing:-1px;line-height:19px;}
+
+.ctns .svc_go_wrap{margin:0 0 -40px 0;padding:25px 0 0 0;}
+.ctns .svc_go_wrap p{padding:0 0 10px 13px;font-size:1.3em;letter-spacing:-2px;}
+.ctns .svc_go_wrap .svc_go{border-top:2px solid #1958a5;}
+.ctns .svc_go_wrap .svc_go ul{overflow:hidden;border-bottom:1px solid #b9b9b9;background:#f7f7f7;}
+.ctns .svc_go_wrap .svc_go ul:last-child{border-bottom:0;}
+.ctns .svc_go_wrap .svc_go ul li{float:left;width:25%;height:87px;}
+.ctns .svc_go_wrap .svc_go ul li a{display:block;position:relative;height:29px;padding:58px 0 0 0;border-top:1px solid #fff;border-right:1px solid #b9b9b9;color:#4a4a4a;font-size:0.95em;font-weight:normal;text-align:center;letter-spacing:-1px;}
+.ctns .svc_go_wrap .svc_go ul li:last-child a{border-right:0;}
+.ctns .svc_go_wrap .svc_go ul li a:before{content:"";display:block;position:absolute;top:6px;left:50%;width:62px;height:51px;margin:0 0 0 -31px;}
+.ctns .svc_go_wrap .svc_go ul li .svc1:before{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat left top;background-size:249px 191px;-webkit-background-size:249px 191px;}
+.ctns .svc_go_wrap .svc_go ul li .svc2:before{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat left -51px;background-size:249px 191px;-webkit-background-size:249px 191px;}
+.ctns .svc_go_wrap .svc_go ul li .svc3:before{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat -62px top;background-size:249px 191px;-webkit-background-size:249px 191px;}
+.ctns .svc_go_wrap .svc_go ul li .svc4:before{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat -126px top;background-size:249px 191px;-webkit-background-size:249px 191px;}
+.ctns .svc_go_wrap .svc_go ul li .svc5:before{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat -189px top;background-size:249px 191px;-webkit-background-size:249px 191px;}
+.ctns .svc_go_wrap .svc_go ul li .svc6:before{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat -63px -51px;background-size:249px 191px;-webkit-background-size:249px 191px;}
+.ctns .svc_go_wrap .svc_go ul li .svc7:before{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat -126px -51px;background-size:249px 191px;-webkit-background-size:249px 191px;}
+.ctns .svc_go_wrap .svc_go ul li .svc8:before{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/icons.png") no-repeat -189px -51px;background-size:249px 191px;-webkit-background-size:249px 191px;}
+
+
+
+/* LAYER */
+.ctns .lyr{position:absolute;top:130px;left:50%;width:402px;margin:0 0 0 -201px;background:#fff;z-index:30;}
+.ctns .lyr .top{width:402px;margin:-6px 0 0 0;}
+.ctns .lyr .lyr_ctns{position:relative;padding:16px 36px 30px 156px;}
+.ctns .lyr .lyr_ctns .logo{position:absolute;top:33px;left:36px;width:86px;height:86px;}
+.ctns .lyr .lyr_ctns .txt{font-size:1.2em;letter-spacing:-1px;line-height:1.3em;} 
+.ctns .lyr .lyr_ctns .txt span{color:#309d00;}
+.ctns .lyr .lyr_ctns .down{display:block;margin:10px 0 0 0;}
+.ctns .lyr .lyr_ctns .down img{width:213px;height:41px;}
+
+.ctns .lyr .cls_wrap{position:relative;}
+.ctns .lyr .cls_wrap input{display:none;}
+.ctns .lyr .cls_wrap label{position:absolute;top:0;left:0;height:37px;padding:17px 0 0 47px;color:#777;font-size:1.05em;font-weight:normal;letter-spacing:-1px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/img_chk_off.png") no-repeat 13px 13px;background-size:27px 27px;-webkit-background-size:27px 27px;}
+.ctns .lyr .cls_wrap input[type="checkbox"]:checked + label{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/img_chk_on.png") no-repeat 13px 13px;background-size:27px 27px;-webkit-background-size:27px 27px;}
+.ctns .lyr .cls_wrap .cls{position:absolute;top:9px;right:13px;}
+.ctns .lyr .cls_wrap .cls img{width:95px;height:35px;}
+.ctns .lyr .cls_wrap .bot{width:402px;margin:0 0 -54px 0;}
+
+
+/* FLICKING COMMON */
+.bn_grp{width:100%;min-width:320px;}
+.bn_grp img{width:100%;height:auto;}
+
+.bn_turn{position:relative;}
+.bn_turn .prev{display:block;position:absolute;top:0;left:0;width:40px;background:none;cursor:pointer;z-index:10;}
+.bn_turn .next{display:block;position:absolute;top:0;right:0;width:40px;background:none;cursor:pointer;z-index:10;}
+.bn_turn .prev span{display:inline-block;width:20px;height:36px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/btns2.png") no-repeat -20px top;background-size:81px 48px;-webkit-background-size:81px 48px;}
+.bn_turn .next span{display:inline-block;width:20px;height:36px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/btns2.png") no-repeat left top;background-size:81px 48px;-webkit-background-size:81px 48px;}
+
+.bn_turn .prev2{display:block;position:absolute;top:0;left:0;width:40px;background:none;cursor:pointer;z-index:10;}
+.bn_turn .next2{display:block;position:absolute;top:0;right:0;width:40px;background:none;cursor:pointer;z-index:10;}
+.bn_turn .prev2 span{display:inline-block;width:20px;height:36px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/btns2.png") no-repeat -60px top;background-size:81px 48px;-webkit-background-size:81px 48px;}
+.bn_turn .next2 span{display:inline-block;width:20px;height:36px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/btns2.png") no-repeat -41px top;background-size:81px 48px;-webkit-background-size:81px 48px;}
+
+.bn_index{margin:8px 0 0 0;text-align:center;}
+.bn_index p{display:inline-block;width:12px;height:12px;margin:0 2px 0 0;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bu_cir.png") no-repeat left top;background-size:24px 12px;-webkit-background-size:24px 12px;}
+.bn_index p.selected{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bu_cir.png") no-repeat -12px top;background-size:24px 12px;-webkit-background-size:24px 12px;}
+
+.bn_index2{padding:14px 0 0 0;border-top:1px solid #d8dadd;text-align:center;}
+.bn_index2 p{display:inline-block;width:12px;height:12px;margin:0 2px 0 0;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bu_cir.png") no-repeat left top;background-size:24px 12px;-webkit-background-size:24px 12px;}
+.bn_index2 p.selected{background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/640/bu_cir.png") no-repeat -12px top;background-size:24px 12px;-webkit-background-size:24px 12px;}
+
+#swipeview-slider > div {position:relative;overflow:hidden;}
+#swipeview-slider > div a{display:block;}
+/* #swipeview-slider img {pointer-events:none;}  ALINK 관련 */
+
+/* FLICKING BEST */
+.gmk_best .bn_grp{height:480px;}
+
+/* FLICKING PLAN */
+.mbl_plan .bn_grp{height:450px;}
+
+
+/* MAIN 반응형웹 */
+@media (min-width:801px){
+.ctns{overflow:hidden;}
+.ctns .rspn_wrap{overflow:hidden;margin:0 0 -60px 0;}
+.ctns .rspn_wrap .rspn1{float:left;width:62.5%;}
+.ctns .rspn_wrap .rspn1 .rspn1_sub{border-right:2px solid #959595;}
+.ctns .rspn_wrap .rspn1 .gmk_best{padding:0 0 55px 0;}
+.ctns .rspn_wrap .rspn1 .bn_index{bottom:30px;}
+.ctns .rspn_wrap .rspn2{float:left;width:37.5%;}
+.ctns .rspn_wrap .rspn2 .mbl_plan{margin:0;padding:0 0 10px 0;}
+.ctns .rspn_wrap .rspn2 .mbl_plan .bn_grp{height:642px;}
+.ctns .rspn_wrap .rspn2 .mbl_plan .bn_index2{display:none;}
+.ctns .rspn_wrap .rspn2 .mbl_plan ul li{overflow:hidden;height:126px;border-bottom:1px solid #d8dadd;}
+.ctns .rspn_wrap .rspn2 .mbl_plan ul li a{height:100px;padding:26px 0 0 165px;}
+.ctns .rspn_wrap .rspn2 .mbl_plan ul li .tit{overflow:hidden;max-height:37px;min-height:20px;margin:0 0 2px 0;padding:0 35px 0 0;font-size:1.2em;line-height:19px;}
+.ctns .rspn_wrap .rspn2 .mbl_plan ul li .desc{overflow:hidden;height:32px;padding:2px 35px 0 0;font-size:0.95em;line-height:16px;}
+.ctns .rspn_wrap .rspn2 .mbl_plan ul li img{top:13px;left:13px;width:144px;height:99px;}
+.ctns .rspn_wrap .rspn2 .svc_go_wrap{padding:32px 0 0 0;}
+.ctns .rspn_wrap .rspn2 .svc_go ul li{width:50%;}
+.ctns .rspn_wrap .rspn2 .svc_go ul{border-bottom:0;}
+.ctns .rspn_wrap .rspn2 .svc_go ul li{border-bottom: 1px solid #b9b9b9;}
+.ctns .rspn_wrap .rspn2 .svc_go ul li:nth-child(even) a{border-right:0;}
+}

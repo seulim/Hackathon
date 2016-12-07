@@ -1,0 +1,111 @@
+﻿@{
+    if (string.IsNullOrEmpty(ViewBag.Title))
+    {
+        ViewBag.Title = "Gmarket";
+    }
+    if (string.IsNullOrEmpty(ViewBag.GoodsCode))
+    {
+        ViewBag.GoodsCode = "";
+    }
+}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+@if (@ViewBag.SiteSpeedPath != null)
+{
+	<script type="text/javascript">		var oSitespeed = { bt: (new Date()).getTime(), path: '@ViewBag.SiteSpeedPath', seq: '@ViewBag.SiteSpeedSeq' };</script>
+}
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/guidGeneration.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/userbehavior/ubprofiler_gmkt.js"></script>
+	<title>@ViewBag.Title</title>
+
+	<script type="text/javascript">
+		document.domain = "gmarket.co.kr";
+	</script>
+	
+	@Html.Partial("_MetaForItem")
+	
+	<link rel="apple-touch-icon-precomposed" href="@Urls.MobileImageUrlV2/icon_01.png" />
+
+	@Styles.Render(Urls.ScriptUrl + "/mobile/css/common.css")
+	@Styles.Render(Urls.ScriptUrl + "/Mobile/css/goods.css?dummy=201409300800")
+	@RenderSection("Css", required: false)
+
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/handlebars-v1.1.2.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/GMobile.js?v=20160817"></script>	
+	<!--script type="text/javascript" src="@Urls.MobileWebUrlSecure/Scripts/GMobile.js?v=20160817"></script--> <!-- todo tolhm 변경 필요 -->
+	<script type="text/javascript" src="@(Urls.ScriptUrl)/js/mitem/Common.js"></script>		
+</head>
+<body>
+@if (PageAttr.HasRPMScript)
+{
+	<script type="text/javascript">
+		GMobile.registerRPM();
+	</script>
+}
+	<!-- WRAPPER -->
+	<div id="wrap">
+@if (PageAttr.ViewHeader == true)
+{
+		<!-- SKIP NAVI -->
+		<div class="hp">
+			<a href="#content">본문 바로가기</a>
+		</div>
+		<!-- //SKIP NAVI -->
+
+		<!-- HEADER -->
+		<div id="head" class="new vip">
+			<div id="header_wrapper">
+				<div class="hd_wrap" id="header_st">
+				</div>
+			</div>
+			<script type="text/javascript">
+				var gmHeader = new GMHeader(@PageAttr.IsMain.ToString().ToLower(), @Convert.ToInt32(GMKT.GMobile.CommonData.HeaderTypeEnum.Vip), '@ViewBag.GoodsCode');
+			</script>
+		</div>
+		<!--// HEADER -->
+		<hr />
+}
+else
+{
+    if (PageAttr.Exid == GMKT.Web.Membership.ExIdAppEnum.SFC)
+    {
+        <script type="text/javascript">
+			var gmHeader = new GMHeader(@PageAttr.IsMain.ToString().ToLower(), @Convert.ToInt32(PageAttr.HeaderType), "@PageAttr.HeaderCode");
+			@if (ViewBag.HeaderTitle != null && ViewBag.HeaderTitle is String && !String.IsNullOrEmpty(ViewBag.HeaderTitle))
+               {
+			                                <text>
+			                                gmHeader.setAppHeaderTitle("@ViewBag.HeaderTitle");
+			                                </text>
+               }
+		</script>
+    }
+}
+
+		@RenderBody()
+
+@if (PageAttr.ViewFooter == true)
+{
+		<hr />
+		<!-- FOOTER -->
+		<div id="foot">
+		</div>
+		<script type="text/javascript">
+			var gmFooter = new GMFooter(@PageAttr.IsMain.ToString().ToLower());
+		</script>
+		<!--// FOOTER -->
+}
+	</div>
+	<!-- //WRAPPER -->
+
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mitem/iscroll_y.js?v=2"></script>
+	<script type="text/javascript" src="@(Urls.ScriptUrl)/Mobile/js/front_v4.js?v=201502271000"></script>
+	
+	
+	<!-- {Start Script Section} //-->
+	@RenderSection("Script", required: false)
+	<!-- {End   Script Section} //-->	
+</body>
+</html>

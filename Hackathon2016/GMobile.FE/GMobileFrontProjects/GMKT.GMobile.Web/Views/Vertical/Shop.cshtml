@@ -1,0 +1,501 @@
+﻿@using GMKT.Web.Context;
+@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Models;
+@model SpecialShopModel	
+@{
+    //ViewData["Title"] = "전문관";
+
+	string jaehuid = Request["jaehuid"];
+    string SkipUse = Request["skip"];
+    string jaehuType = Request["jaehutype"];
+    string MocaSkip = "moca://gobrowser/?";
+
+    if (SkipUse == "N")
+    {
+        MocaSkip = "";
+    }
+
+}
+	<hr />
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		<!-- BANNER -->	
+		<div class="ban_wrap">
+			<div class="bn_grp ban" id="bnGrp">
+				<ul>
+@if ( Model.ShopBanners.Count > 0 ) {
+	var rand = new Random();
+
+	foreach (var banner in Model.ShopBanners.OrderBy(x => rand.Next()) )
+	{
+        string bannerUrl = string.Empty;
+        if (jaehuType == "moca" && banner.BannerLnkUrl != "")
+        {
+			bannerUrl = MocaSkip + Urls.MobileWebUrl + "/Vertical/MocaRedirect?type=banner&bannerLnkUrl=" + banner.BannerLnkUrl + "&viewHeader=N&viewFooter=N&jaehuid=" + jaehuid;
+        }
+        else
+        {
+            bannerUrl = banner.BannerLnkUrl;
+        }
+					<li><a href="@bannerUrl"><img src="@banner.BannerImageUrl" alt="@banner.BannerNm" /></a></li>
+    }	
+}
+				</ul>
+			</div>
+@if (Model.ShopBanners.Count > 1)
+{
+			<!-- 흰색 화살표 -->
+			<div id="bnTurn" class="bn_turn">
+				<button type="button" id="prev" class="prev" onclick="gallery1.prev();return false;"><span></span></button> 
+				<button type="button" id="next" class="next" onclick="gallery1.next();return false;"><span></span></button>
+			</div>
+			<!-- //흰색 화살표 -->
+}
+
+		</div>		
+		<!-- //BANNER -->
+
+
+
+
+@{
+    int i = 1;    
+}
+
+    @if (Model.ShopBestItems.Count > 0 || Model.ShopBestAutoItems.Count > 0)
+    {
+
+		<!-- GMARKET BEST -->
+		<div class="gmk_best sctn_tit">
+			<div class="tit_grp">
+				<h3>주목! 이 상품</h3>
+			</div>
+			<div class="bn_grp" id="bnGrp2">
+
+        @foreach (var item in Model.ShopBestItems)
+        {
+            string itemUrl = string.Empty;
+            if (jaehuType == "moca")
+            {
+				itemUrl = MocaSkip + Urls.MobileWebUrl + "/Vertical/MocaRedirect?goodscode=" + item.GdNo + "&type=item&viewHeader=N&viewFooter=N&jaehuid=" + jaehuid;
+            }
+            else
+	        {
+                itemUrl = Urls.MItemWebURL + "/Item?goodscode=" + item.GdNo;   
+	        }
+            
+            if (i % 6 == 1)
+            {
+				@:<ol>
+			}
+					<li>
+						<a href="@itemUrl">
+							<span class="num">@i</span>
+							<span class="tit">@item.GdNm</span>
+							<img src="@BizUtil.GetGoodsImagePath(@item.GdNo.ToString(), "M2")" alt="" />
+							<span class="prc">@CurrencyUtil.ToMoney(@item.AdcouponPrice.ToString(), false)<span>원</span></span>
+						</a>
+					</li>
+            if (i % 6 == 0)
+            {
+				@:</ol>
+			}
+
+            i++;
+        }
+
+        @foreach (var item in Model.ShopBestAutoItems)
+        {
+            string itemUrl = string.Empty;
+            if (jaehuType == "moca")
+            {
+				itemUrl = MocaSkip + Urls.MobileWebUrl + "/Vertical/MocaRedirect?goodscode=" + item.GdNo + "&type=item&viewHeader=N&viewFooter=N&jaehuid=" + jaehuid;
+            }
+            else
+            {
+                itemUrl = Urls.MItemWebURL + "/Item?goodscode=" + item.GdNo;   
+            }
+            
+            if (i % 6 == 1)
+            {
+				@:<ol>
+			}
+					<li>
+						<a href="@itemUrl">
+							<span class="num">@i</span>
+							<span class="tit">@item.GdNm</span>
+							<img src="@BizUtil.GetGoodsImagePath(@item.GdNo.ToString(), "M2")" alt="" />
+							<span class="prc">@CurrencyUtil.ToMoney((@item.SellPrice - @item.DiscountPrice).ToString(), false)<span>원</span></span>
+						</a>
+					</li>
+            if (i % 6 == 0)
+            {
+				@:</ol>
+			}
+
+            i++;
+        }
+			</div>
+@{
+        int totalPageCnt = 1;
+        totalPageCnt = @Model.BestResultSize / 6;
+}        
+        @if (@Model.BestResultSize % 6 > 0)
+        {
+            totalPageCnt++;
+        }
+        
+        @if (totalPageCnt > 1)
+        {
+			<div id="bnIndex2" class="bn_index">
+
+				<p class="selected"></p>
+        	@for (int page = 1; page < totalPageCnt; page++)
+            {
+				<p></p>
+            }
+			</div>
+        }
+		</div>
+		<!-- //GMARKET BEST -->
+    }
+
+@{
+    int j = 1;    
+}
+
+    @if (Model.ShopPopularPlans.Count > 0)
+    {
+		<!-- MOBILE PLAN -->
+		<div class="bnr_spacial sctn_tit">
+			<div class="tit_grp">
+				<h3>인기 기획전</h3>
+			</div>
+			<div class="bn_grp" id="bnGrp3">
+
+        @foreach (var item in Model.ShopPopularPlans)
+        {
+            string specialShoppingUrl = string.Empty;
+            if (jaehuType == "moca")
+            {
+				specialShoppingUrl = MocaSkip + Urls.MobileWebUrl + "/Vertical/MocaRedirect?lcId=" + item.GdlcCd + "&sid=" + item.Sid + "&type=Special&viewHeader=N&viewFooter=N&jaehuid=" + jaehuid;
+            }
+            else
+            {
+                specialShoppingUrl = Urls.MobileWebUrl + "/Display/SpecialShopping?lcId=" + item.GdlcCd + "&sid=" + item.Sid;
+            }
+            
+            if (j % 3 == 1)
+            {
+				@:<ul>
+			}
+					<li>
+						<a href="@specialShoppingUrl">
+    						<img src="@item.MobileThumbImageUrl" alt="" />
+						</a>
+					</li>
+            if (j % 3 == 0)
+            {
+				@:</ul>
+            }
+
+            if (j == 15 || j == @Model.PlanResultSize)
+            {
+                break;
+            }
+
+            j++;
+        }
+			</div>
+@{
+        int totalPageCnt = 1;
+        totalPageCnt = j / 3;
+}        
+        @if (j % 3 > 0)
+        {
+            totalPageCnt++;
+        }
+        
+        @if (totalPageCnt > 1)
+        {
+			<div id="bnIndex3" class="bn_index2">
+
+				<p class="selected"></p>
+            @for (int page = 1; page < totalPageCnt; page++)
+            {
+				<p></p>
+            }
+			</div>
+        }
+		</div>
+		<!-- //MOBILE PLAN -->
+	}
+
+	</div>
+	<!-- //CONTENT -->
+
+	<hr />
+
+
+@section scripts
+{
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+    <script type="text/javascript">
+    //<![CDATA[
+	    var gallery1,
+			    el,
+			    i,
+			    page,
+			    dots1 = document.querySelectorAll('#bnIndex button');
+
+	    /* HTML 파싱 */
+	    var bnGrpList1 = $("#bnGrp li");
+	    var bnGrpListAtag1 = [];
+	    // 시작포인트 랜덤
+	    var index1 = 0;
+	    randomPage1 = Math.floor(Math.random() * (bnGrpList1.length));
+	    for (var j = randomPage1; j < bnGrpList1.length; j++, index1++) {
+		    bnGrpListAtag1[index1] = bnGrpList1[j].innerHTML;
+	    }
+	    if (randomPage1 > 0) {
+		    for (var j = 0; j < randomPage1; j++, index1++) {
+			    bnGrpListAtag1[index1] = bnGrpList1[j].innerHTML;
+		    }
+	    }
+	    var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+	    /* //HTML 파싱 */
+
+
+	    gallery1 = new SwipeView('#bnGrp', {
+		    numberOfPages: bnGrpListAtag1.length,
+		    hastyPageFlip: true,
+		    flickTime: 1000 // 4초후
+	    });
+
+	    // Load initial data
+	    for (i = 0; i < 3; i++) {
+		    if (1 == bnGrpListAtag1.length) {
+			    page = i == 0 || 2 ? bnGrpListAtag1.length - 1 : i - 1;
+		    }
+		    else {
+			    page = i == 0 ? bnGrpListAtag1.length - 1 : i - 1;
+		    }
+
+		    el = document.createElement('span');
+		    el.innerHTML = bnGrpListAtag1[page];
+		    gallery1.masterPages[i].appendChild(el)
+
+		    el.width = bnGrpListAtag1[page].width;
+		    el.height = bnGrpListAtag1[page].height;
+		    el.onload = function () { this.className = ''; }
+	    }
+
+	    gallery1.onFlip(function () {
+		    var el,
+				    upcoming,
+				    i;
+
+		    for (i = 0; i < 3; i++) {
+			    upcoming = gallery1.masterPages[i].dataset.upcomingPageIndex;
+
+			    if (upcoming != gallery1.masterPages[i].dataset.pageIndex) {
+				    el = gallery1.masterPages[i].querySelector('span');
+				    el.innerHTML = bnGrpListAtag1[upcoming];
+			    }
+		    }
+	    });
+
+	    flicking("bnGrp", "prev", "next", gallery1); //131203 
+
+    //]]>
+    </script>
+
+    @if (Model.ShopBestItems.Count > 0 || Model.ShopBestAutoItems.Count > 0)
+    {
+    <script type="text/javascript">
+    //<![CDATA[
+	    var gallery2,
+			    el,
+			    i,
+			    page,
+			    dots2 = document.querySelectorAll('#bnIndex2 p');
+
+	    /* HTML 파싱 */
+	    var bnGrpList2 = $("#bnGrp2 ol");
+	    var bnGrpListAtag2 = [];
+	    for (var j = 0; j < bnGrpList2.length; j++) {
+		    bnGrpListAtag2[j] = bnGrpList2[j].innerHTML;
+	    }
+	    var globalBnGrpListAtag2 = bnGrpListAtag2.join(",");
+	    /* //HTML 파싱 */
+
+	    gallery2 = new SwipeView('#bnGrp2', {
+		    numberOfPages: bnGrpListAtag2.length,
+		    hastyPageFlip: true,
+		    flickTime: 0 // 0은 작동안함
+	    });
+
+	    // Load initial data
+	    for (i = 0; i < 3; i++) {
+		    if (1 == bnGrpListAtag2.length) {
+			    page = i == 0 || 2 ? bnGrpListAtag2.length - 1 : i - 1;
+		    }
+		    else {
+			    page = i == 0 ? bnGrpListAtag2.length - 1 : i - 1;
+		    }
+
+		    el = document.createElement('ol');
+		    el.innerHTML = bnGrpListAtag2[page];
+		    gallery2.masterPages[i].appendChild(el)
+
+		    el.width = bnGrpListAtag2[page].width;
+		    el.height = bnGrpListAtag2[page].height;
+		    el.onload = function () { this.className = ''; }
+	    }
+
+	    gallery2.onFlip(function () {
+		    var el,
+				    upcoming,
+				    i;
+
+		    for (i = 0; i < 3; i++) {
+			    upcoming = gallery2.masterPages[i].dataset.upcomingPageIndex;
+
+			    if (upcoming != gallery2.masterPages[i].dataset.pageIndex) {
+				    el = gallery2.masterPages[i].querySelector('ol');
+				    el.innerHTML = bnGrpListAtag2[upcoming];
+			    }
+		    }
+
+		    document.querySelector('#bnIndex2 .selected').className = '';
+		    dots2[gallery2.pageIndex].className = 'selected';
+	    });
+
+	    flicking("bnGrp2");
+    //]]>
+    </script>
+    }
+
+    @if (Model.ShopPopularPlans.Count > 0)
+    {
+    <script type="text/javascript">
+    //<![CDATA[
+	    var gallery3,
+			    el,
+			    i,
+			    page,
+			    dots3 = document.querySelectorAll('#bnIndex3 p');
+
+	    /* HTML 파싱 */
+	    var bnGrpList3 = $("#bnGrp3 ul");
+	    var bnGrpListAtag3 = [];
+	    for (var j = 0; j < bnGrpList3.length; j++) {
+		    bnGrpListAtag3[j] = bnGrpList3[j].innerHTML;
+	    }
+	    var globalBnGrpListAtag3 = bnGrpListAtag3.join(",");
+	    /* //HTML 파싱 */
+
+	    gallery3 = new SwipeView('#bnGrp3', {
+		    numberOfPages: bnGrpListAtag3.length,
+		    hastyPageFlip: true,
+		    flickTime: 0 // 0은 작동안함
+	    });
+
+	    // Load initial data
+	    for (i = 0; i < 3; i++) {
+		    if (1 == bnGrpListAtag3.length) {
+			    page = i == 0 || 2 ? bnGrpListAtag3.length - 1 : i - 1;
+		    }
+		    else {
+			    page = i == 0 ? bnGrpListAtag3.length - 1 : i - 1;
+		    }
+
+		    el = document.createElement('ul');
+		    el.innerHTML = bnGrpListAtag3[page];
+		    gallery3.masterPages[i].appendChild(el)
+
+		    el.width = bnGrpListAtag3[page].width;
+		    el.height = bnGrpListAtag3[page].height;
+		    el.onload = function () { this.className = ''; }
+	    }
+
+	    gallery3.onFlip(function () {
+		    var el,
+				    upcoming,
+				    i;
+
+		    for (i = 0; i < 3; i++) {
+			    upcoming = gallery3.masterPages[i].dataset.upcomingPageIndex;
+
+			    if (upcoming != gallery3.masterPages[i].dataset.pageIndex) {
+				    el = gallery3.masterPages[i].querySelector('ul');
+				    el.innerHTML = bnGrpListAtag3[upcoming];
+			    }
+		    }
+
+		    document.querySelector('#bnIndex3 .selected').className = '';
+		    dots3[gallery3.pageIndex].className = 'selected';
+	    });
+
+	    flicking("bnGrp3");
+
+		if (typeof orientationchange != "undefined"){
+			$(window).on("orientationchange", function(){
+				changeCtext('bnGrp3');
+			});
+		}
+		else{
+			$(window).on("resize",function(){
+				changeCtext('bnGrp3');
+			});
+		}
+		function changeCtext(id){
+			var wrapObj = $('#' + id);
+			var bnrImg = wrapObj.find('a > img');
+			var bnrImgHeight = bnrImg.height();//이미지높이값
+			wrapObj.css('height',(bnrImgHeight*3+20)+'px');//래퍼높이값 조절
+		}
+    //]]>
+    </script>  
+    }
+    <script type="text/javascript">
+    		window.onload = function () {
+
+    			//래퍼 높이값 자동 조절 140312
+    			changeCtext('bnGrp3');
+
+            /* landing Banner */
+            var em = eModule
+            , apps = em.apps
+            , landing = apps.landing;
+
+            landing.init({
+                pageName: 'VerticalShop',
+                landingType: '@Model.LandingBanner.Type',
+                imageUrl: '@Model.LandingBanner.ImageUrl',
+                description: '@Model.LandingBanner.Description',
+                campaign: '@Model.Campaign.Name',
+                medium: '@Model.Campaign.Medium',
+                mediumSource: '@Model.Campaign.MediumSource',
+                mediumContent: '@Model.Campaign.MediumContent',
+                term: '@Model.Campaign.Keyword'
+            });
+
+            $("#lay_notice").on('click', '#goToApp', function (e) {
+                e.preventDefault();
+                landing.installApp();
+            }).on('click', '#landingClose', function (e) {
+                e.preventDefault();
+                landing.close();
+            });
+            /* landing Banner */
+
+            setTimeout(function () {
+                displayLayer("progress_icon", "none");
+            }, 100);
+        }
+
+    </script>
+}

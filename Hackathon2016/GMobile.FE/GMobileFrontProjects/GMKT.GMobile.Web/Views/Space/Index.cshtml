@@ -1,0 +1,256 @@
+﻿@using Newtonsoft.Json
+
+@model GMKT.GMobile.Web.Models.SpaceModel
+
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		<section class="sec_room">
+			<h2 class="blind">공간서비스</h2>
+
+			<!-- 프로모션 -->
+			<div class="bx_prom swipewrp">
+				<ul id="liContentsList" class="lst_banner sw-viwer">
+				</ul>
+				<div class="bx_paging">
+					<div class="num_area sw_idc">
+						<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "713100002", Urls.MobileWebUrl + "/Space/ContentsAll")" class="btn_more sp_room"><span class="blind">더보기</span></a>
+					</div>
+					<button type="button" class="btn_prev"><span class="blind">이전</span></button>
+					<button type="button" class="btn_next"><span class="blind">다음</span></button>
+				</div>
+			</div>
+			<!-- // 프로모션 -->
+
+			<!-- tab menu -->
+			<div class="bx_tab" id="divTab">
+				<ul>
+				<!-- [D] 활성화 class="on" 추가 -->
+				<li class="tab_mnu on">
+					<a href="javascript:Router.navigate('1/0');" class="cate_tit sp_room" id="spaceSpaceTab" data-fcd="713200001"><span class="blind"><strong>공간</strong></span></a>
+					<div class="tabcont">
+						<div class="bx_swipe">
+							<ul>
+								<!-- [D] 활성화 li class="on" 추가 -->
+								<li class="type3"><a href="javascript:Router.navigate('1/1');" id="aSpaceCategory01" data-fcd="713200002"><span class="sp_room"></span><span class="tit">침실</span></a></li>
+								<li class="type"><a href="javascript:Router.navigate('1/2');" id="aSpaceCategory02" data-fcd="713200003"><span class="sp_room"></span><span class="tit">거실</span></a></li>
+								<li class="type2"><a href="javascript:Router.navigate('1/3');" id="aSpaceCategory03" data-fcd="713200004"><span class="sp_room"></span><span class="tit">주방</span></a></li>
+								<li class="type5"><a href="javascript:Router.navigate('1/4');" id="aSpaceCategory04" data-fcd="713200005"><span class="sp_room"></span><span class="tit">서재</span></a></li>
+								<li class="type4"><a href="javascript:Router.navigate('1/5');" id="aSpaceCategory05" data-fcd="713200006"><span class="sp_room"></span><span class="tit">아이방</span></a></li>
+							</ul>
+						</div>
+					</div>
+				</li>
+				<!-- [D] 활성화 class="on" 추가 -->
+				<li class="tab_mnu">
+					<a href="javascript:Router.navigate('2/0');" class="cate_tit sp_room" id="spaceBrandTab" data-fcd="713300001"><span class="blind"><strong>Brand</strong></span></a>
+					<div class="tabcont">
+						<div class="bx_swipe">
+							<ul>
+								<!-- [D] 활성화 li class="on" 추가 -->
+								<li class="type"><a href="javascript:Router.navigate('2/6');" id="aBrandCategory06" data-fcd="713300002"><span class="sp_room"></span><span class="tit">가구</span></a></li>
+								<li class="type2"><a href="javascript:Router.navigate('2/7');" id="aBrandCategory07" data-fcd="713300003"><span class="sp_room"></span><span class="tit">침구</span></a></li>
+								<li class="type3"><a href="javascript:Router.navigate('2/8');" id="aBrandCategory08" data-fcd="713300004"><span class="sp_room"></span><span class="tit">주방</span></a></li>
+								<li class="type4"><a href="javascript:Router.navigate('2/9');" id="aBrandCategory09" data-fcd="713300005"><span class="sp_room"></span><span class="tit">인테리어</span></a></li>
+							</ul>
+						</div>
+					</div>
+				</li>
+				</ul>
+			</div>
+			<!-- //tab menu  -->
+
+			<div class="room_cont">
+				<h2 class="blind">공간 컨텐츠</h2>
+				<div id="item_list_wrapper" class="sec_banner">
+					
+				</div>
+				<!--  loading  -->
+				<span class="ico_loading" id="ico_loading" style="display: none;">로딩중</span>
+				<span class="bx_more"><button type="button" class="btn_more" id="btn_more" data-fcd="713200008">더보기</button></span>
+			</div>
+
+			@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "space", ShareFcdCode = "704600019", ShortcutFcdCode = "704600020", TargetUrl = string.Empty, Title = string.Empty })
+		</section>
+		<a href="#" class="btn_top_main">Top으로 이동</a>
+		<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+	</div>
+
+
+@section scripts
+{
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=20160728"></script>
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/Router.js"></script>
+
+	<script type="text/javascript">
+		var mobileWebUrl = "@Urls.MobileWebUrl";
+		var lCd = @((int)ViewData["lCd"]);
+		var mCd = @((int)ViewData["mCd"]);
+
+        Router.add(/([^\/]+)\/?([^\/]*)\/?([^\/]*)/, function(){
+            var mainTabNo = arguments[0];
+            var subTabNo = arguments[1];
+
+            if(mainTabNo){
+                lCd = Number(mainTabNo);
+            }
+
+            if(subTabNo){
+                mCd = Number(subTabNo);
+            }
+        }).check(location.href.hash).listen();
+
+		$(document).ready(function () {
+			
+			/* landing Banner */
+			var em = eModule
+						, apps = em.apps
+						, landing = apps.landing;
+
+			landing.init({
+				pageName: 'Space',
+				landingType: '@Model.LandingBanner.Type',
+				imageUrl: '@Model.LandingBanner.ImageUrl',
+				description: '@Model.LandingBanner.Description',
+				campaign: '@Model.Campaign.Name',
+				medium: '@Model.Campaign.Medium',
+				mediumSource: '@Model.Campaign.MediumSource',
+				mediumContent: '@Model.Campaign.MediumContent',
+				term: '@Model.Campaign.Keyword'
+			});
+
+			$("#lay_notice").on('click', '#goToApp', function (e) {
+				e.preventDefault();
+				landing.installApp();
+			}).on('click', '#landingClose', function (e) {
+				e.preventDefault();
+				landing.close();
+			});
+			/* landing Banner */
+
+			KakaoInit();
+			ShareTo("kakaotalk");
+		});
+
+		var ShareTo = function (type) {
+			var dataName = "G마켓 공간";
+			switch (type) {
+				case MobileSnsUtil.snsType().KAKAOTALK:
+					dataName = "공간";
+					break;
+				default:
+					break;
+			}
+			var data = {
+				"name": dataName,
+				"url": "@Urls.MobileWebUrl" + "/Space",
+				"title": ""
+			};
+			if (type == "kakaotalk") {
+				KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+			}
+			else {
+				var sender = MobileSnsUtil.sns(type).sender;
+				sender.send(type, new SnsParam(type, data))
+			}
+		};
+
+		(function (GMobile, undefined) {
+			(function (Space, undefined) {
+				(function (Data, undefined) {
+					Data.ContentsSection = @Html.Raw(JsonConvert.SerializeObject(Model.ContentsSection));
+					Data.SpaceSection = @Html.Raw(JsonConvert.SerializeObject(Model.SpaceSection));
+				})(Space.Data = Space.Data || {});
+			})(GMobile.Space = GMobile.Space || {});
+		})(window.GMobile = window.GMobile || {});
+	</script>
+
+	<script id="tmpl_Brand_item" type="text/x-handlebars-template">
+		{{#each BrandGroupList}}
+			<div class="bx_prd">
+				<a href="{{getSnaUrlForBrand Seq "713300001" ConnectUrl}}" class="lnk_brd">
+					<img src="{{BrandLogoImageUrl}}" alt="modern house" />
+					<span class="tit">{{BrandDescription}}</span>
+				</a>
+				
+				{{#ifSale this}}
+				<span class="ico_sale sp_room"><span class="blind">sale 행사</span></span>
+				{{/ifSale}}
+
+				<ul class="lst_prd">
+				{{#each ItemList}}
+					<li>
+						<a href="{{getSnaUrl LandingUrl "713300006"}}">
+							<img src="{{ImageUrl}}" alt="" />
+							<strong class="prd_tit">{{GoodsName}}</strong>
+							<span class="prd_price"><span class="blind">가격</span>{{Price}}</span>
+						</a>
+					</li>
+				{{/each}}
+				</ul>
+			</div>
+		{{/each}}
+	</script>
+
+	<script id="tmpl_Space_item" type="text/x-handlebars-template">
+		{{#each ItemGroupList}}
+			<div class="bx_banner {{spaceItemType this.Type}}">
+				{{#ifTypeA this}}
+					<ul>
+						<li>
+						{{#each ItemList}}
+							{{> PartialSpaceItem}}
+						{{/each}}
+						</li>
+					</ul>
+				{{else}}
+					{{#ifTypeB this}}
+						<ul>
+							<li>
+								<div class="imgwrp">
+									{{#eachBTop ItemList this.Type}}
+										{{> PartialSpaceItem}}
+									{{/eachBTop}}
+								</div>
+							</li>
+							<li>
+								 <div class="imgwrp">
+									{{#eachBBottom ItemList this.Type}}
+										{{> PartialSpaceItem}}
+									{{/eachBBottom}}
+								</div>
+							</li>
+						</ul>
+					{{else}}
+						<ul>
+							{{#each ItemList}}
+							<li>
+								<div class="bx_img">
+									<a href="{{getSnaUrlForItem LandingUrl Type "713200007"}}">
+									<img src="{{ImageUrl}}" alt="" />
+									<span class="bx_info"><span class="blind">가격</span>{{Price}}</span>
+									</a>
+								</div>
+							</li>
+							{{/each}}
+						</ul>
+					{{/ifTypeB}}
+				{{/ifTypeA}}
+			</div>
+		{{/each}}
+	</script>
+
+	<script id="tmpl_partial_space_item" type="text/x-handlebars-template">
+		<div class="bx_img">
+			<a href="{{getSnaUrlForItem LandingUrl Type "713200007"}}"><img src="{{ImageUrl}}" alt="" /></a>
+		</div>
+	</script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/SpaceController.js"></script>
+	@*<script type="text/javascript" src="http://scriptlocal.gmarket.co.kr/js/mobile/main/page/SpaceController.js"></script>*@
+}
+

@@ -1,0 +1,142 @@
+﻿@using GMKT.GMobile.Data;
+@model MobileDrawerTotal
+
+@{
+    string strAppCheck = "N";
+
+    if (PageAttr.IsIphoneApp || PageAttr.IsAndroidApp)
+    {
+        strAppCheck = "Y";
+    }
+}
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		<!-- menu_category -->
+		<div id="menu_category">
+            
+			<div class="box_category">
+				<div class="title"><span class="s_tit">카테고리</span></div>
+				<ul class="dep1_menu">
+                    @foreach (GroupCategoryInfo eachGroupCategoryInfo in Model.GroupCategoryInfo)
+                    { 
+					<li>
+						<a href="@eachGroupCategoryInfo.LinkURL" class="@eachGroupCategoryInfo.CssClass">@(new HtmlString(eachGroupCategoryInfo.Name))</a>
+						<ul class="depth2">
+                            @foreach (CategoryInfo eachCategoryInfo in eachGroupCategoryInfo.LargeCategoryList)
+                            { 
+                                <li><a href="@GlobalFunction.GetSnaUrl(true, "716520118", eachCategoryInfo.LinkURL)">@eachCategoryInfo.Name</a></li>
+                            }
+						</ul>
+					</li>
+                    }
+				</ul>
+				<div class="title" id="recent_item_title">
+					<span class="s_tit">최근 본 상품</span>
+					<a class="btn_all" href="@GlobalFunction.GetSnaUrl(true, "716520119", @Urls.MMyGUrl + "/Favorite/RecentItems")">모두보기</a>
+				</div>
+				<div class="list_recent_prod" id="recent_item_div">
+					<div id="recent_loading" style="text-align: center; padding: 35px 0">
+						<img src="@Urls.MobileImageUrlV2/640/img_load.gif" width="36" height="36" />
+					</div>
+					<ul id="recent_item_list_wrapper">
+					</ul>
+					<div id="no_recent_item" class="no_result" style="display: none;">최근본상품이 없습니다.</div>
+				</div>
+				
+				<div class="title"><span class="s_tit">전체서비스</span></div>
+				<div class="set_service">
+					<ul>
+                        @foreach (HomeService eachHomeService in Model.HomeService)
+                        { 
+                          if(eachHomeService.TagYn=="Y") { 
+                              <li class="new"><a href="@GlobalFunction.GetSnaUrl(true, eachHomeService.Fcd, eachHomeService.ServiceLnkUrl)"><span>@eachHomeService.ServiceText</span></a></li>
+                          }
+                          else
+                          { 
+                              <li><a href="@GlobalFunction.GetSnaUrl(true, eachHomeService.Fcd, eachHomeService.ServiceLnkUrl)"><span>@eachHomeService.ServiceText</span></a></li>  
+                          }
+                        }
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- menu_category -->
+	</div>
+	<!-- //CONTENT -->
+@section scripts
+{
+<script type="text/x-handlebars-template" id="recent_item_template">
+	{{#each list}}
+        <li><a href="{{getSnaUrlForItem "716520120" "@Urls.MItemWebURL" goodsCode}}"><img src="{{imageUrl}}" alt="" /></a></li>
+	{{/each}}
+</script>
+
+
+<script type="text/javascript">
+setTimeout(function () {
+	displayLayer("progress_icon", "none");
+	var appYN = "@strAppCheck";
+	if (appYN == "N") {
+	}
+}, 100);
+
+function menuCategory() {
+	var winWidth = $(window).width();
+	var menuList = $('.dep1_menu > li');
+
+	$('.dep1_menu > li > a').on('click', function () {
+		menuList.not($(this).parent()).removeClass('on');
+		$(this).parent().toggleClass('on');
+
+		if (menuList.hasClass('on') == true) {
+			for (var i = 0; i < menuList.length; i++) {
+				var listTopPos = $(this).parent().position().top;
+				var topPos = listTopPos + $(this).height();
+				var activeDepthHeight = $(this).parent().find('.depth2').height() + 1;
+
+				$('.dep1_menu .depth2').css({ top: topPos });
+				if (listTopPos == menuList.eq(i).position().top) {
+					menuList.eq(i).animate({ marginBottom: activeDepthHeight }, 250);
+				} else {
+					menuList.eq(i).css({ marginBottom: 0 });
+				}
+			}
+		} else {
+			menuList.css({ marginBottom: 0 });
+		}
+	});
+
+	$(window).resize(function () {
+		if ($('.dep1_menu > li.on').length > 0) {
+			for (var i = 0; i < menuList.length; i++) {
+				var listTopPos = $('.dep1_menu > li.on').position().top;
+				var topPos = listTopPos + $('.dep1_menu > li.on').height();
+				var activeDepthHeight = $('.dep1_menu > li.on').find('.depth2').height() + 1;
+				$('.dep1_menu .depth2').css({ top: topPos + 1 });
+				if (listTopPos == menuList.eq(i).position().top) {
+					menuList.eq(i).css({ marginBottom: activeDepthHeight });
+				} else {
+					menuList.eq(i).css({ marginBottom: 0 });
+				}
+			}
+		}
+	});
+}
+
+</script>
+
+<iframe id="leftDrawerGetRecentItems" width="0" height="0" style="border: 0; display: none;"></iframe>
+
+<script type="text/javascript" src="~/Scripts/LeftDrawer.js?v=2"></script>
+<script type="text/javascript">
+	$(document).ready(function () {
+		if (typeof __MOBILE_WEB_URL_SECURE == "undefined") {
+			__MOBILE_WEB_URL_SECURE = "@Urls.MobileWebUrlSecure";
+		}
+		$leftDrawerGetRecentItemsIframe.attr("src", "@Urls.MobileWebUrlSecure/Common/RecentThings");
+
+		menuCategory();
+	});
+</script>
+}

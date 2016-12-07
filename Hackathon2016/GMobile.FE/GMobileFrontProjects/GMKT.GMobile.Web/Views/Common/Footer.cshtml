@@ -1,0 +1,124 @@
+﻿@using GMKT.Web.Membership
+@using GMKT.GMobile.Util
+@{
+	Layout = null;
+}
+
+@if(!PageAttr.IsApp && PageAttr.Exid == ExIdAppEnum.None){
+<a id="footer_back" href="javascript:;" onclick='javascript:SnaUrlFooter("716600001"); pdsClickLog("200000171", "utility", {"goodscode":"@ViewData["goodsCode"]"}); history.back();' style="display:none;" class="btn_prev"><span class="hp">이전</span></a>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js"></script>
+<script type="text/javascript">
+	var CONST_RECENT_ITEMS_LAYER_DOMAIN_URL = "@(Urls.MobileWebUrl.Replace("http:", ""))";
+	var __MOBILE_WEB_URL_SECURE = "@Urls.MobileWebUrlSecure";
+</script>
+<div id="footer_bar_menu" style="display:none;">
+	<div class="f_bar_inner">
+		<ul class="nav">
+		<li class="btn_prev"><a href="javascript:SnaUrlFooter('717000027');pdsClickLog('200000165','utility',{});history.back();" class="sp_hd">뒤로가기</a></li><!-- [D]비활성 disable 추가-->
+		<li class="btn_next"><a href="javascript:SnaUrlFooter('717000028');pdsClickLog('200000166','utility',{});history.forward();" class="sp_hd">앞으로가기</a></li>
+		<li class="btn_home"><a href="@GlobalFunction.GetSnaUrl(true, "717000029", Urls.MobileWebUrl)" onclick="pdsClickLog('200000167','link',{});" class="sp_hd">G마켓</a></li>
+		<li class="btn_menu">
+	@if (PageAttr.IsApp && PageAttr.AppVersion.Digit1 >= 5)
+	{
+		<a href="gmarket://openmenu" class="left_mn">메뉴</a>
+	}
+	else
+	{
+		<a href="@GlobalFunction.GetSnaUrl(true, "717000030", Urls.MobileWebUrl + "/Home/LeftDrawer")" onclick="pdsClickLog('200000168','utility',{});" class="sp_hd">메뉴</a>
+	}
+		</li>
+		<li class="btn_my"><a href="@GlobalFunction.GetSnaUrl(true, "717000031", Urls.MMyGUrl + "/home")" onclick="pdsClickLog('200000169','link',{});" class="sp_hd">마이페이지</a></li>
+		<li id="rviLayer" class="recent_wrap" onclick="SnaUrlFooter('717000032');pdsClickLog('200000170','utility',{});">
+		</li><!-- [D] 최근 본 상품 없을경우 li에 disable 클래스 추가 -->
+		</ul>
+	</div>
+</div>
+}
+
+@if (PageAttr.Exid == ExIdAppEnum.None)
+{
+	if (PageAttr.IsPushLanding == true)
+	{
+		CheckAppVersion checkNewVersion = new CheckAppVersion();
+		string isDevicePush = checkNewVersion.CheckOverVersion(PageAttr.AppVersion, checkNewVersion.GetAppVersion("5.5.1")).ToString();
+		
+		<div id="btnDeclinePush" class="btn_lf dnt_call">
+			<a href="javascript:declinePushMessage('btnDeclinePush', '@isDevicePush');"><span>모바일 알림 서비스 <em>수신거부(무료)</em></span></a>
+		</div>
+	}
+	<div class="btn_lf">
+	@if (PageAttr.IsLogin == true)
+	{
+		<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704700001", Urls.LogoutUrl)"><span>로그아웃</span></a>
+	}
+	else
+	{ 
+		<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704700001", Urls.LoginUrl)"><span>로그인</span></a>
+	}
+		<a href="#" onclick="GMFooter.goPCWeb('@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704700002", "http://www.gmarket.co.kr/?sL=MW")'); return false;"><span>PC버전</span></a>
+		<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704700003", Urls.MobileWebUrl + "/CustomerCenter")"><span>고객센터</span></a>
+		<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704700007", "http://mg.gmarket.co.kr")"><span>ENG/中文</span></a>
+	</div>
+	<div class="ft_cnt">
+		<div class="ftx or1">
+			<span>㈜이베이코리아  대표이사 :  변광윤</span><br />
+			<span class="t1">사업자등록번호 : 220 - 81 - 83676</span><span>통신판매업신고 :  강남 10630호</span><br />
+			<span class="t1">서울시 강남구 테헤란로 152 (역삼동 강남파이낸스센터)</span><address><a href="mailto:gmarket@corp.gmarket.co.kr">gmarket@corp.gmarket.co.kr</a></address><br />
+			<span class="t1">고객센터 : 1566 - 5701</span><span>상담가능시간 : 오전 9시 - 오후 6시(토요일, 공휴일 휴무)</span>
+		</div>
+		<div class="ft_link">
+            @if (PageAttr.IsMain)
+            {
+                <a href="http://www.ftc.go.kr/info/bizinfo/communicationList.jsp" onclick="javascript:SnaUrlFooter('704700004');">사업자정보확인</a>
+            }
+            else
+            {
+                <a href="http://www.ftc.go.kr/info/bizinfo/communicationList.jsp">사업자정보확인</a>
+            }
+			<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704700005", "http://www.gmarket.co.kr/challenge/neo_help/policy01.asp")">개인정보처리방침</a>
+			<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704700006", Urls.MMyGUrl + "/Service")">이용약관</a>
+		</div>
+
+		<p class="ftx or2">G마켓은 통신판매중개자이며 통신판매의 당사자가 아닙니다. <br />따라서 G마켓은 상품/거래정보 및 가격에 대하여 책임을 지지 않습니다.</p>
+
+		<p class="ftx or3">Copyright &copy;eBay Korea Co., Ltd. All rights reserved</p>
+	</div>
+}
+else
+{
+	<div class="btn_lf">
+	@if (PageAttr.IsLogin == true)
+ {
+		<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "7146100002", Urls.MobileWebUrl + "/Logout")"><span>로그아웃</span></a>
+ }
+ else
+ {
+		<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "7146100001", Urls.MobileWebUrl + "/Login/LoginSFC")"><span>로그인</span></a>
+ }
+		<a href="@Urls.MobileWebUrl/CustomerCenter"><span>고객센터</span></a>
+	</div>
+	
+	<div class="ft_cnt">
+		<div class="ftx or1">
+			<span>㈜이베이코리아  대표이사 :  변광윤</span><br />
+			<span class="t1">사업자등록번호 : 220 - 81 - 83676</span><span>통신판매업신고 :  강남 10630호</span><br />
+			<span class="t1">서울시 강남구 역삼동 737 강남파이낸스센터 34층</span><address><a href="mailto:gmarket@corp.gmarket.co.kr">gmarket@corp.gmarket.co.kr</a></address><br />
+			<span class="t1 t2">고객센터 : 1644 - 5783</span><span>상담가능시간 : 오전 9시 - 오후 6시(토요일, 공휴일 휴무)</span>
+		</div>
+
+		<div class="ft_link">
+			<a href="http://www.ftc.go.kr/info/bizinfo/communicationList.jsp">사업자정보확인</a>
+			<a href="http://www.gmarket.co.kr/challenge/neo_help/policy01.asp">개인정보취급방침</a>
+			<a href="@Urls.MMyGUrl/Service">이용약관</a>
+		</div>
+
+		<p class="ftx or2">G마켓은 통신판매중개자이며 통신판매의 당사자가 아닙니다.<br />따라서 G마켓은 상품/거래정보 및 가격에 대하여 책임을 지지 않습니다.</p>
+
+		<p class="ftx or3">Copyright &copy;eBay Korea Co., Ltd. All rights reserved</p>
+
+		<div class="ftx or1">
+			<span>㈜호텔신라 대표이사 : 이부진</span><br />
+			<span class="t1">사업자등록번호 : 203-81-43363</span><span>서울시 중구 장충동2가 202번지</span>
+		</div>
+	</div>
+}

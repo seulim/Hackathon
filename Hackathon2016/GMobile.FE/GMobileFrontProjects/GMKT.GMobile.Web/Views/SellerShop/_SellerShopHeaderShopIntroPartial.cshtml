@@ -1,0 +1,114 @@
+﻿@using GMKT.GMobile.Data.SellerShop
+@{
+    ShopData shop = (ShopData)ViewBag.Shop;
+    SellerData seller = shop.Seller;
+
+    string introBoxCss = (Char.ToUpper(ViewBag.Shop.DisplayInfo.ShopLevel) == 'P' && ViewBag.TopIntro != null && ViewBag.TopIntro.TopDispType == TopDispType.Image) ? "" : "basic";
+}
+
+@if (ViewBag.PageType != null && ViewBag.PageType == PageType.Main && ViewBag.TopIntro != null && ViewBag.TopIntro.ExposeYN == 'Y')
+{
+    string introImage = ViewBag.TopIntro.ImageUrl;
+            <!-- 샵 소개 -->
+		    <div class="shop--intro">
+                
+			    <div class="shop--intro_box @introBoxCss">
+				    <dl class="shop-info">
+					    <dt class="shop-info_name">@shop.Title</dt>
+					    <dd class="shop-info_introduce">@shop.Introduction</dd>
+                        <dd class="shop-info_image"><img src="@introImage" alt=""></dd>
+				    </dl>
+				    <div class="shop-util">
+					    <button type="button" class="button button--info">
+						    <span class="icon icon_shop_info">정보</span>
+					    </button>
+
+                        @if (false == PageAttr.IsLogin)
+                        {
+                            <button type="button" class="button button--favorite" onclick="location.href='@Urls.LoginUrl'">
+						        <span class="icon icon_shop_favorite">관심</span>
+                                <span class="icon icon_shop_favorite count">관심</span>
+					        </button>
+                        }
+                        else if (PageAttr.IsLogin && ViewBag.Shop.Favorite.IsFavoriteShop)
+                        {
+                            <button type="button" class="button button--favorite is-active" id="del_shop_interest">
+						        <span class="icon icon_shop_favorite">관심</span>
+                                <span class="icon icon_shop_favorite count">관심</span>
+					        </button>
+                            <button type="button" class="button button--favorite" id="add_shop_interest" style="display:none;">
+						        <span class="icon icon_shop_favorite">관심</span>
+                                <span class="icon icon_shop_favorite count">관심</span>
+					        </button>
+						}
+						else
+						{   
+                            <button type="button" class="button button--favorite is-active" id="del_shop_interest" style="display:none;">
+						        <span class="icon icon_shop_favorite">관심</span>
+                                <span class="icon icon_shop_favorite count">관심</span>
+					        </button>
+                            <button type="button" class="button button--favorite" id="add_shop_interest">
+						        <span class="icon icon_shop_favorite">관심</span>
+                                <span class="icon icon_shop_favorite count">관심</span>
+					        </button>
+						}
+
+					    <button type="button" class="button button--share">
+						    <span class="icon icon_shop_share">공유</span>
+					    </button>
+				    </div>
+                    <div class="shop--intro_bg">
+					    <img src="@introImage" alt="">
+					</div>
+			    </div>
+
+			    <!-- 판매자 정보 -->
+			    <div class="shop-detail-info">
+				    <div class="detail-info_header">
+					    <span class="txt-name">판매자정보</span>
+					    <button type="button" class="button button--close"><span class="icon_category_close">닫기</span></button>
+				    </div>
+
+				    <dl class="detail-info">
+					    <dt>@seller.CompanyName</dt>
+					    <dd>@shop.Introduction</dd>
+					    <dd><a href="tel:@seller.PhoneNumber" class="contact">@seller.PhoneNumber</a></dd>
+				    </dl>
+
+				    <ul class="detail-info_list">
+					    <li><span class="label">대표자명</span><span class="value">@seller.Manager</span></li>
+					    <li><span class="label">e-mail</span><span class="value">@seller.EmailAddress</span></li>
+                        @if (false == string.IsNullOrEmpty(seller.BusinessNo) && "EP" != seller.CustomerType)
+						{
+					    <li><span class="label">사업자번호</span><span class="value">@seller.BusinessNo</span></li>
+						}
+					    <li><span class="label">통신판매번호</span><span class="value">@seller.EcommerceNo</span></li>
+					    <li><span class="label">영업소재지</span><span class="value">@seller.StreetAddress</span></li>
+				    </ul>
+			    </div>
+			    <!-- //판매자 정보 -->
+
+			    <!-- 공유하기 -->
+			    <div class="shop-share-socialmedia">
+				    <ul class="share-list">
+					    <li class="share-item share-kakaotalk" id="SnsKakaoTalk"><a href="javascript:if(CheckPc(MobileSnsUtil.snsType().KAKAOTALK) != false){ShareSnSTo(MobileSnsUtil.snsType().KAKAOTALK);}">카카오톡</a></li>
+					    <li class="share-item share-kakaostory"><a href="javascript:ShareSnSTo(MobileSnsUtil.snsType().KAKAOSTORY);">카카오스토리</a></li>
+					    <li class="share-item share-facebook"><a href="javascript:ShareSnSTo(MobileSnsUtil.snsType().FACEBOOK);">페이스북</a></li>
+					    <li class="share-item share-twitter"><a href="javascript:ShareSnSTo(MobileSnsUtil.snsType().TWITTER);">트위터</a></li>
+					    <!--li class="share-item share-line"><a href="javascript:ShareSnSTo(MobileSnsUtil.snsType().LINE);">라인</a></li//-->
+					    <!--li class="share-item share-url"><a href="#">URL</a></li//-->
+				    </ul>
+			    </div>
+			    <!-- //공유하기 -->
+		    </div>
+		    <!-- //샵 소개 -->
+            <script type="text/javascript">
+                var snsData = {
+                    "name": "@ViewBag.HeaderTitle",
+                    "url": "@Request.Url.ToString()",
+                    "text": "@ViewBag.HeaderTitle 미니샵에 오신것을 환영합니다.",
+                    "image": "",
+                    "src": "@Request.Url.ToString()"
+                };
+            </script>
+}

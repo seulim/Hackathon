@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+	@Html.Partial("_incHeader_320")
+	@RenderSection("Css", required: false)
+
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/handlebars-v1.1.2.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/GMobile.js?v=20160817"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/guidGeneration.js"></script>
+	<script type="text/javascript">
+		var _ubLogActEnum = {
+			click: "click"
+		}
+		function _ubLog(code, act) {
+			if (typeof ubprofiler === 'object' && typeof ubprofiler.send === 'function') {
+				ubprofiler.send(
+              'event'         // behavior
+              , 'page'        // src
+              , 'm/1.0'       // id, version info
+              ,
+							{
+								'url': document.location.href,  // url, required 
+								'ref': document.referrer,       // referrer url, optional
+								'act': act,                 // action, required
+								'acode': code        // area code, required
+							});
+			}
+		}
+	</script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/swipeview.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/front_v4.js?v=4"></script>
+</head>
+<body>
+@if (PageAttr.HasRPMScript)
+{
+	<script type="text/javascript">
+		GMobile.registerRPM();
+	</script>
+}
+	<!-- WRAPPER -->
+	<div id="wrap">
+		@RenderBody()
+		@Html.Partial("_Footer3")
+	</div>
+	<!--// WRAPPER -->
+
+	@RenderSection("iframes", required: false)
+	@Html.Partial("_Script3")
+	@RenderSection("scriptfiles", required: false)
+	@RenderSection("scripts", required: false)
+</body>
+</html>

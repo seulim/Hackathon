@@ -1,0 +1,786 @@
+﻿@using GMKT.GMobile.Constant;
+@using GMobile.Data.Tiger;
+@using GMobile.Data.DisplayDB;
+@using GMobile.Data.Diver;
+@using GMKT.Web.Membership
+
+@model GMKT.GMobile.Web.Models.HomeModel
+
+@{
+    
+
+	PageAttr.IsMain = true;
+	string strPopupYn = "N";
+	string strNType = string.Empty;
+	string strNKind = string.Empty;
+	string strNContent = string.Empty;
+	string strAppCheck = "N";
+
+
+	string BannerString = "";
+
+	if (Model.HomeAdBanner != null && Model.HomeAdBanner.Count > 0)
+	{
+		string[] BannerList = new string[Model.HomeAdBanner.Count];
+		int bannerFcdCode = 704300001;
+		for (int i = 0; i < Model.HomeAdBanner.Count; i++)
+		{
+			BannerList[i] = string.Format("'<div class=\"li\"><a href=\"{0}\"><img src=\"{1}\" /></a></div>'", @GlobalFunction.GetSnaUrl(PageAttr.IsMain, bannerFcdCode.ToString(), Model.HomeAdBanner[i].BnLinkUrl), Model.HomeAdBanner[i].BnImgPath);
+			bannerFcdCode++;
+		}
+
+		BannerString = String.Join(",", BannerList).ToString();
+	}
+
+	string strAppInfo = string.Empty;
+	string strIpadPopupYn = "N";
+
+	if (Request.Cookies["app_info"] != null &&
+			!string.Empty.Equals(Request.Cookies["app_info"].Value))
+	{
+		strAppInfo = Request.Cookies["app_info"].Value.ToUpper();
+		string[] arrAppInfo = strAppInfo.Split(':');
+
+		if ((arrAppInfo[0] == "IPHONE") && (arrAppInfo[2] == "IPAD"))
+		{
+			strIpadPopupYn = "Y";
+		}
+
+	}
+
+
+	if (PageAttr.IsIphone == true || PageAttr.IsIpod == true)
+	{
+		strNType = "I";
+	}
+	else if (PageAttr.IsAndroid == true)
+	{
+		strNType = "A";
+	}
+	else
+	{
+		strNType = "";
+	}
+
+	if (Model.PopupList.Count > 0)
+	{
+		for (int k = 0; k < Model.PopupList.Count; k++)
+		{
+			if (strNType == Model.PopupList[k].NType && Model.PopupList[k].NKind == "A")
+			{
+				strNContent = Model.PopupList[k].NContent;
+				strPopupYn = "Y";
+			}
+		}
+	}
+
+	if (PageAttr.IsIphoneApp || PageAttr.IsAndroidApp)
+	{
+		strAppCheck = "Y";
+	}
+
+	string GmarketAppURL = "";
+	string G9AppUrl = "";
+	if (PageAttr.IsAndroid)
+	{
+		GmarketAppURL = "market://details?id=com.ebay.kr.gmarket";
+		G9AppUrl = "market://details?id=com.ebay.kr.g9";
+	}
+	else
+	{
+		GmarketAppURL = "http://itunes.apple.com/kr/app/gmarket/id340330132?mt=8";
+
+		if (PageAttr.IsIpad)
+		{
+			G9AppUrl = "http://itunes.apple.com/kr/app/id688158993?mt=8";
+		}
+		else
+		{
+			G9AppUrl = "http://itunes.apple.com/kr/app/id781174192?mt=8";
+		}
+	}
+}
+    <hr />
+
+    <!-- CONTENT -->
+	<div id="content" class="ctns">
+		<div class="resps_wraper type2">
+			<div class="display_bnr">
+				<div class="bnr_w">
+					<div id="bnrList" class="lst"><div class="bnrbg"></div></div>
+					<div class="h_page">
+						<a href="javascript:;" id="hotPrev" class="prev" onclick="spcListScroller.prev();">이전</a>
+						<a href="javascript:;" id="hotNext" class="next" onclick="spcListScroller.next();">다음</a>
+						<div id="bnrPage" class="page"><span class="pag">1</span>/<span class="pag2">10</span></div>
+						<a href="javascript:;SnaUrlFooter('704300030');" class="bnr_all">배너모두보기</a>
+					</div>
+				</div>
+				<div class="sevlist_cnt">
+					<div class="lst_srv">
+@if (Model.HomeIcon != null && Model.HomeIcon.Count > 0)
+{
+	int homeIconFcdCode = 704300100;
+	foreach (var Icon in Model.HomeIcon)
+	{
+		<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, homeIconFcdCode.ToString(), Icon.IconLnkUrl)"><span class="ico"><img src="@(Icon.IconImageUrl)" alt="@(Icon.IconText)" />@if (Icon.IsIconNew == true){ <span class="new">N</span> }</span></a>
+		homeIconFcdCode++;
+	}
+}
+					</div>
+				</div>
+			</div>
+			<!-- 주요서비스 w_mode -->
+			<div class="resps_gow">
+				<div class="serv_dgo">  
+					<div class="m_title">
+						<h3>서비스 바로가기</h3> 
+					</div>
+					<div class="sevlist_wp2"></div>
+				</div>
+			</div>
+			<!--// 주요서비스 w_mode -->
+		</div>
+@if (Model.SuperDeal != null && Model.SuperDeal.Count > 0)
+{ 
+		<div class="super_deal type2">
+			<div class="m_title m_title2">
+				<h3>
+					<a href="@Urls.MobileWebUrl/SuperDeal" class="tit" onclick="javascript:SnaUrlFooter('704400001');"><span class="blind">슈퍼딜</span></a>
+				</h3>
+			</div>
+			<span class="ico_loading" style="display:none">로딩중</span>
+			<ul class="lst_prd">
+@{
+	for (int i = 0; i < Model.SuperDeal.Count; i++)
+	{
+		var item = Model.SuperDeal[i];
+	
+		string linkURL = GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704800001", item.LinkURL);
+		string subURL = GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704800013", item.SubUrl);
+		string buyCount = "";
+		if (item.IsSoldOut)
+		{
+			linkURL = "javascript:;";
+		}
+		buyCount = item.BuyCount.ToString("#,##0") + "개 구매";
+			<li>
+				<div class="bx_prd"> 
+					@if (false == string.IsNullOrEmpty(item.ShopGdlcNm))
+	 {<a href="@subURL" class="btn_cate"><span>@item.ShopGdlcNm</span></a>}
+					<a href="@linkURL">
+						<div class="pimg">
+		@if (i < 20)
+		{ 
+							<span class="img"><img src="@item.ImageURL" /></span>
+		}
+		else
+		{
+							<span class="img"><img class="superdeal_lazy" src="@Urls.MobileImageUrlV2/640/superdeal_loading.png" data-original="@item.ImageURL" /></span>
+		}
+							
+							@if (item.IsSoldOut)
+	   { <div class="sold_out_v4"><span class="ico_sold">품절되었습니다.</span></div> }
+						</div>
+						<div class="prod_ct2">
+							<div class="bx_info">
+								<div class="pd_b3">
+									<span class="tit">@item.ItemTitle</span>
+							@if (item.IsSoldOut)
+	   {	
+									<div class="bx_price">
+										<span class="txt">SOLD OUT</span>									</div>	
+	   }
+	   else
+	   {
+		   if (item.UnitPrice != null && item.UnitPrice.Length > 0)
+		   {
+									<span class="unit_cost">@item.UnitPrice</span>
+		   }
+									<div class="bx_price">
+									@if (item.IsSoldOut == false && item.Price.Equals("무료") == false && item.DiscountRate != 0)
+		 {
+										<span class="rate">@item.DiscountRate<span class="pc">%</span></span>
+		 }
+										
+										<span class="sale">@item.Price</span>
+										<span class="origin">@item.OriginalPrice</span>
+									</div>
+	   }
+								</div>
+							</div>
+							<div class="pd_b4">
+								<div class="labbox">
+									
+									@if (item.IsTpl == true)
+		 {<span class="smart">스마트배송</span>}
+									else if(item.DeliveryInfo == "무료")
+		 {<span class="free">무료배송</span>}
+
+									@if (item.ShowBuyCount == true)
+		 {<span class="number">@buyCount</span>}
+								</div>
+							</div> 
+						</div>
+					</a>
+				</div>
+			</li>
+	}}			</ul>
+			<a href="@Urls.MobileWebUrl/SuperDeal" onclick="javascript:SnaUrlFooter('704800014');" class="btn_more"><span class="txt">슈퍼딜 전체보기</span></a>		</div>
+}
+		<!--  [D] 수퍼딜 배너추가 -->
+		<section class="sdeal">
+		@if (Model.HomeServiceBanner != null && Model.HomeServiceBanner.Count > 0)
+		{
+			int serviceBannerFcdCode = 704500001;
+			<!-- banner List -->
+			<ul class="bx_banner">
+			@foreach (GMKT.GMobile.Data.HomeServiceSet set in Model.HomeServiceBanner)
+			{
+				foreach (GMKT.GMobile.Data.HomeServiceBanner banner in set.Banners)
+				{
+					string bannerLinkURL = GlobalFunction.GetSnaUrl(PageAttr.IsMain, serviceBannerFcdCode.ToString(), banner.LinkUrl);
+					if (set.Banners.IndexOf(banner) == 0 || (set.SetType =='A' && set.Banners.IndexOf(banner) == 7) || (set.SetType == 'B' && set.Banners.IndexOf(banner) == 5))
+					{
+					<li>
+						<a href="@bannerLinkURL">
+							<!-- [D] A타입 작은이미지배너 class="sz_type", 큰이미지배너 class="sz_type2" 추가 -->	
+							<img src="@banner.BannerImgUrl" alt="" class="sz_type" />
+							<img src="@banner.LandScapeBannerImgUrl" alt="" class="sz_type2" />
+						</a>
+					</li>
+					}
+					else
+					{
+					<li><a href="@bannerLinkURL"><img src="@banner.BannerImgUrl" alt="" /></a></li>
+					}
+					serviceBannerFcdCode++;
+				}
+			}
+			</ul>
+			<!-- //banner List -->
+		}
+		</section>
+@*		<div class="serv_wraper">
+			<div class="serv_dgo">
+				<div class="m_title">
+					<h3>서비스 바로가기</h3>
+				</div>
+				<div class="sevlist_wp">
+                @if (Model.HomeService != null && Model.HomeService.Count > 0)
+				{
+					int serviceFCDCode = 704500001;
+					foreach (var service in Model.HomeService)
+					{
+						if (service.TagYn == "Y")
+						{
+                            <a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, serviceFCDCode.ToString(), service.ServiceLnkUrl)"><span class="ico"><img src="@(service.ServiceImageUrl)" alt="" /><span class="new">N</span></span><span class="s_name">@(service.ServiceText)</span></a>
+						}
+						else
+						{
+                            <a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, serviceFCDCode.ToString(), service.ServiceLnkUrl)"><span class="ico"><img src="@(service.ServiceImageUrl)" alt="" /></span><span class="s_name">@(service.ServiceText)</span></a>
+						}
+						serviceFCDCode++;
+					}
+				}
+				</div>
+			</div>
+		</div>*@
+
+		@if (PageAttr.Exid == ExIdAppEnum.None)
+		{
+		<div class="botm_dgo">
+			<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704600001", GmarketAppURL)" class="go1">G마켓 앱 설치하기</a>
+			<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "704600002", G9AppUrl)" class="go2">G9 앱 설치하기</a>
+		</div>
+		}
+
+		<div id="view_bnr_all">
+			<div class="lay_tit"><strong>추천 이벤트</strong></div>
+			<div class="list_bnr"></div>
+			<a class="close" href="#"><span>닫기</span></a>
+            <!--140305 닫기추가-->
+			<span class="cls">
+            <button type="button" class="close"><span>닫기</span></button>
+		</div>
+
+		@*<div class="layer_allsv" id="layer_allsv">
+			<div class="lay_wp">
+				<h3>서비스 전체보기</h3>
+				<div class="sevlist_wp">
+                @if (Model.HomeService != null && Model.HomeService.Count > 0)
+				{
+					int serviceFCDCode = 704500001;
+					foreach (var service in Model.HomeService)
+					{
+						if (service.TagYn == "Y")
+						{
+                            <a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, serviceFCDCode.ToString(), service.ServiceLnkUrl)"><span class="ico"><img src="@(service.ServiceImageUrl)" alt="@(service.ServiceText)" /><span class="new">N</span></span><span class="s_name">@(service.ServiceText)</span></a>   
+						}
+						else
+						{ 
+                            <a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, serviceFCDCode.ToString(), service.ServiceLnkUrl)"><span class="ico"><img src="@(service.ServiceImageUrl)" alt="@(service.ServiceText)" /></span><span class="s_name">@(service.ServiceText)</span></a>
+						}
+						serviceFCDCode++;
+					}
+				}
+				</div>
+				<a href="#" class="lay_clse" onclick="popBlockUI('layer_allsv');return false;">닫기</a>
+			</div>
+		</div>*@
+
+	@if (Model.HasHomeNotice && Model.HomeNotice != null)
+	{
+		@* 전면광고 레이어 *@
+		<div id="layer_hmBanner" class="layer_hm_banner" data-seq="@Model.HomeNotice.Seq" style="display:none;">
+			<div class="img_bx">
+				<a href="@Model.HomeNotice.LandingUrl"><img src="@Model.HomeNotice.BannerImageUrl" alt="@Model.HomeNotice.Title" /></a>
+			</div>
+			<a href="#" class="btn_close" onclick="popBlockUI('layer_hmBanner'); return false;">닫기</a>
+		</div>
+		@* // 전면광고 레이어 *@
+	}
+    
+    @if (Model.HasLGUPlusNotice && Model.LGUPlusNotice != null && ViewBag.IsUPlusIpAddress)
+{
+    <div id="layer_lgUBanner" class="ly_lgu" data-seq="@Model.LGUPlusNotice.DailySeq" style="display:none;">
+		<div class="ly_img" data-pdslog="@Model.LGUPlusNotice.PdsLogImpression">
+			<a href="@Model.LGUPlusNotice.LandingUrl" class="btn_view" onclick="sendPDSLogFromEliment(this);" data-pdslog="@Model.LGUPlusNotice.PdsLogDetail"><span class="blind">자세히 보기</span></a>
+			<button type="button" class="btn_clse"  data-pdslog="@Model.LGUPlusNotice.PdsLogDoNotSee"><span class="blind">한 달간 보지 않기</span></button>
+			<button type="button" class="btn_clse2" data-pdslog="@Model.LGUPlusNotice.PdsLogClose"><span class="blind">닫기</span></button>				
+		</div>
+	</div>
+}
+
+		<a href="#" class="btn_top_main">Top으로 이동</a>
+		<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+	</div>
+	<!-- //CONTENT -->
+
+@section scripts
+{
+
+<script id="superdeal_item_template" type="text/x-handlebars-template">
+{{#each Items}}
+	<li>
+		<a href="{{getLinkUrl LinkURL IsSoldOut}}" class="noBorder"">
+			<div class="pimg">
+				<span class="img"><img src="{{ImageURL}}" /></span>
+			</div>
+			<div class="prod_ct">
+				<div class="pd_b1">
+					<span class="tx1">{{ItemSubTitle}}</span>
+					<span class="tx2">{{ItemTitle}}</span>
+				</div>
+				{{#if UnitPrice}}
+				<span class="unit_cost">({{UnitPrice}})</span>
+				{{/if}}
+				<div class="pd_b2">
+					{{renderDiscountRate IsSoldOut Price DiscountRate}}
+					<div class="price">
+					<span class="origin">{{OriginalPrice}}</span>
+					<span class="sale">{{Price}}</span>
+					<div class="labbox">
+					{{renderDeliveryInfo DeliveryInfo}}
+					{{#if ShowBuyCount}}
+					<span class="number">{{addComma BuyCount}}개 구매</span>
+					{{/if}}
+					</div>
+				</div>
+				</div>
+			</div>
+		</a>
+		{{#if IsSoldOut}}
+		<div class="sold_out"><span>품절되었습니다.</span></div>
+		{{/if}}
+	</li>	
+{{/each}}
+</script>
+<script type="text/javascript">
+	$(document).ready(function () {
+		$(".superdeal_lazy").lazyload({
+			effect: "fadeIn",
+			threshold: 400
+		});
+
+			var wdW = $(window).width();
+			var responseRatio = 64;
+			var imgW = 640;
+			var imgH = 340;
+			var tgH;
+			if(wdW >=610){
+				var w = wdW*responseRatio/100; 
+				tgH = w*imgH / imgW;
+			}
+			else{
+				tgH = wdW*imgH / imgW;
+			}
+			$("#bnrList").height(tgH);
+			$(".bnrbg").remove();
+
+    topBanerList = setDataArray(topBanerList, 1);
+	  spcListScroller = swipeGmk(topBanerList, "#bnrList", "bnrPage", true, false, @Model.CountOfExternalMallAdBanner);
+
+		Handlebars.registerHelper('getLinkUrl', HHgetLinkUrl);
+		Handlebars.registerHelper('renderDiscountRate', HHrenderDiscountRate);
+		Handlebars.registerHelper('renderDeliveryInfo', HHrenderDeliveryInfo);
+		Handlebars.registerHelper('addComma', HHaddComma);
+
+
+
+
+        /* landing Banner 9 */
+        var em = eModule
+            , apps = em.apps
+            , landing = apps.landing;
+
+        landing.init({
+            pageName: 'Home',
+            landingType: '@Model.LandingBanner.Type',
+            imageUrl: '@Model.LandingBanner.ImageUrl',
+            description: '@Model.LandingBanner.Description',
+            campaign: '@Model.Campaign.Name',
+            medium: '@Model.Campaign.Medium',
+            mediumSource: '@Model.Campaign.MediumSource',
+	        mediumContent: '@Model.Campaign.MediumContent',
+            term: '@Model.Campaign.Keyword'
+        });
+
+        $("#lay_notice").on('click','#goToApp' , function(e){
+            e.preventDefault();
+            landing.installApp();
+        }).on('click', '#landingClose', function(e){
+            e.preventDefault();
+            landing.close();
+        });
+        /* landing Banner 9 */
+
+
+	});
+
+	var selectedSuperDealCode = "0";
+
+	function HHgetLinkUrl(linkUrl, isSoldOut) {
+		if (isSoldOut == true || linkUrl == undefined || linkUrl == "") {
+			return new Handlebars.SafeString('javascript:;');
+		}
+
+		try {
+			var fcdCode = 704800001;
+			fcdCode = fcdCode + parseInt(selectedSuperDealCode);
+			var superDealItemLinkUrl = "http://sna.gmarket.co.kr/?fcd=" + fcdCode + "&url=" + encodeURIComponent(linkUrl);
+			return new Handlebars.SafeString(superDealItemLinkUrl);
+
+		}  catch (e) {}
+		
+		return new Handlebars.SafeString('');
+	}
+
+	function HHrenderDiscountRate(isSoldOut, price, discountRate) {
+		var discountRateHtml = "";
+		if (isSoldOut == false && price != "무료" && discountRate != 0) {
+			discountRateHtml = '<div class="rate">' + discountRate + '<span class="pc">%</span></div>';
+		}
+		return new Handlebars.SafeString(discountRateHtml);
+	}
+
+	function HHrenderDeliveryInfo(deliveryInfo) {
+		var deliveryInfoHtml = "";
+		if (deliveryInfo == "무료") {
+			deliveryInfoHtml = '<span class="free">무료배송</span>';
+		}
+		return new Handlebars.SafeString(deliveryInfoHtml);
+	}
+
+	function HHaddComma(nStr) {
+		nStr += '';
+		x = nStr.split('.');
+		x1 = x[0];
+		x2 = x.length > 1 ? '.' + x[1] : '';
+		var rgx = /(\d+)(\d{3})/;
+		while (rgx.test(x1)) {
+			x1 = x1.replace(rgx, '$1' + ',' + '$2');
+		}
+		return new Handlebars.SafeString(x1 + x2);
+	}
+
+
+
+
+
+    var topBanerList = [@Html.Raw(BannerString)];
+
+	function swipeGmk(data, areaId, pageId, random, auto, count)
+	{
+		var dots;
+		var tempSwipe = new SwipeView(areaId, { numberOfPages: data.length, autoSwipe:auto });
+		if(pageId != null && pageId != '')
+		{
+			$('.pag').text(tempSwipe.pageIndex + 1);	
+			$('.pag2').text(data.length);
+		}
+
+		for (var i=0; i<3; i++) 
+		{
+			var page = i==0 ? data.length-1 : data.length==1 ? 0 : i-1;
+			tempSwipe.masterPages[i].innerHTML = data[page];
+		}
+
+		tempSwipe.onFlip(function () {
+			var upcoming;
+
+			for (var i=0; i<3; i++) 
+			{
+				upcoming = tempSwipe.masterPages[i].dataset.upcomingPageIndex;
+
+				if (upcoming != tempSwipe.masterPages[i].dataset.pageIndex) {
+					tempSwipe.masterPages[i].innerHTML = data[upcoming];
+				}	
+			}
+			if(pageId != null && pageId != '')
+			{
+				$('.pag').text(tempSwipe.pageIndex + 1);	
+			}
+		});
+		
+		var index = 0;
+
+		if(random)
+		{
+			var length = 0 ;
+			if (count > 0) {
+				length = count;
+			} else {
+				length = data.length;
+			}
+
+			index = Math.floor(Math.random() * length) % length;
+			
+			tempSwipe.goToPage(index);
+		}
+		if(auto)
+		{
+			tempSwipe.t = setTimeout(function() {tempSwipe.next();}, 3000);
+		} 
+
+		return tempSwipe;
+	}
+
+	function setDataArray(data, dispCnt){
+		if(dispCnt > 1)
+		{
+			var totDispCnt = data.length;
+			var totPage = Math.floor(data.length / dispCnt);
+			var tmpArr = new Array();
+			var tmpHtml = '';
+			for(var i=0; i < totPage; i++)
+			{
+				for(var j = 0; j < dispCnt; j++){
+					tmpHtml += data[i*dispCnt+j];
+				}
+				tmpArr[i] = tmpHtml;
+				tmpHtml = '';
+			}	
+			return tmpArr;
+		} else {
+			return data;
+		}
+	}
+	
+	//래퍼 높이값 자동 조절
+	window.onload = function(){playResponse();changeCtext('bnrList');};
+
+	if (typeof orientationchange != "undefined"){
+		$(window).on("orientationchange", function(){
+			playResponse();
+			changeCtext('bnrList');
+		});
+	} else{
+		$(window).on("resize",function(){
+			playResponse();
+			changeCtext('bnrList');
+		});
+	};
+
+	function changeCtext(id){
+		var wrapObj = $('#' + id);
+		var bnrImg = wrapObj.find('a > img');
+		var bnrImgHeight = bnrImg.height();//이미지높이값
+		wrapObj.css('height',bnrImgHeight+'px');//래퍼높이값 조절
+		
+		//ios7에서 높이값 잡지 못하는 버그	
+		$('#swipeview-slider').children().height(bnrImgHeight);
+	};
+
+
+
+
+
+</script>
+
+<script type="text/javascript">
+	var layer_banner_all = {}
+
+	$(window).load(function() {
+        layer_banner_all.items = topBanerList;
+		var $box_list_bnr = $('#view_bnr_all')
+		var $list_bnr = $('#view_bnr_all .list_bnr');
+		var $list_bnr_close = $box_list_bnr.find('.close');
+		var box_list_items='';
+		$('a.bnr_all').on('click',function() {
+			$box_list_bnr.show();
+			$('#wrap').addClass('no_highlight');
+			$("<div id='mask' selected='true'></div>").appendTo("#wrap");			
+			for(var i=0; i < layer_banner_all.items.length; i++) {
+				box_list_items += layer_banner_all.items[i];
+			}
+			$list_bnr.html(box_list_items);
+			setTimeout(function() {
+				$('#wrap #mask').on('click',function(e) {
+					if(e.target.getAttribute('id')=='mask') {
+						$('#wrap').removeClass('no_highlight');
+						$('#wrap #mask').off();
+						layer_banner_all.items = [];
+						$box_list_bnr.hide();
+						$("#wrap #mask").remove();					
+					}
+				});
+			},100);
+		});
+		$list_bnr_close.on('click',function() {
+			$('#wrap #mask').off();
+			layer_banner_all.items = [];
+			$('#wrap').removeClass('no_highlight');
+			setTimeout(function() {
+			$box_list_bnr.hide();
+			$("#wrap #mask").remove();
+			},300)
+			return false;
+		});
+	});
+</script>
+
+<script type="text/javascript">
+	var responMain = {};
+	var flag_resp;
+	responMain.$service = $('.sevlist_cnt .lst_srv');
+	responMain.$service2 = $('.resps_gow .sevlist_wp2');
+	responMain.$serviceHTML = responMain.$service.html();
+
+	function playResponse() {
+		responMain.$winWidth = window.innerWidth;
+		console.log(window.innerWidth)
+		if (responMain.$winWidth > 610) {
+			if (responMain.$service2.children().size() == 0) {
+				var $tag = responMain.$service.children().detach();
+				responMain.$service2.append($tag);
+			}
+		}
+		else {
+			if (responMain.$service.children().size() == 0) {
+				var $tag = responMain.$service2.children().detach();
+				responMain.$service.append($tag);
+			}
+		}
+	}
+</script>
+
+	@if (Model.HasHomeNotice)
+	{
+@* 전면광고 레이어 *@
+<script type="text/javascript">
+    var $homeNoticeLayer = $("#layer_hmBanner");
+    var $lgUPlusNoticeLayer = $("#layer_lgUBanner");
+
+	function showHomeNotice() {
+		if ($homeNoticeLayer.length > 0) {
+			$homeNoticeLayer.show();
+
+			$homeNoticeLayer.find(".btn_close").click(function () {
+			    $('body').unbind('touchmove');
+			    checkLgUPlusNotice();
+			});
+			$("<div id='mask' selected='true'></div>").appendTo("#content");
+			$('body').bind('touchmove', function (e) { e.preventDefault() });
+
+			if (typeof mobileLocalStorage !== "undefined") {
+				mobileLocalStorage.setItem("GMobileHomeNoticeHideSeq", $homeNoticeLayer.data("seq"));
+			}
+		}
+    }
+
+    function showLgUPlusNotice() {
+        if ($lgUPlusNoticeLayer.length > 0) {
+            $lgUPlusNoticeLayer.show();
+
+            if (typeof mobileLocalStorage !== "undefined") {
+                mobileLocalStorage.setItem("GMobileLgUPlusNoticeHideSeq", $lgUPlusNoticeLayer.data("seq").toString());
+            }
+
+            $lgUPlusNoticeLayer.find(".btn_clse").click(function (e) {
+                sendPDSLogFromEliment(this);
+                popBlockUI('layer_lgUBanner');
+                if (typeof mobileLocalStorage !== "undefined") {
+                    mobileLocalStorage.setItem("GMobileLgUPlusNoticeHideSeq", $lgUPlusNoticeLayer.data("seq").toString().substring(0, $lgUPlusNoticeLayer.data("seq").toString().length - 2));
+                }
+            });
+
+            $lgUPlusNoticeLayer.find(".btn_clse2").click(function (e) {
+                sendPDSLogFromEliment(this);
+                popBlockUI('layer_lgUBanner');
+            });
+
+            var impressionLog = $lgUPlusNoticeLayer.find(".ly_img").data("pdslog");
+            sendPDSImpressionLog(impressionLog);
+        }
+    }
+
+    function checkLgUPlusNotice() {
+        if ($lgUPlusNoticeLayer.length > 0) {
+            if (typeof mobileLocalStorage !== "undefined") {
+                var hideLgUPlusSeq = mobileLocalStorage.getItem("GMobileLgUPlusNoticeHideSeq");
+                var dailyLgUPlusSeq = $lgUPlusNoticeLayer.data("seq").toString();
+                var monthlyLgUPlusSeq = $lgUPlusNoticeLayer.data("seq").toString().substring(0, $lgUPlusNoticeLayer.data("seq").toString().length - 2);
+                if (hideLgUPlusSeq == dailyLgUPlusSeq || hideLgUPlusSeq == monthlyLgUPlusSeq) {
+                    $lgUPlusNoticeLayer.remove();
+                }
+                else {
+                    showLgUPlusNotice();
+                }
+            }
+            else {
+                showLgUPlusNotice();
+            }
+        }
+    }
+
+	$(document).ready(function () {
+		if (typeof mobileLocalStorage !== "undefined") {
+			var hideSeq = Number(mobileLocalStorage.getItem("GMobileHomeNoticeHideSeq"));
+			if (hideSeq >= $homeNoticeLayer.data("seq")) {
+			    $homeNoticeLayer.remove();
+			    checkLgUPlusNotice();
+			} else {
+				showHomeNotice();
+			}
+		} else {
+			showHomeNotice();
+		}
+	});
+</script>
+@* // 전면광고 레이어 *@
+	 }
+}
+
+@section scriptfiles
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+}
+
+@section iframes
+{
+<form id="MainWiseLogForm" name="MainWiseLogForm" method="post" >
+<iframe id="ifrMainWiseLogForm" name="ifrMainWiseLogForm" src="about:blank"  height="0" width="0" style="display:none;"></iframe>
+</form>
+}

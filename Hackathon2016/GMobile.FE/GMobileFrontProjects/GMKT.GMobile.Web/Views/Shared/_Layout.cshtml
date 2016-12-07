@@ -1,0 +1,22 @@
+﻿@{
+	ViewData["Title"] = "Gmarket";
+}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+	@Html.Partial("_incHeader2")
+	@*
+	@Styles.Render("~/Content/css")
+	@Scripts.Render("~/bundles/modernizr")
+	@Scripts.Render("~/bundles/jquery")
+	@RenderSection("head", required: false)
+	*@
+	@RenderSection("Css", required: false)
+</head>
+<body>
+	@RenderSection("scripts", required: false)
+	@Html.Partial("_Header2")
+	@RenderBody()
+	@Html.Partial("_Footer2")
+</body>
+</html>

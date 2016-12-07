@@ -1,0 +1,37 @@
+﻿<script type="text/javascript">
+	function setIsSmallPacking(val) {
+		$('#hdnSmallPacking').val(val);
+	}
+
+	$(document).ready(function () {
+		$('#btnSmartDelSrch').click(function () {
+			$('#frmSmartDelSrch').submit();
+		});
+	});
+</script>
+
+<div class="smart_wrap">
+	<div class="smart_box">
+		<h2 class="smart_tit"><a href="@Urls.MobileWebUrl/SmartDelivery" onclick="javascript:SnaUrlFooter('711100001');"><span class="sp_smart">스마트배송관 판매자가 달라도, 배송비는 한번만</span></a></h2>
+		<button class="sp_smart btn_srch" onclick="javascript:SnaUrlFooter('711100002');">검색</button>
+		<div class="srch_bx" style="display: none;">
+			<form action="@Urls.MobileWebUrl/SmartDelivery/Search" method="get" id="frmSmartDelSrch">
+				<fieldset>
+				<legend>스마트배송 검색</legend>
+					<div class="srch_in">
+						<button type="button" class="btn_sel">스마트배송상품</button>
+						<input type="text" class="inp_bx" name="keyword" />
+						<input type="hidden" id="hdnSmallPacking" name="isSmallPacking" value="N" />
+						<button type="button" class="btn_insrch" id="btnSmartDelSrch"><span class="sp_smart">검색</span></button>
+					</div>
+					<div class="ly_sel" style="display:none">
+						<ul class="sel_lst">
+							<li class="selected"><a href="javascript:;" onclick="setIsSmallPacking('N')">스마트배송상품</a></li>
+							<li><a href="javascript:;" onclick="setIsSmallPacking('Y')">소량포장상품</a></li>
+						</ul>
+					</div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,42 @@
+﻿@*<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/swipeview.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/front_v3.js?v=3"></script>*@
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/Ajax.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/header/httpAjaxRequest.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/util.js?ver=1"></script>
+
+<script type="text/javascript">
+	@* TODO: 얘는 어떡하지... *@
+function doSubmit() {
+	//뒤공백 제거 후 비교
+	if ((document.searchForm.topKeyword.value).replace(/\s*$/, "") == "") {
+		alert("검색어를 입력해 주세요");
+	} else {
+		try {
+			recentKeywordsController.setRecentKeyword(document.searchForm.topKeyword.value);
+		} catch (e) { }
+@if (PageAttr.IsMain == true) 
+{
+        @:pdsClickLog('200000141','utility',{});
+		@:location.href = "http://sna.gmarket.co.kr/?fcd=717000003&url=" + encodeURIComponent("@Urls.MobileWebUrl/Search/Search?topKeyword=" + encodeURIComponent(searchForm.topKeyword.value));
+}
+else
+{
+		@:document.searchForm.submit();
+}
+	}
+}
+
+
+function closeAppBanner()
+{
+	$('#app_baner').hide();
+}
+
+function fnSubFooterGoInstall() {
+	if (navigator.userAgent.indexOf("iPhone") > -1 || navigator.userAgent.indexOf("iPad") > -1 || navigator.userAgent.indexOf("iPod") > -1)
+		location.href = "@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000012", "http://itunes.apple.com/kr/app/gmarket/id340330132?mt=8")";
+	else // 안드로이드
+		location.href = "@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000012", "market://market.android.com/details?id=com.ebay.kr.gmarket")";
+}
+</script>

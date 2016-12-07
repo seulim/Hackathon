@@ -1,0 +1,297 @@
+﻿@using GMKT.GMobile.Web.Models;
+@model ShopMainGoodsModel
+@{
+	Layout = "_ShopLayout.cshtml";
+}
+@if (ViewBag.Shop.MainImg.Count > 0)
+{
+	<!-- 미니샵/스토어 메인 배너 -->
+	<div class="response_area">
+
+		<!-- 메인 배너 -->
+		<div class="banner_main" id="bnGrp">
+			<p class="bnLoading"><img src="@Urls.MobileImageUrlV2/shop/img/lazy_640x350.gif" alt="" /></p>
+			<ul id="main_banner_wrapper" class="bnr" style="display: none;">
+				@foreach (GMKT.GMobile.Data.ImageT main in ViewBag.Shop.MainImg)
+				{
+				<li><a href="@main.imgLinkURL"><img src="@main.imgURL" alt="" style="height:auto;"/></a></li>
+				}
+			</ul>
+			@if (ViewBag.Shop.MainImg.Count > 1)
+			{
+			<button type="button" id="prev" class="banner_turn banner_turn_prev"><span>이전</span></button>
+			<button type="button" id="next" class="banner_turn banner_turn_next"><span>다음</span></button>
+			}
+			@if (ViewBag.Shop.MainImg.Count > 1)
+			{
+			<div id="bnIndex1" class="bn_index">
+				<span class="selected"></span>
+				@for (var i = 0; i < ViewBag.Shop.MainImg.Count - 1; i++)
+				{ 
+				<span></span>
+				}
+			</div>
+			}
+		</div>
+		<!-- //메인 배너 -->
+
+		<!-- 가로모드확장 상품 -->
+		<div class="extend_prod" id="bnGrp4">
+			<h3><img src="@Urls.MobileImageUrlV2/shop/ico/ico_new_prod.png" alt="NEW" width="41" height="41" /></h3>
+			<div class="prod_list">
+				<ul class="orientation">
+				@foreach (ShopItemModel newly in Model.NewItems.Items)
+				{
+					<li>
+						<a href="javascript:;" onclick="shopController.addHistoryAndGo('Item', '', '@newly.VipUrl', '@newly.ImagePath', '@newly.ErrorMessage')">
+							<span class="prd_img"><img class="lazyImage" src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@newly.ImagePath" alt="" /></span>
+							<span class="dim"></span>
+							<span class="prd_info">
+								<span class="desc">@newly.Name</span>
+								<span class="price">
+								@if (newly.SellPrice == "2" ) { <em>가입상품</em> } 
+								else { 
+									<em>@newly.SellPrice</em><span>원</span> 
+									if (!String.IsNullOrEmpty(newly.DiscountRate)){ <span class="discount">@newly.DiscountRate%</span> }
+								}
+								<span class="favorite _favoriteFunc" data-goodscode="@newly.ItemID"><span class="ico_splt_2">관심상품</span></span></span>
+							</span>
+						</a>
+					</li>
+				}
+				</ul>
+			</div>
+		</div>
+		<!-- //가로모드확장 상품 -->
+	</div>
+	<!-- //미니샵/스토어 메인 배너 -->
+}
+@if (Model.SelectedItem != null)
+{
+	@* 내가클릭한 상품 *@
+	<div class="clicked_prod">
+		<h3>선택한 상품</h3>
+		<div class="prod_list">
+			<a href="javascript:;">
+				<span class="prd_img"><img src="@Model.SelectedItem.ImagePath" alt="" onclick="shopController.addHistoryAndGo('Item', '', '@Model.SelectedItem.VipUrl', '@Model.SelectedItem.ImagePath', '@Model.SelectedItem.ErrorMessage')" /></span>
+				<span class="dim"></span>
+				<span class="prd_info">
+					<span class="desc" onclick="shopController.addHistoryAndGo('Item', '', '@Model.SelectedItem.VipUrl', '@Model.SelectedItem.ImagePath', '@Model.SelectedItem.ErrorMessage')">@Model.SelectedItem.Name</span>
+					<span class="price">
+						@if (Model.SelectedItem.SellPrice == "2") { <em>가입상품</em> }
+						else { 
+							<em onclick="shopController.addHistoryAndGo('Item', '', '@Model.SelectedItem.VipUrl', '@Model.SelectedItem.ImagePath', '@Model.SelectedItem.ErrorMessage')">@Model.SelectedItem.SellPrice</em><span>원</span> 
+							if (!String.IsNullOrEmpty(Model.SelectedItem.DiscountRate)){ <span class="discount">@Model.SelectedItem.DiscountRate%</span> }
+						}
+						<span class="favorite _favoriteFunc" data-goodscode="@Model.SelectedItem.ItemID"><span class="ico_splt_2">관심상품</span></span>
+					</span>
+					<span class="icons">
+	@if (Model.SelectedItem.IsDeliveryFree)
+	{
+						<img src="@Urls.MobileImageUrlV2/shop/ico/ico_ship_free.gif" width="47" height="19" alt="무료배송" />
+	}
+					</span>
+				</span>
+			</a>
+		</div>
+	</div>
+	@* //내가클릭한 상품 *@
+}
+
+	<!-- 미니샵/스토어 상품 -->	
+@for (int i = 0; i < ViewBag.Mobile.DisplayInfo.Count; i++)
+{	  
+	<div class="prod_main">
+@if (Model.MainItems != null && Model.MainItems[i].Items != null && Model.MainItems[i].Items.Count > 0)
+{
+
+		<div class="prod_tit"><h3>@ViewBag.Mobile.DisplayInfo[i].Title</h3></div>
+		<div class="prod_list">
+	@if (ViewBag.Mobile.DisplayInfo[i].DisplayType == 2)
+	{
+				<!-- 모자이크형 -->
+				<ul class="type2">
+		@foreach (ShopItemModel item in Model.MainItems[i].Items)
+		{
+					<li class="mosaic">
+						<a class="mosaic_for_mouse" href="javascript:;">
+							<span class="prd_img"><img class="lazyImage" src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@item.ImagePath" alt="" /></span>
+							<span class="dim"></span>
+							<span class="prd_info">
+								<span class="desc" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.Name</span>
+								<span class="price">
+								@if (item.SellPrice == "2") { <em>가입상품</em> }
+								else { 
+									<em onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.SellPrice</em><span>원</span>
+									if (!String.IsNullOrEmpty(item.DiscountRate)){ <span class="discount">@item.DiscountRate%</span> }
+								}
+								<span class="favorite _favoriteFunc" data-goodscode="@item.ItemID"><span class="ico_splt_2">관심상품</span></span></span>
+							</span>
+						</a>
+					</li>
+		}
+				</ul>
+	}
+	else if (ViewBag.Mobile.DisplayInfo[i].DisplayType == 3)
+	{
+				<!-- 가로형 -->
+				<ul class="type3">
+		@foreach (ShopItemModel item in Model.MainItems[i].Items)
+		{
+					<li>
+						<a href="javascript:;">
+							<span class="prd_img"><img class="lazyImage" src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@item.ImagePath" alt="" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')"/></span>
+							<span class="dim"></span>
+							<span class="prd_info">
+								<span class="desc" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.Name</span>
+								<span class="price">
+								@if (item.SellPrice == "2") { <em>가입상품</em> }
+								else { 
+									<em onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.SellPrice</em><span>원</span> 
+									if (!String.IsNullOrEmpty(item.DiscountRate)){ <span class="discount">@item.DiscountRate%</span> }
+								}
+								<span class="favorite _favoriteFunc" data-goodscode="@item.ItemID"><span class="ico_splt_2">관심상품</span></span></span>
+								<span class="icons">
+									@if (item.IsDeliveryFree)
+									{
+										<img src="@Urls.MobileImageUrlV2/shop/ico/ico_ship_free.gif" width="47" height="19" alt="무료배송" />
+									}
+									@if (item.IsBrandOn)
+									{
+									<img src="@Urls.MobileImageUrlV2/shop/ico/ico_brandon.gif" width="57" height="19" alt="BRAND ON" />
+									}
+									else if (item.IsSoho)
+									{
+									<img src="@Urls.MobileImageUrlV2/shop/ico/ico_sohoshop.gif" width="57" height="19" alt="SOHO" />
+									}				
+								</span>
+							</span>
+						</a>
+					</li>
+		}
+				</ul>
+	}
+	else if (ViewBag.Mobile.DisplayInfo[i].DisplayType == 4)
+	{ 
+				<!-- 세로형 상품 -->
+				<ul class="type4">
+		@foreach (ShopItemModel item in Model.MainItems[i].Items)
+		{
+					<li>
+						<a href="javascript:;">
+							<span class="prd_img"><img class="lazyImage" src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@item.ImagePath" alt="" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')"/></span>
+							<span class="dim"></span>
+							<span class="prd_info">
+								<span class="desc" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.Name</span>
+								<span class="price">
+								@if (item.SellPrice == "2") { <em>가입상품</em> }
+								else { 
+									<em onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.SellPrice</em><span>원</span> 
+									if (!String.IsNullOrEmpty(item.DiscountRate)){ <span class="discount">@item.DiscountRate%</span> }
+								}
+								<span class="favorite _favoriteFunc" data-goodscode="@item.ItemID"><span class="ico_splt_2">관심상품</span></span></span>
+							</span>
+						</a>
+					</li>
+		}
+				</ul>
+	}
+	else if (ViewBag.Mobile.DisplayInfo[i].DisplayType == 5)
+	{ 
+				<!-- 큰이미지 상품 -->
+				<ul class="type5">
+		@foreach (ShopItemModel item in Model.MainItems[i].Items)
+		{
+					<li>
+						<a href="javascript:;">
+							<span class="prd_img"><img class="lazyImage" src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@item.BigImagePath" alt="" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')" data-onerror="@item.OnErrorBigImagePath" /></span>
+							<span class="dim"></span>
+							<span class="prd_info">
+								<span class="desc" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.Name</span>
+								<span class="price">
+								@if (item.SellPrice == "2") { <em>가입상품</em> }
+								else { 
+									<em onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.SellPrice</em><span>원</span> 
+									if (!String.IsNullOrEmpty(item.DiscountRate)){ <span class="discount">@item.DiscountRate%</span> }
+								}
+								<span class="favorite _favoriteFunc" data-goodscode="@item.ItemID"><span class="ico_splt_2">관심상품</span></span></span>
+							</span>
+						</a>
+					</li>
+		}
+				</ul>
+	}
+	else
+	{
+				<!-- 기본형 상품 -->
+				<ul class="type1">
+		@foreach (ShopItemModel item in Model.MainItems[i].Items)
+		{
+					<li>
+						<a href="javascript:;">
+							<span class="prd_img"><img class="lazyImage" src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@item.ImagePath" alt="" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')"/></span>
+							<span class="dim"></span>
+							<span class="prd_info">
+								<span class="desc" onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.Name</span>
+								<span class="price">
+								@if (item.SellPrice == "2") { <em>가입상품</em> }
+								else { 
+									<em onclick="shopController.addHistoryAndGo('Item', '', '@item.VipUrl', '@item.ImagePath', '@item.ErrorMessage')">@item.SellPrice</em><span>원</span>
+									if (!String.IsNullOrEmpty(item.DiscountRate)){ <span class="discount">@item.DiscountRate%</span> }
+								}
+								<span class="favorite _favoriteFunc" data-goodscode="@item.ItemID"><span class="ico_splt_2">관심상품</span></span></span>
+							</span>
+						</a>
+					</li>
+		}
+				</ul>
+	}
+	</div>
+}
+	@if (ViewBag.Mobile.DisplayInfo[i].SortType != 5)
+	{
+		<a href="@Url.Action("List", "Shop", new { sort = ViewBag.Mobile.DisplayInfo[i].Sort, dpno = i })" class="btn_more">더보기<span> +</span></a>
+	}
+	</div>
+}
+	
+	<!-- //미니샵/스토어 상품 -->
+
+
+@section Scripts
+{
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/shop/BannerController.js?dummy=201312111000"></script>
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+	<script type="text/javascript">
+	    var bannerController = new BannerController("#main_banner_wrapper", "#bnIndex1", "#prev", "#next");
+	    window.onload = function () {
+	        /* landing Banner */
+	        var em = eModule
+                , apps = em.apps
+                , landing = apps.landing;
+
+	        landing.init({
+	            root: '#ms_wrap',
+	            content: '.ms_wrap_extend',
+                pageName: 'Shop',
+                landingType: '@Model.LandingBanner.Type',
+                imageUrl: '@Model.LandingBanner.ImageUrl',
+                description: '@Model.LandingBanner.Description',
+                campaign: '@Model.Campaign.Name',
+                medium: '@Model.Campaign.Medium',
+                mediumSource: '@Model.Campaign.MediumSource',
+                mediumContent: '@Model.Campaign.MediumContent',
+                term: '@Model.Campaign.Keyword'
+	        });
+
+	        $("#lay_notice").on('click', '#goToApp', function (e) {
+	            e.preventDefault();
+	            landing.installApp();
+	        }).on('click', '#landingClose', function (e) {
+	            e.preventDefault();
+	            landing.close();
+	        });
+	        /* landing Banner */
+	    };
+	</script>
+}

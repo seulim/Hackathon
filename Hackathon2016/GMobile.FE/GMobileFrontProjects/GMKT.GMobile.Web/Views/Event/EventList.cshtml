@@ -1,0 +1,29 @@
+﻿<!-- CONTENTS -->
+<div id="contents" class="cts">
+	<div class="cstm_ct">
+		
+		<h3 class="tit">이벤트 응모 및 당첨내역</h3>
+		<ul class="noti_txt">
+		<li>최근 3개월간 당첨 내역입니다.</li>
+		<li>3개월 이전 당첨내역은 PC 나의쇼핑정보>이벤트응모현황에서 확인하실 수 있습니다.</li>
+		</ul> 
+		<div class="result_btn">
+			<a href="javascript:pageNo=1;orderKind='A';getEventList();"  id="showAll" >전체보기</a>
+			<a href="javascript:pageNo=1;orderKind='S';getEventList();"   id="showWin">당첨만보기</a>
+		</div>
+		
+            <div class="evet_list">
+				<p class="evet_list_head"><span class="t1">응모일</span><span class="t2">이벤트명</span><span class="reslt">결과</span></p>				
+                <ul id="event_list">		
+				</ul>
+                <!-- 페이징1 -->
+				<div class="paginate" id="EventApplicantListPageing">
+				</div>
+			</div>
+	</div>
+</div>
+<!--// CONTENTS -->
+<input type="hidden" id="NoticePageNo" />
+<input type="hidden" id="NoticePageSize" />
+@*<script src="../../Scripts/Event/EventList.js" type="text/javascript"></script>*@
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/EventList.js"></script>

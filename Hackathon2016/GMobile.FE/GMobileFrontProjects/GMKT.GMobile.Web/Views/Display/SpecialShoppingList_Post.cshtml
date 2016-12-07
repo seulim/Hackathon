@@ -1,0 +1,13 @@
+﻿@using GMKT.GMobile.Constant;
+@{
+    Layout = "";
+
+    foreach (var plan in Model.planList)  
+    {
+						<li>
+							<a href="@Urls.MobileWebUrl/Display/SpecialShopping?lcId=@plan.GdlcCd&sid=@plan.Sid"> 
+								<img src="@plan.MobileThumbImageUrl" alt="@plan.Title" />
+							</a> 
+						</li>
+    }
+}

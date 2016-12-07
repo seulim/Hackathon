@@ -1,0 +1,929 @@
+﻿@using Newtonsoft.Json
+@using GMKT.GMobile.Data
+
+@model GMKT.GMobile.Web.Models.LookV2MainModel
+@{
+	int fashionBannerFcdCode = 716200003;
+	int fashionBrandFcdCode = 716200012;
+	int beautyBannerFcdCode = 716300002;
+	int beautyBrandFcdCode = 716300009;
+}@section scripts{	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+}
+
+
+<!-- CONTENT -->
+<div id = "content">
+	<h2 class="blind">LOOK</h2>
+	<div class="look_renewal">
+		@if (!ViewBag.IsBeautyFirst)
+  {
+		<div id="LookV2Main">
+			<ul class="look_tab">
+				<li><a href="#" id="fashionTab" onclick="javascript:ViewFashionOrBeauty('F');" class="on"><span>FASHION</span></a></li>
+				<li><a href="#" id= "beautyTab" onclick="javascript:ViewFashionOrBeauty('B');"><span>BEAUTY</span></a></li>
+			</ul>
+			<div class = "look_cont" id="MainFashion">
+			@foreach (LookV2Promotion entity in Model.Fashion.Promotion)
+   {
+				<div class = "@entity.PromotionClassStr">
+					<a href="@GlobalFunction.GetSnaUrl(true, fashionBannerFcdCode.ToString(), entity.LandingUrl)">
+						<span class = "img_box"><img src="@entity.BannerImageUrl" alt="" /></span>
+						<span class = "@entity.PromotionSpanClassStr">
+						@if (entity.ExposeType == LookV2PromotionType.AType)
+	  {
+							<strong class = "m_txt">
+								<span class = "tag">@entity.TagText</span>@entity.MainText1
+							</strong>
+		  if (entity.Price != null && entity.Price != String.Empty)
+		  {
+			  if (entity.Price.ToUpper() == "SOLD OUT")
+			  {
+									<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+									<span class ="price">@entity.Price</span>
+			  }
+		  }
+
+	  }
+	  else if (entity.ExposeType == LookV2PromotionType.BType)
+	  {
+							<span class = "tag">@entity.TagText</span>
+							<strong class = "m_txt line2">
+								<span>@entity.MainText1</span>
+								<span>@entity.MainText2</span>
+							</strong>
+							<span class = "info01">@entity.SubText</span>
+		  if (entity.Price != null && entity.Price != String.Empty)
+		  {
+			  if (entity.Price.ToUpper() == "SOLD OUT")
+			  {
+									<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+									<span class ="price">@entity.Price</span>
+			  }
+		  }
+	  }						
+						</span>
+					</a>
+				</div>
+	  fashionBannerFcdCode++;
+   }
+			
+				<div class = "look_list_box fashion">
+					<h3 class= "look_tit"><span>@Model.Fashion.Cast.Title</span></h3>
+					<ul>
+					@foreach (LookV2CastContents entity in Model.Fashion.Cast.Items)
+	 {
+						<li>
+							<a href = '@GlobalFunction.GetSnaUrl(true, "716200008", entity.LandingUrl)'>
+								<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+								<span class = "info_box">
+									<strong class = "m_txt line2">
+										<span>@entity.MainText1</span>
+										<span>@entity.MainText2</span>
+									</strong>
+									<span class = "info02"><img src="@entity.PublisherImageUrl" alt="" />@entity.PublisherName</span>									
+								</span>
+							</a>
+						</li>
+	 }
+					</ul>
+					<a href = '@GlobalFunction.GetSnaUrl(true, "716200009", Model.Fashion.Cast.MoreLandingUrl)' class = "btn_look_more">@Model.Fashion.Cast.DetailViewText<span></span></a>
+				</div>
+			
+				<div class="look_list_box soho">
+					<h3 class = "look_tit"><span>@Model.Fashion.SohoGallery.Title</span></h3>				
+					@foreach (LookV2SohoMainItemGroup entity in Model.Fashion.SohoGallery.Items)
+	 {
+						<ul class="@entity.SohoMainItemGroupClass">
+						@foreach (LookV2SohoMainItem miniEntity in entity.Items)
+	  {
+		  if (miniEntity.ImageType == LookV2SohoImageType.Left || miniEntity.ImageType == LookV2SohoImageType.Right)
+		  {
+								<li class="big">
+									<a href = '@GlobalFunction.GetSnaUrl(true, "716200010", miniEntity.LandingUrl)'>
+										<span class="img_box">
+										@if (miniEntity.ExposeType == LookV2SohoMainItemType.Banner)
+		  {
+											<img src="@miniEntity.BannerImageUrl" alt="" />
+											<span class="i_txt">@miniEntity.SubText<strong>@miniEntity.MainText</strong></span>
+		  }
+		  else
+		  {
+											<img src="@miniEntity.ExposeImageUrl" alt="" />
+											<span class="price">@miniEntity.Price</span>
+		  }	 										
+										</span>
+									</a>
+								</li>	
+		  }
+		  else
+		  {
+								<li>
+									<a href='@GlobalFunction.GetSnaUrl(true, "716200010", miniEntity.LandingUrl)'>
+										<span class="img_box">
+										@if (miniEntity.ExposeType == LookV2SohoMainItemType.Banner)
+		  {
+											<img src="@miniEntity.BannerImageUrl" alt="" />
+											<span class="i_txt">@miniEntity.SubText<strong>@miniEntity.MainText</strong></span>
+		  }
+		  else
+		  {
+											<img src="@miniEntity.ExposeImageUrl" alt="" />
+											<span class="price">@miniEntity.Price</span>
+		  }	
+										</span>
+									</a>
+								</li>
+		  }
+	  }
+						</ul>
+	 }
+						<a href='@GlobalFunction.GetSnaUrl(true, "716200011", Model.Fashion.SohoGallery.MoreLandingUrl)' class="btn_look_more">@Model.Fashion.SohoGallery.DetailViewText<span></span></a>				
+				</div>
+
+				<div class = "look_list_box brand">
+					<h3 class="look_tit"><span>@Model.Fashion.BrandGallery.Title</span></h3>
+					<ul>
+						@foreach (LookV2BrandGalleryItem entity in Model.Fashion.BrandGallery.Items)
+	  {
+		  if (entity.ExposeType == LookV2BrandMainItemType.Banner)
+		  {
+								<li class = "wide">
+									<a href="@entity.LandingUrl" onclick="SnaUrlFooter('@fashionBrandFcdCode.ToString()')">
+										<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+										<span class="txt">@entity.GoodsName</span>
+									</a>
+								</li>
+			  fashionBrandFcdCode++;
+		  }
+		  else
+		  {
+								<li>
+									<a href='@entity.LandingUrl'>
+										<span class="img_box"><img src = "@entity.ImageUrl" alt="" /></span>
+										<span class="info_box">
+											<span class="info01">@entity.GoodsName</span>
+											<strong class="price">@entity.Price
+											@if(int.Parse(string.IsNullOrEmpty(entity.DiscountRate) ? "0" : entity.DiscountRate)>0){
+												<span>@entity.DiscountRate%</span>
+											}
+											</strong>
+										</span>
+									</a>
+								</li>
+		  }
+	  }
+					</ul>
+					<a href='@GlobalFunction.GetSnaUrl(true, "716200017", Model.Fashion.BrandGallery.MoreLandingUrl)' class="btn_look_more" id="btnFashionBrandGalleryMore">@Model.Fashion.BrandGallery.DetailViewText<span></span></a>
+				</div>
+
+				<div class="look_list_box brand v2">
+					<h3 class="look_tit"><span>@Model.Fashion.BrandBest.Title</span></h3>
+					<ul>
+						@foreach (LookV2Item entity in Model.Fashion.BrandBest.Items)
+	  {
+							<li>
+								<a href="@entity.LandingUrl">
+									<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+									<span class = "info_box">
+										<strong class="m_txt">@entity.BrandName</strong>
+										<span class="info01">@entity.GoodsName</span>
+										<strong class="price">@entity.Price
+											@if (int.Parse(string.IsNullOrEmpty(entity.DiscountRate) ? "0" : entity.DiscountRate) > 0)
+		   {
+												<span>@entity.DiscountRate%</span>
+											}
+										</strong>
+									</span>
+								</a>
+							</li>
+	  }
+					</ul>
+					<a href = '@GlobalFunction.GetSnaUrl(true, "716200018", Model.Fashion.BrandBest.MoreLandingUrl)' class="btn_look_more" id="btnFashionBrandBestMore">@Model.Fashion.BrandBest.DetailViewText<span></span></a>
+				</div>
+
+			</div>
+
+			<div class = "look_cont" id = "MainBeauty">
+			@*@foreach (LookV2Promotion entity in Model.Beauty.Promotion)
+			{*@
+			@if (Model.Beauty.Promotion.Count > 0)
+   {
+	   int firstCount = Model.Beauty.Promotion.Count > 2 ? 2 : Model.Beauty.Promotion.Count;
+	   for (int i = 0; i < firstCount; i++)
+	   {
+				<div class = "@Model.Beauty.Promotion[i].PromotionClassStr">
+					<a href='@GlobalFunction.GetSnaUrl(true, beautyBannerFcdCode.ToString(), Model.Beauty.Promotion[i].LandingUrl)'>
+						<span class = "img_box"><img src="@Model.Beauty.Promotion[i].BannerImageUrl" alt="" /></span>
+						<span class = "@Model.Beauty.Promotion[i].PromotionSpanClassStr">
+						@if (Model.Beauty.Promotion[i].ExposeType == LookV2PromotionType.AType)
+	  {
+							<strong class = "m_txt">
+								<span class = "tag">@Model.Beauty.Promotion[i].TagText</span>@Model.Beauty.Promotion[i].MainText1
+							</strong>
+		  if (Model.Beauty.Promotion[i].Price != null && Model.Beauty.Promotion[i].Price != String.Empty)
+		  {
+			  if (Model.Beauty.Promotion[i].Price.ToUpper() == "SOLD OUT")
+			  {
+												<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+												<span class ="price">@Model.Beauty.Promotion[i].Price</span>
+			  }
+		  }
+
+	  }
+	  else if (Model.Beauty.Promotion[i].ExposeType == LookV2PromotionType.BType)
+	  {
+							<span class = "tag">@Model.Beauty.Promotion[i].TagText</span>
+							<strong class = "m_txt line2">
+								<span>@Model.Beauty.Promotion[i].MainText1</span>
+								<span>@Model.Beauty.Promotion[i].MainText2</span>
+							</strong>
+							<span class = "info01">@Model.Beauty.Promotion[i].SubText</span>
+		  if (Model.Beauty.Promotion[i].Price != null && Model.Beauty.Promotion[i].Price != String.Empty)
+		  {
+			  if (Model.Beauty.Promotion[i].Price.ToUpper() == "SOLD OUT")
+			  {
+													<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+													<span class ="price">@Model.Beauty.Promotion[i].Price</span>
+			  }
+		  }
+	  }						
+						</span>
+					</a>
+				</div>
+	  beautyBannerFcdCode++;
+	   }
+   }
+				<div class = "look_list_box fashion">
+					<h3 class= "look_tit"><span>@Model.Beauty.Cast.Title</span></h3>
+					<ul>
+					@foreach (LookV2CastContents entity in Model.Beauty.Cast.Items)
+	 {
+						<li>
+							<a href = "@GlobalFunction.GetSnaUrl(true, "716300007", entity.LandingUrl)">
+								<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+								<span class = "info_box">
+									<strong class = "m_txt line2">
+										<span>@entity.MainText1</span>
+										<span>@entity.MainText2</span>
+									</strong>
+									<span class = "info02"><img src="@entity.PublisherImageUrl" alt="" />@entity.PublisherName</span>									
+								</span>
+							</a>
+						</li>
+	 }
+					</ul>
+					<a href = "@GlobalFunction.GetSnaUrl(true, "716300008", Model.Beauty.Cast.MoreLandingUrl)" class = "btn_look_more">@Model.Beauty.Cast.DetailViewText<span></span></a>
+				</div>
+
+				@if (Model.Beauty.Promotion.Count > 2)
+	{
+		//int firstCount = Model.Beauty.Promotion.Count > 2 ? 2: Model.Beauty.Promotion.Count;
+		for (int i = 2; i < Model.Beauty.Promotion.Count; i++)
+		{
+				<div class = "@Model.Beauty.Promotion[i].PromotionClassStr">
+					<a href="@GlobalFunction.GetSnaUrl(true, beautyBannerFcdCode.ToString(), Model.Beauty.Promotion[i].LandingUrl)">
+						<span class = "img_box"><img src="@Model.Beauty.Promotion[i].BannerImageUrl" alt="" /></span>
+						<span class = "@Model.Beauty.Promotion[i].PromotionSpanClassStr">
+						@if (Model.Beauty.Promotion[i].ExposeType == LookV2PromotionType.AType)
+	  {
+							<strong class = "m_txt">
+								<span class = "tag">@Model.Beauty.Promotion[i].TagText</span>@Model.Beauty.Promotion[i].MainText1
+							</strong>
+		  if (Model.Beauty.Promotion[i].Price != null && Model.Beauty.Promotion[i].Price != String.Empty)
+		  {
+			  if (Model.Beauty.Promotion[i].Price.ToUpper() == "SOLD OUT")
+			  {
+												<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+												<span class ="price">@Model.Beauty.Promotion[i].Price</span>
+			  }
+		  }
+
+	  }
+	  else if (Model.Beauty.Promotion[i].ExposeType == LookV2PromotionType.BType)
+	  {
+							<span class = "tag">@Model.Beauty.Promotion[i].TagText</span>
+							<strong class = "m_txt line2">
+								<span>@Model.Beauty.Promotion[i].MainText1</span>
+								<span>@Model.Beauty.Promotion[i].MainText2</span>
+							</strong>
+							<span class = "info01">@Model.Beauty.Promotion[i].SubText</span>
+		  if (Model.Beauty.Promotion[i].Price != null && Model.Beauty.Promotion[i].Price != String.Empty)
+		  {
+			  if (Model.Beauty.Promotion[i].Price.ToUpper() == "SOLD OUT")
+			  {
+													<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+													<span class ="price">@Model.Beauty.Promotion[i].Price</span>
+			  }
+		  }
+	  }						
+						</span>
+					</a>
+				</div>
+	  beautyBannerFcdCode++;
+		}
+	}
+
+
+
+				<div class = "look_list_box brand">
+					<h3 class="look_tit"><span>@Model.Beauty.BrandGallery.Title</span></h3>
+					<ul>
+						@foreach (LookV2BrandGalleryItem entity in Model.Beauty.BrandGallery.Items)
+	  {
+		  if (entity.ExposeType == LookV2BrandMainItemType.Banner)
+		  {
+								<li class = "wide">
+									<a href="@entity.LandingUrl" onclick="SnaUrlFooter('@beautyBrandFcdCode.ToString()')">
+										<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+										<span class="txt">@entity.GoodsName</span>
+									</a>
+								</li>
+			  beautyBrandFcdCode++;
+		  }
+		  else
+		  {
+								<li>
+									<a href="@entity.LandingUrl">
+										<span class="img_box"><img src = "@entity.ImageUrl" alt="" /></span>
+										<span class="info_box">
+											<span class="info01">@entity.GoodsName</span>
+											<strong class="price">@entity.Price
+												@if (int.Parse(string.IsNullOrEmpty(entity.DiscountRate) ? "0" : entity.DiscountRate) > 0)
+			{
+												<span>@entity.DiscountRate%</span>
+												}
+											</strong>
+										</span>
+									</a>
+								</li>
+		  }
+
+
+	  }
+					</ul>
+					<a href="@GlobalFunction.GetSnaUrl(true, "716300014", Model.Beauty.BrandGallery.MoreLandingUrl)" class="btn_look_more" id="btnBeautyBrandGalleryMore">@Model.Beauty.BrandGallery.DetailViewText<span></span></a>
+				</div>
+
+				<div class="look_list_box brand v2">
+					<h3 class="look_tit"><span>@Model.Beauty.BrandBest.Title</span></h3>
+					<ul>
+						@foreach (LookV2Item entity in Model.Beauty.BrandBest.Items)
+	  {
+							<li>
+								<a href="@entity.LandingUrl">
+									<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+									<span class = "info_box">
+										<strong class="m_txt">@entity.BrandName</strong>
+										<span class="info01">@entity.GoodsName</span>
+										<strong class="price">@entity.Price
+											@if (int.Parse(string.IsNullOrEmpty(entity.DiscountRate) ? "0" : entity.DiscountRate) > 0)
+		   {
+												<span>@entity.DiscountRate%</span>
+											}
+										</strong>
+									</span>
+								</a>
+							</li>
+	  }
+					</ul>
+					<a href = "@GlobalFunction.GetSnaUrl(true, "716300015", Model.Beauty.BrandBest.MoreLandingUrl)" class="btn_look_more" id="btnBeautyBrandBestMore">@Model.Beauty.BrandBest.DetailViewText<span></span></a>
+				</div>
+
+			</div>
+		</div>
+  }
+  else
+  {
+  <div id="LookV2Main">
+			<ul class="look_tab">
+				<li><a href="#" id="fashionTab" onclick="javascript:ViewFashionOrBeauty('F');"><span>FASHION</span></a></li>
+				<li><a href="#" id= "beautyTab" onclick="javascript:ViewFashionOrBeauty('B');"  class="on"><span>BEAUTY</span></a></li>
+			</ul>
+			<div class = "look_cont" id = "MainBeauty">
+			@*@foreach (LookV2Promotion entity in Model.Beauty.Promotion)
+			{*@
+			@if (Model.Beauty.Promotion.Count > 0)
+   {
+	   int firstCount = Model.Beauty.Promotion.Count > 2 ? 2 : Model.Beauty.Promotion.Count;
+	   for (int i = 0; i < firstCount; i++)
+	   {
+				<div class = "@Model.Beauty.Promotion[i].PromotionClassStr">
+					<a href='@GlobalFunction.GetSnaUrl(true, beautyBannerFcdCode.ToString(), Model.Beauty.Promotion[i].LandingUrl)'>
+						<span class = "img_box"><img src="@Model.Beauty.Promotion[i].BannerImageUrl" alt="" /></span>
+						<span class = "@Model.Beauty.Promotion[i].PromotionSpanClassStr">
+						@if (Model.Beauty.Promotion[i].ExposeType == LookV2PromotionType.AType)
+	  {
+							<strong class = "m_txt">
+								<span class = "tag">@Model.Beauty.Promotion[i].TagText</span>@Model.Beauty.Promotion[i].MainText1
+							</strong>
+		  if (Model.Beauty.Promotion[i].Price != null && Model.Beauty.Promotion[i].Price != String.Empty)
+		  {
+			  if (Model.Beauty.Promotion[i].Price.ToUpper() == "SOLD OUT")
+			  {
+												<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+												<span class ="price">@Model.Beauty.Promotion[i].Price</span>
+			  }
+		  }
+
+	  }
+	  else if (Model.Beauty.Promotion[i].ExposeType == LookV2PromotionType.BType)
+	  {
+							<span class = "tag">@Model.Beauty.Promotion[i].TagText</span>
+							<strong class = "m_txt line2">
+								<span>@Model.Beauty.Promotion[i].MainText1</span>
+								<span>@Model.Beauty.Promotion[i].MainText2</span>
+							</strong>
+							<span class = "info01">@Model.Beauty.Promotion[i].SubText</span>
+		  if (Model.Beauty.Promotion[i].Price != null && Model.Beauty.Promotion[i].Price != String.Empty)
+		  {
+			  if (Model.Beauty.Promotion[i].Price.ToUpper() == "SOLD OUT")
+			  {
+													<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+													<span class ="price">@Model.Beauty.Promotion[i].Price</span>
+			  }
+		  }
+	  }						
+						</span>
+					</a>
+				</div>
+	  beautyBannerFcdCode++;
+	   }
+   }
+				<div class = "look_list_box fashion">
+					<h3 class= "look_tit"><span>@Model.Beauty.Cast.Title</span></h3>
+					<ul>
+					@foreach (LookV2CastContents entity in Model.Beauty.Cast.Items)
+	 {
+						<li>
+							<a href = "@GlobalFunction.GetSnaUrl(true, "716300007", entity.LandingUrl)">
+								<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+								<span class = "info_box">
+									<strong class = "m_txt line2">
+										<span>@entity.MainText1</span>
+										<span>@entity.MainText2</span>
+									</strong>
+									<span class = "info02"><img src="@entity.PublisherImageUrl" alt="" />@entity.PublisherName</span>									
+								</span>
+							</a>
+						</li>
+	 }
+					</ul>
+					<a href = "@GlobalFunction.GetSnaUrl(true, "716300008", Model.Beauty.Cast.MoreLandingUrl)" class = "btn_look_more">@Model.Beauty.Cast.DetailViewText<span></span></a>
+				</div>
+
+				@if (Model.Beauty.Promotion.Count > 2)
+	{
+		//int firstCount = Model.Beauty.Promotion.Count > 2 ? 2: Model.Beauty.Promotion.Count;
+		for (int i = 2; i < Model.Beauty.Promotion.Count; i++)
+		{
+				<div class = "@Model.Beauty.Promotion[i].PromotionClassStr">
+					<a href="@GlobalFunction.GetSnaUrl(true, beautyBannerFcdCode.ToString(), Model.Beauty.Promotion[i].LandingUrl)">
+						<span class = "img_box"><img src="@Model.Beauty.Promotion[i].BannerImageUrl" alt="" /></span>
+						<span class = "@Model.Beauty.Promotion[i].PromotionSpanClassStr">
+						@if (Model.Beauty.Promotion[i].ExposeType == LookV2PromotionType.AType)
+	  {
+							<strong class = "m_txt">
+								<span class = "tag">@Model.Beauty.Promotion[i].TagText</span>@Model.Beauty.Promotion[i].MainText1
+							</strong>
+		  if (Model.Beauty.Promotion[i].Price != null && Model.Beauty.Promotion[i].Price != String.Empty)
+		  {
+			  if (Model.Beauty.Promotion[i].Price.ToUpper() == "SOLD OUT")
+			  {
+												<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+												<span class ="price">@Model.Beauty.Promotion[i].Price</span>
+			  }
+		  }
+
+	  }
+	  else if (Model.Beauty.Promotion[i].ExposeType == LookV2PromotionType.BType)
+	  {
+							<span class = "tag">@Model.Beauty.Promotion[i].TagText</span>
+							<strong class = "m_txt line2">
+								<span>@Model.Beauty.Promotion[i].MainText1</span>
+								<span>@Model.Beauty.Promotion[i].MainText2</span>
+							</strong>
+							<span class = "info01">@Model.Beauty.Promotion[i].SubText</span>
+		  if (Model.Beauty.Promotion[i].Price != null && Model.Beauty.Promotion[i].Price != String.Empty)
+		  {
+			  if (Model.Beauty.Promotion[i].Price.ToUpper() == "SOLD OUT")
+			  {
+													<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+													<span class ="price">@Model.Beauty.Promotion[i].Price</span>
+			  }
+		  }
+	  }						
+						</span>
+					</a>
+				</div>
+	  beautyBannerFcdCode++;
+		}
+	}
+
+
+
+				<div class = "look_list_box brand">
+					<h3 class="look_tit"><span>@Model.Beauty.BrandGallery.Title</span></h3>
+					<ul>
+						@foreach (LookV2BrandGalleryItem entity in Model.Beauty.BrandGallery.Items)
+	  {
+		  if (entity.ExposeType == LookV2BrandMainItemType.Banner)
+		  {
+								<li class = "wide">
+									<a href="@entity.LandingUrl" onclick="SnaUrlFooter('@beautyBrandFcdCode.ToString()')">
+										<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+										<span class="txt">@entity.GoodsName</span>
+									</a>
+								</li>
+			  beautyBrandFcdCode++;
+		  }
+		  else
+		  {
+								<li>
+									<a href="@entity.LandingUrl">
+										<span class="img_box"><img src = "@entity.ImageUrl" alt="" /></span>
+										<span class="info_box">
+											<span class="info01">@entity.GoodsName</span>
+											<strong class="price">@entity.Price
+												@if (int.Parse(string.IsNullOrEmpty(entity.DiscountRate) ? "0" : entity.DiscountRate) > 0)
+			{
+												<span>@entity.DiscountRate%</span>
+												}
+											</strong>
+										</span>
+									</a>
+								</li>
+		  }
+
+
+	  }
+					</ul>
+					<a href="@GlobalFunction.GetSnaUrl(true, "716300014", Model.Beauty.BrandGallery.MoreLandingUrl)" class="btn_look_more" id="btnBeautyBrandGalleryMore">@Model.Beauty.BrandGallery.DetailViewText<span></span></a>
+				</div>
+
+				<div class="look_list_box brand v2">
+					<h3 class="look_tit"><span>@Model.Beauty.BrandBest.Title</span></h3>
+					<ul>
+						@foreach (LookV2Item entity in Model.Beauty.BrandBest.Items)
+	  {
+							<li>
+								<a href="@entity.LandingUrl">
+									<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+									<span class = "info_box">
+										<strong class="m_txt">@entity.BrandName</strong>
+										<span class="info01">@entity.GoodsName</span>
+										<strong class="price">@entity.Price
+											@if (int.Parse(string.IsNullOrEmpty(entity.DiscountRate) ? "0" : entity.DiscountRate) > 0)
+		   {
+												<span>@entity.DiscountRate%</span>
+											}
+										</strong>
+									</span>
+								</a>
+							</li>
+	  }
+					</ul>
+					<a href = "@GlobalFunction.GetSnaUrl(true, "716300015", Model.Beauty.BrandBest.MoreLandingUrl)" class="btn_look_more" id="btnBeautyBrandBestMore">@Model.Beauty.BrandBest.DetailViewText<span></span></a>
+				</div>
+
+			</div>
+			<div class = "look_cont" id="MainFashion">
+			@foreach (LookV2Promotion entity in Model.Fashion.Promotion)
+   {
+				<div class = "@entity.PromotionClassStr">
+					<a href="@GlobalFunction.GetSnaUrl(true, fashionBannerFcdCode.ToString(), entity.LandingUrl)">
+						<span class = "img_box"><img src="@entity.BannerImageUrl" alt="" /></span>
+						<span class = "@entity.PromotionSpanClassStr">
+						@if (entity.ExposeType == LookV2PromotionType.AType)
+	  {
+							<strong class = "m_txt">
+								<span class = "tag">@entity.TagText</span>@entity.MainText1
+							</strong>
+		  if (entity.Price != null && entity.Price != String.Empty)
+		  {
+			  if (entity.Price.ToUpper() == "SOLD OUT")
+			  {
+									<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+									<span class ="price">@entity.Price</span>
+			  }
+		  }
+
+	  }
+	  else if (entity.ExposeType == LookV2PromotionType.BType)
+	  {
+							<span class = "tag">@entity.TagText</span>
+							<strong class = "m_txt line2">
+								<span>@entity.MainText1</span>
+								<span>@entity.MainText2</span>
+							</strong>
+							<span class = "info01">@entity.SubText</span>
+		  if (entity.Price != null && entity.Price != String.Empty)
+		  {
+			  if (entity.Price.ToUpper() == "SOLD OUT")
+			  {
+									<span class = "price sold_out">SOLD OUT</span>
+			  }
+			  else
+			  {
+									<span class ="price">@entity.Price</span>
+			  }
+		  }
+	  }						
+						</span>
+					</a>
+				</div>
+	  fashionBannerFcdCode++;
+   }
+			
+				<div class = "look_list_box fashion">
+					<h3 class= "look_tit"><span>@Model.Fashion.Cast.Title</span></h3>
+					<ul>
+					@foreach (LookV2CastContents entity in Model.Fashion.Cast.Items)
+	 {
+						<li>
+							<a href = '@GlobalFunction.GetSnaUrl(true, "716200008", entity.LandingUrl)'>
+								<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+								<span class = "info_box">
+									<strong class = "m_txt line2">
+										<span>@entity.MainText1</span>
+										<span>@entity.MainText2</span>
+									</strong>
+									<span class = "info02"><img src="@entity.PublisherImageUrl" alt="" />@entity.PublisherName</span>									
+								</span>
+							</a>
+						</li>
+	 }
+					</ul>
+					<a href = '@GlobalFunction.GetSnaUrl(true, "716200009", Model.Fashion.Cast.MoreLandingUrl)' class = "btn_look_more">@Model.Fashion.Cast.DetailViewText<span></span></a>
+				</div>
+			
+				<div class="look_list_box soho">
+					<h3 class = "look_tit"><span>@Model.Fashion.SohoGallery.Title</span></h3>				
+					@foreach (LookV2SohoMainItemGroup entity in Model.Fashion.SohoGallery.Items)
+	 {
+						<ul class="@entity.SohoMainItemGroupClass">
+						@foreach (LookV2SohoMainItem miniEntity in entity.Items)
+	  {
+		  if (miniEntity.ImageType == LookV2SohoImageType.Left || miniEntity.ImageType == LookV2SohoImageType.Right)
+		  {
+								<li class="big">
+									<a href = '@GlobalFunction.GetSnaUrl(true, "716200010", miniEntity.LandingUrl)'>
+										<span class="img_box">
+										@if (miniEntity.ExposeType == LookV2SohoMainItemType.Banner)
+		  {
+											<img src="@miniEntity.BannerImageUrl" alt="" />
+											<span class="i_txt">@miniEntity.SubText<strong>@miniEntity.MainText</strong></span>
+		  }
+		  else
+		  {
+											<img src="@miniEntity.ExposeImageUrl" alt="" />
+											<span class="price">@miniEntity.Price</span>
+		  }	 										
+										</span>
+									</a>
+								</li>	
+		  }
+		  else
+		  {
+								<li>
+									<a href='@GlobalFunction.GetSnaUrl(true, "716200010", miniEntity.LandingUrl)'>
+										<span class="img_box">
+										@if (miniEntity.ExposeType == LookV2SohoMainItemType.Banner)
+		  {
+											<img src="@miniEntity.BannerImageUrl" alt="" />
+											<span class="i_txt">@miniEntity.SubText<strong>@miniEntity.MainText</strong></span>
+		  }
+		  else
+		  {
+											<img src="@miniEntity.ExposeImageUrl" alt="" />
+											<span class="price">@miniEntity.Price</span>
+		  }	
+										</span>
+									</a>
+								</li>
+		  }
+	  }
+						</ul>
+	 }
+						<a href='@GlobalFunction.GetSnaUrl(true, "716200011", Model.Fashion.SohoGallery.MoreLandingUrl)' class="btn_look_more">@Model.Fashion.SohoGallery.DetailViewText<span></span></a>				
+				</div>
+
+				<div class = "look_list_box brand">
+					<h3 class="look_tit"><span>@Model.Fashion.BrandGallery.Title</span></h3>
+					<ul>
+						@foreach (LookV2BrandGalleryItem entity in Model.Fashion.BrandGallery.Items)
+	  {
+		  if (entity.ExposeType == LookV2BrandMainItemType.Banner)
+		  {
+								<li class = "wide">
+									<a href="@entity.LandingUrl" onclick="SnaUrlFooter('@fashionBrandFcdCode.ToString()')">
+										<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+										<span class="txt">@entity.GoodsName</span>
+									</a>
+								</li>
+			  fashionBrandFcdCode++;
+		  }
+		  else
+		  {
+								<li>
+									<a href='@entity.LandingUrl'>
+										<span class="img_box"><img src = "@entity.ImageUrl" alt="" /></span>
+										<span class="info_box">
+											<span class="info01">@entity.GoodsName</span>
+											<strong class="price">@entity.Price
+											@if (int.Parse(string.IsNullOrEmpty(entity.DiscountRate) ? "0" : entity.DiscountRate) > 0)
+		   {
+												<span>@entity.DiscountRate%</span>
+											}
+											</strong>
+										</span>
+									</a>
+								</li>
+		  }
+	  }
+					</ul>
+					<a href='@GlobalFunction.GetSnaUrl(true, "716200017", Model.Fashion.BrandGallery.MoreLandingUrl)' class="btn_look_more" id="btnFashionBrandGalleryMore">@Model.Fashion.BrandGallery.DetailViewText<span></span></a>
+				</div>
+
+				<div class="look_list_box brand v2">
+					<h3 class="look_tit"><span>@Model.Fashion.BrandBest.Title</span></h3>
+					<ul>
+						@foreach (LookV2Item entity in Model.Fashion.BrandBest.Items)
+	  {
+							<li>
+								<a href="@entity.LandingUrl">
+									<span class = "img_box"><img src="@entity.ImageUrl" alt="" /></span>
+									<span class = "info_box">
+										<strong class="m_txt">@entity.BrandName</strong>
+										<span class="info01">@entity.GoodsName</span>
+										<strong class="price">@entity.Price
+										@if(int.Parse(string.IsNullOrEmpty(entity.DiscountRate) ? "0" : entity.DiscountRate )>0){
+												<span>@entity.DiscountRate%</span>
+											}
+										</strong>
+									</span>
+								</a>
+							</li>
+	  }
+					</ul>
+					<a href = '@GlobalFunction.GetSnaUrl(true, "716200018", Model.Fashion.BrandBest.MoreLandingUrl)' class="btn_look_more" id="btnFashionBrandBestMore">@Model.Fashion.BrandBest.DetailViewText<span></span></a>
+				</div>
+
+			</div>
+		</div>
+  }
+
+		@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "look", ShareFcdCode = "704600007", ShortcutFcdCode = "704600008" })
+		@* fcd코드 세팅*@
+
+		@if (false == PageAttr.IsApp)
+		{
+			<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+		}
+		<a href="#" class="btn_top_main">Top으로 이동</a>
+		
+	</div>
+
+
+	<script type = "text/javascript">
+		var flagPage = "";
+		function ViewFashionOrBeauty(Code) {
+			if (flagPage == Code) return;
+			flagPage = Code;
+
+			if (Code == "F") {
+				$("#MainBeauty").hide();
+				$("#MainFashion").show();
+				SnaUrlFooter("716200002");
+				history.pushState({ page: "/Look" }, null, "/Look");
+			}
+			else if (Code == "B") {
+				$("#MainFashion").hide();
+				$("#MainBeauty").show();
+				SnaUrlFooter("716300001");
+				history.pushState({ page: "/Look/Beauty" }, null, "/Look/Beauty");
+			}
+		}
+
+		$(document).ready(function () {
+			
+			@if (ViewBag.IsBeautyFirst)
+   {
+				<text>
+				$("#MainFashion").hide();
+				$("#MainBeauty").show();
+				$("#fashionTab").removeClass("on");
+				$("#beautyTab").addClass("on");
+				SnaUrlFooter("716300001");
+				//ViewFashionOrBeauty("B");
+				flagPage = "B";
+			</text>
+   }
+   else
+   {
+				<text>
+				$("#MainBeauty").hide();
+				$("#MainFashion").show();
+				SnaUrlFooter("716200002");
+				//ViewFashionOrBeauty("F");
+				flagPage = "F";
+			</text>
+   }
+
+		});
+
+		var ShareTo = function (type) {
+			var dataName = "G마켓 패션";
+			switch (type) {
+				case MobileSnsUtil.snsType().KAKAOTALK:
+					dataName = "패션";
+					break;
+				default:
+					break;
+			}
+			var data = {
+				"name": dataName,
+				"url": "@Urls.MobileWebUrl" + "/Look",
+				"title": ""
+			};
+
+			if (type == "kakaotalk") {
+				KakaoController("#SnsKakaoTalk", new SnsParam(type, data), "home");
+			} else {
+				var sender = MobileSnsUtil.sns(type).sender;
+				sender.send(type, new SnsParam(type, data));
+			}
+		}
+
+
+
+		$(document).ready(function () {
+			KakaoInit();
+			ShareTo("kakaotalk");
+
+			/* landing Banner */
+			var em = eModule
+		, apps = em.apps
+		, landing = apps.landing;
+
+			landing.init({
+				pageName: 'Look',
+				landingType: '@Model.LandingBanner.Type',
+				imageUrl: '@Model.LandingBanner.ImageUrl',
+				description: '@Model.LandingBanner.Description',
+				campaign: '@Model.Campaign.Name',
+				medium: '@Model.Campaign.Medium',
+				mediumSource: '@Model.Campaign.MediumSource',
+				mediumContent: '@Model.Campaign.MediumContent',
+				term: '@Model.Campaign.Keyword'
+			});
+
+			$("#lay_notice").on('click', '#goToApp', function (e) {
+				e.preventDefault();
+				landing.installApp();
+			}).on('click', '#landingClose', function (e) {
+				e.preventDefault();
+				landing.close();
+			});
+			/* landing Banner */
+
+		});
+	</script>
+</div>

@@ -1,0 +1,248 @@
+﻿@model GMKT.GMobile.Web.Models.MartV2ViewModel
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+	
+	<!-- 마트 카테고리 -->
+	<div class="ecpn_tit mart">			
+		<div class="cate_area_new">
+			<ul class="mart_menu" id="cate_lst"></ul>
+			@if(ViewBag.NeedHomeplus)
+			{
+			<a href="@ViewBag.HomeplusUrl" class="hplus_menu noBorder"><span class="sp_mart_new ico_hplus">마트당일배송 홈플러스</span></a>
+			}
+		</div>
+	</div>
+	<!-- //마트 카테고리 -->
+	
+	<!-- 마트 소카테고리 리스트 -->
+	<div class="mart_smenu" style="display:block" id="subcate_lst"></div>
+	<!-- //마트 소카테고리 리스트 -->
+	
+	<span class="ico_loading" style="display:none">로딩중</span>
+	<!-- 상품리스트 -->
+	<div class="mart_wrap" id="mprd_lst">		
+	</div>
+	<!-- //상품리스트 -->
+
+	<!-- 공유하기 레이어 -->
+	@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "mart", ShareFcdCode = "704600007", ShortcutFcdCode = "704600008", TargetUrl = string.Empty, Title = string.Empty })
+	<!-- //공유하기 레이어 -->
+
+	<!-- TimeDeal -->
+	<div id="layer_timeDeal" class="layer_time"></div>
+	<div id="mask" style="display:none"></div>
+	<!-- //TimeDeal -->
+	<a href="#" class="btn_top_main noBorder" style="display: inline;">Top으로 이동</a>
+	<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+</div>
+<!-- //CONTENT -->
+
+
+@section scripts
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+
+		/* landing Banner */
+		var em = eModule
+				, apps = em.apps
+				, landing = apps.landing;
+
+		landing.init({
+			pageName: 'Mart',
+			landingType: '@Model.LandingBanner.Type',
+			imageUrl: '@Model.LandingBanner.ImageUrl',
+			description: '@Model.LandingBanner.Description',
+			campaign: '@Model.Campaign.Name',
+			medium: '@Model.Campaign.Medium',
+			mediumSource: '@Model.Campaign.MediumSource',
+			mediumContent: '@Model.Campaign.MediumContent',
+			term: '@Model.Campaign.Keyword'
+		});
+
+		$("#lay_notice").on('click', '#goToApp', function (e) {
+			e.preventDefault();
+			landing.installApp();
+		}).on('click', '#landingClose', function (e) {
+			e.preventDefault();
+			landing.close();
+		});
+		/* landing Banner */
+
+		KakaoInit();
+		ShareTo("kakaotalk");
+	});
+
+	var ShareTo = function (type) {
+		var dataName = "G마켓 마트";
+		switch (type) {
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "마트";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name": dataName,
+			"url": "@Urls.MobileWebUrl" + "/Mart",
+			"title": ""
+		};
+
+		if (type == "kakaotalk") {
+			KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+		} else {
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data));
+		}
+	};
+
+	(function (GMobile, undefined) {
+		(function (Mart, undefined) {
+			(function (Data, undefined) {
+				Data.TimeDeal = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.TimeDeal));
+				Data.CategoryList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.CategoryList));
+				Data.ItemGroupList = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.ItemGroupList));
+			})(Mart.Data = Mart.Data || {});
+			Mart.mobileWebUrl = "@Urls.MobileWebUrl";			
+		})(GMobile.Mart = GMobile.Mart || {});
+	})(window.GMobile = window.GMobile || {});
+</script>
+
+
+<script id="mart_category_template" type="text/x-handlebars-template">
+{{#each CategoryList}}
+	{{#if IsSelected}}
+	<li class="on" data-category="{{CategoryCode}}">
+	{{else}}
+	<li>
+	{{/if}}
+		<a href="{{getCategoryUrl ../FcdPrefix CategoryCode}}">
+			<span class="sp_mart_new {{getCategoryIconCss @@index CategoryCode}}"></span>
+			<em>{{OffText}}</em>
+		</a>
+	</li>
+{{/each}}
+</script>
+
+<script id="mart_subcategory_template" type="text/x-handlebars-template">
+{{#each CategoryList}}
+{{#if SubCategoryList}}
+<ul class="prd{{@@index}}" id="sub{{CategoryCode}}">
+	{{#each SubCategoryList}}
+	{{#if IsSelected}}
+	<li class="on">
+	{{else}}
+	<li>
+	{{/if}}
+	<a href="{{getCategoryUrl ../../../FcdPrefix CategoryCode}}">{{OffText}}</a></li>
+	{{/each}}
+</ul>
+{{/if}}
+{{/each}}
+</script>
+
+<script id="mart_group_template" type="text/x-handlebars-template">
+{{#each ItemGroupList}}
+	{{#ifBannerType Type}}
+		{{> PartialMartBanner}}
+	{{/ifBannerType}}
+
+	{{#ifItemType Type}}
+		{{> PartialMartItem}}
+	{{/ifItemType}}
+{{/each}}
+</script>
+
+<script id="mart_banner_template" type="text/x-handlebars-template">	
+{{#ifCategoryTitle Type}}
+<h3 class="{{printMartItemGroupCss Type}}"><span>{{Title}}</span></h3>
+{{else}}
+<div class="{{printMartItemGroupCss Type}}">
+	{{#if LandingUrl}}
+	<a href="{{getSnaUrl '713100006' LandingUrl}}">
+	{{/if}}
+		{{#if ImageUrl}}
+		<img src="{{ImageUrl}}" alt="">
+		{{else}}
+		<h4>{{Title}}</h4>
+		{{/if}}
+	{{#if LandingUrl}}
+	</a>
+	{{/if}}
+</div>
+{{/ifCategoryTitle}}
+</script>
+
+<script id="mart_item_template" type="text/x-handlebars-template">
+<div class="{{printMartItemGroupCss Type}}">
+	{{#each ItemList}}
+	<div class="inner">
+		<a href="{{getItemUrl ../Type LandingMartCategory GoodsCode LandingUrl}}" class="l_mart">
+			{{#ifSelectedItem ../Type}}
+			<strong class="sp_mart_new ico_selected">선택한 상품</strong>
+			{{/ifSelectedItem}}
+			<span class="thmb">
+				<img src="{{ImageUrl}}" alt="" onError="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';">
+				{{renderDeliveryTag DeliveryType}}
+			</span>
+			<span class="info">
+				<strong class="tit">{{Title}}</strong>
+				<span class="price_area">
+					{{#ifGreaterThan 0 DiscountRate}}
+					<span class="per">{{DiscountRate}}<span>%</span><span class="blind">할인</span></span>
+					{{/ifGreaterThan}}
+					<span class="price_dsc">
+						{{#ifGreaterThan 0 DiscountRate}}
+						<span class="per_price"><span class="blind">판매가</span>{{OriginalPrice}}</span>
+						{{/ifGreaterThan}}
+						<strong class="price"><span class="blind">할인가</span>{{DiscountPrice}}</strong>
+					</span>					
+				</span>
+			</span>
+		</a>
+		{{#if IsSoldOut}}
+		<div class="sold_out"><span>품절되었습니다.</span></div>
+		{{/if}}
+	</div>
+	{{/each}}
+</div>
+</script>
+
+<script id="mart_timedeal_template" type="text/x-handlebars-template">
+<div class="time_titbx">
+	<h3 class="sp_mart_new">Time DEAL</h3>
+ 	<p class="lay_time"><span class="blind">남은시간</span><span class="time" id="txtRemainTime"></span></p>
+</div>
+<a href="{{getSnaUrl Fcd LandingUrl}}">
+	<img src="{{ImageUrl}}" alt="">
+	<span class="ord_info">
+		<strong class="tit">{{Title}}</strong>
+		<span class="price_area">
+			{{#ifGreaterThan 0 DiscountRate}}
+			<span class="per">{{DiscountRate}}<span class="blind">할인</span></span>				
+			<span class="per_price"><span class="blind">판매가</span> {{OriginalPrice}}</span>
+			{{/ifGreaterThan}}
+			<strong class="price"><span class="blind">할인가</span>{{DiscountPrice}}<span class="won">원</span></strong>
+		</span>
+	</span>
+</a>
+<div class="btn_area">
+	<a href="#" id="btn_timedeal_done" class="btn_done" onclick="popBlockUI('layer_timeDeal');return false;">다시 보지 않기</a>
+	<a href="#" id="btn_timedeal_close" class="btn_close " onclick="popBlockUI('layer_timeDeal');return false;">닫기</a>
+</div>
+
+</script>
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/MartController.js"></script>
+}

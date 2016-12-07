@@ -1,0 +1,186 @@
+﻿@model List<GMKT.GMobile.Data.EventV2.NavigationIconT>
+
+			
+         
+            @if (Model != null){
+                string fcdNo = "0";
+                string Agent = "";
+
+                if (!PageAttr.IsIphone && !PageAttr.IsIpad && !PageAttr.IsIpod) //IOS 
+                {
+                    if (PageAttr.IsAndroidApp) //안드로이드 앱
+                    {
+                        Agent = "Android";
+                    }
+                    else
+                    {
+                        Agent = "MW";
+                    }
+                }
+                else  //IOS
+                {
+                    if (PageAttr.IsIphoneApp)  //IOS
+                    {
+                        Agent = "IOS";
+                    }
+                    else
+                    {
+                        Agent = "MW";
+                    }
+                }
+                				
+				<ul class="coupon_nav" id="bnGrpNavi">
+                @for (int ni = 0; ni <  Model.Count; ni++)
+                {
+                    if (@Model[ni].MlangBannerName == "플러스존")
+                    {                        
+                        switch (Agent)
+	                    {
+                            case "MW":
+                                   fcdNo = "716700002";
+                                break;
+                            case "Android":
+                                   fcdNo = "716710002";
+                                break;
+                            case "IOS":
+                                   fcdNo = "716720002";
+                                break;		                   
+	                    }                                       
+                    }
+                    else if (@Model[ni].MlangBannerName == "쿠폰존")
+                    {                     
+                        switch (Agent)
+                        {
+                            case "MW":
+                                fcdNo = "716700003";
+                                break;
+                            case "Android":
+                                fcdNo = "716710003";
+                                break;
+                            case "IOS":
+                                fcdNo = "716720003";
+                                break;
+                        }                               
+                    }                    
+                    else if (@Model[ni].MlangBannerName == "SmilePoint")
+                    {                                                
+                        switch (Agent)
+                        {
+                            case "MW":
+                                fcdNo = "716700004";
+                                break;
+                            case "Android":
+                                fcdNo = "716710004";
+                                break;
+                            case "IOS":
+                                fcdNo = "716720004";
+                                break;
+                        }                               
+                    }
+                    else if (@Model[ni].MlangBannerName == "G스탬프")
+                    {                        
+                        switch (Agent)
+                        {
+                            case "MW":
+                                fcdNo = "716700006";
+                                break;
+                            case "Android":
+                                fcdNo = "716710006";
+                                break;
+                            case "IOS":
+                                fcdNo = "716720006";
+                                break;
+                        }     
+                    }
+                    else if (@Model[ni].MlangBannerName == "스마일페이")
+                    {                                                
+                        switch (Agent)
+                        {
+                            case "MW":
+                                fcdNo = "716700005";
+                                break;
+                            case "Android":
+                                fcdNo = "716710005";
+                                break;
+                            case "IOS":
+                                fcdNo = "716720005";
+                                break;
+                        }     
+                    }
+                    else if (@Model[ni].MlangBannerName == "그린카펫")
+                    {                        
+                        switch (Agent)
+                        {
+                            case "MW":
+                                fcdNo = "716700007";
+                                break;
+                            case "Android":
+                                fcdNo = "716710007";
+                                break;
+                            case "IOS":
+                                fcdNo = "716720007";
+                                break;
+                        }     
+                    }
+                    else if (@Model[ni].MlangBannerName == "슈퍼기프트")
+                    {
+                        fcdNo = "710000007";
+                    }
+                    else if (@Model[ni].MlangBannerName == "카드포인트")
+                    {                        
+                        switch (Agent)
+                        {
+                            case "MW":
+                                fcdNo = "716700008";
+                                break;
+                            case "Android":
+                                fcdNo = "716710008";
+                                break;
+                            case "IOS":
+                                fcdNo = "716720008";
+                                break;
+                        }     
+                    }
+                    
+				<li class="l_nav" id="navi_@(ni)">
+                    <a href="@Model[ni].LinkUrl" onclick="javascript:SnaUrlFooter('@fcdNo');" class="ic">
+                   
+                    @if (@ViewBag.selectTab == @Model[ni].MlangBannerName)
+                    {
+                        <img src="@Model[ni].IconOnImageUrl" class="ic_img" alt="@Model[ni].MlangBannerName"  />                   
+                    }
+                    else
+                    {
+                        <img src="@Model[ni].IconOffImageUrl" class="ic_img" alt="@Model[ni].MlangBannerName"  />                                       
+                    }
+                    </a>
+                </li>
+                 
+                }
+               </ul>
+            }
+            	
+
+        @{
+            int selIdx = 0;
+            if (Model != null)
+            {
+                for (int ni = 0; ni < Model.Count; ni++)
+                {
+                    if (@ViewBag.selectTab == @Model[ni].MlangBannerName)
+                    {
+                        selIdx = ni;
+                        break;
+                    }
+                }
+            }
+        }        
+
+        <script type="text/javascript">
+  		//<!--[D] 선택된 항목 li에 nav_on 클래스 추가 -->
+        (function () {
+		    $("#navi_@selIdx").addClass("nav_on");		   
+
+		} ());                
+	    </script>
+		

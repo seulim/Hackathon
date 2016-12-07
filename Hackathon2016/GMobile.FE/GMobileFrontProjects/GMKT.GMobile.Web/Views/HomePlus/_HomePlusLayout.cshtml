@@ -1,0 +1,496 @@
+﻿@using GMKT.Web.Membership
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<meta http-equiv="Cache-Control" content="max-age=0" />
+<meta name="format-detection" content="telephone=no" />
+<title>홈플러스 당일배송관 - G마켓 모바일</title>
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/common.css?v=8" /> 
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/main.css" />
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/hplus.css" />
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/handlebars-v1.1.2.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/GMobile.js?v=20160817"></script>
+
+@*<script type="text/javascript" src="../../scripts/GMobile.js?v=20160817"></script>*@
+
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/guidGeneration.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/jquery.bxslider.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/swipeview.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/front_v4.js?v=3"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/homeplus.js"></script>
+<script type="text/javascript">
+	var CONST_MOBILE_WEB_URL = "@Urls.MobileWebUrl";
+	var CONST_MOBILE_WEB_URL_SECURE = "@Urls.MobileWebUrlSecure";
+</script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/HomePlusController.js?dummy=20160404"></script>
+@*<script type="text/javascript" src="../../scripts/HomePlusController.js"></script>*@
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/NewHomePlus.js?dummy=20160404"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/Router.js""></script>
+@*<script type="text/javascript" src="../../scripts/NewHomePlus.js"></script>*@
+@RenderSection("Css", required: false)
+
+@if (PageAttr.Exid != ExIdAppEnum.None)
+{
+<style type="text/css">
+	#head.head_simple
+	{
+		display: none;
+	}
+</style>
+}
+
+<script type="text/javascript">
+	var _ubLogActEnum = {
+		click: "click"
+	}
+	function _ubLog(code, act) {
+		if (typeof ubprofiler === 'object' && typeof ubprofiler.send === 'function') {
+			ubprofiler.send(
+            'event'         // behavior
+            , 'page'        // src
+            , 'm/1.0'       // id, version info
+            ,
+						{
+							'url': document.location.href,  // url, required 
+							'ref': document.referrer,       // referrer url, optional
+							'act': act,                 // action, required
+							'acode': code        // area code, required
+						});
+		}
+	}
+</script>
+<script type="text/javascript">
+	function SnaChannelCodeUrl(cc) {
+		$.get("http://sna.gmarket.co.kr/?cc=" + cc);
+	}
+</script>
+<style type="text/css">
+.items .item_img,.cate1 .item_img{background-image:url(@ViewBag.categoryImage);}
+</style>
+</head>
+<body>
+
+<!-- WRAPPER -->
+<div id="wrap">
+	
+	<!-- SKIP NAVI -->
+	<div class="hp">
+		<a href="#content">본문 바로가기</a>
+	</div>
+	<!-- //SKIP NAVI -->
+
+	<!-- HEADER -->
+	@Html.Partial("~/Views/Shared/_Header3.cshtml")
+	<!-- //HEADER -->
+
+	<hr />
+	
+	<!-- CONTENT -->
+	<div id="content" class="homeplus ctns">        
+		<div class="hplus_wrap">
+			<!-- cont_header -->
+			<div class="cont_header">
+				<a href="/HomePlus" onclick="javascript:SnaChannelCodeUrl('HPM0A001');"><h2 class="sp_logo m_logo">홈플러스 마트 당일배송</h2></a>
+				<div class="rgt_bx">
+@if (PageAttr.IsLogin)
+{
+	if (ViewBag.shippingAddr != null)
+	{
+					<!-- [D] 내점포 설정 후 완료 설명문구 3초 노출후 사라짐 처리 , 아래 코드로 노출 -->
+					<span class="set_after">
+                        <em class="tx"></em>
+						<a href="javascript:getMyHomePlusBranchTimeTable();" class="sp_hplus my_hplus">내 점포</a>  @*onclick="popBlockUI('hplus_dtime');return false;"*@
+						@*<p class="noti">배송점포가 설정되었습니다.</p>*@
+					</span>
+	}
+	else
+	{
+					<!-- [D] 최초진입, 내점포 설정 전 설명문구 3초간 노출 후 사라짐 -->
+					<span class="set">
+						<a href="javascript:getMyAddrList();" class="sp_hplus my_hplus">내 점포</a> @*onclick="popBlockUI('hplus_address');iFrameScroll('fixed_scroll_addr');return false;"*@
+						<p class="noti">배송주소를 입력하면 가까운 배송점포가 자동 설정됩니다.</p>
+					</span>
+	}
+}
+else
+{
+					<span class="set">
+						<a href="@(Urls.MemberOnlyLoginUrl)&URL=@Request.Url.ToString()" class="sp_hplus my_hplus">내 점포</a>
+						<p class="noti">배송주소를 입력하면 가까운 배송점포가 자동 설정됩니다.</p>
+					</span>
+}
+					<script type="text/javascript">
+						// 내점포 설명 문구 노출 함수
+						setNoti();
+					</script>
+@if (PageAttr.IsLogin)
+{
+	if (ViewBag.settedBranch != null && ViewBag.settedBranch.BranchInfo != null)
+	{
+		if (ViewBag.cartList != null && ViewBag.cartList.Count > 0)
+		{
+		<!-- [D] 장바구니 들어있을떄 on 추가 -->
+		<a href="javascript:getCartList();" onclick="javascript:SnaChannelCodeUrl('HPM0A002');" class="sp_hplus ico_cal on">카트계산기</a>
+		}
+		else
+		{
+		<a href="javascript:getCartList();" onclick="javascript:SnaChannelCodeUrl('HPM0A002');" class="sp_hplus ico_cal">카트계산기</a>
+		}
+	}
+	else
+	{
+	<a href="javascript:getMyAddrList();" onclick="javascript:SnaChannelCodeUrl('HPM0A002');" class="sp_hplus ico_cal">카트계산기</a>
+	}
+}
+else
+{
+		<a href="@(Urls.MemberOnlyLoginUrl)&URL=@Request.Url.ToString()" onclick="javascript:SnaChannelCodeUrl('HPM0A002');" class="sp_hplus ico_cal">카트계산기</a>
+}
+				</div>
+			</div>
+			<!-- // cont_header -->
+			<div class="search_wrap">
+				<a href="#hplus_cate" class="sp_hplus btn_cate" onclick="javascript:SnaChannelCodeUrl('HPM0A003');">카테고리</a>
+				<form action="@Urls.MobileWebUrl/HomePlus/List" method="get" id="frmHomePlusSrch">
+				<div class="serch_bx">
+					<span class="ipt_bx"><label for="hplus_ser">홈플러스 상품검색</label><input type="text" name="primeKeyword" id="hplus_ser" title="상품검색" /></span>
+					<button type="button" class="sp_hplus btn_serach" id="btnHomePlusSrch" onclick="javascript:SnaChannelCodeUrl('HPM0A004');">찾기</button>
+				</div>
+				</form>
+			</div>
+
+			@RenderBody()
+		</div>
+
+		<!-- [D] 홈플러스 카테고리 -->
+		<div id="hplus_cate" class="cate_pannel">
+			<h3 class="tit">홈플러스 카테고리</h3>
+			<div class="scroller_wrap">
+				<div class="scroller" id="ctg_pannel" >
+					<ul class="items">
+@if (ViewBag.categoryList != null && ViewBag.categoryList.Count > 0)
+{
+	foreach (GMKT.GMobile.Data.HomePlus.SpecialShopCategoryT cate in ViewBag.categoryList)
+	{
+		string cateCss = "item_img cate" + cate.DisplayAreaTypeValue;
+					<li>
+						<a href="@Url.Action("List", "HomePlus", new { shopCategory = cate.ShopCategoryCd })">
+						<span class="@cateCss"></span>
+						<span class="name">@cate.ImageTitle</span>
+						</a>
+					</li>
+	}
+}
+					</ul>
+				</div>
+			</div>
+		</div>        
+		<!--// [D] 홈플러스 카테고리 -->
+		<!-- [D] 카트계산기 레이어 -->
+		<div id="hplus_cal" class="bef2 layer_hplus hplus_cal">
+			<div class="l_wrap">
+				<div class="hgroup">
+					<h4 class="tit">홈플러스 카트계산기</h4>
+					<div class="l_cont">
+						<div id="scroll_cal" class="scroll_cal" style="overflow: hidden;">
+						<ul class="cal_lst" id="cal_lst_ul" style="transition-property: transform; -webkit-transition-property: transform; transition-duration: 0ms; -webkit-transition-duration: 0ms; transform-origin: 0px 0px 0px; transform: translate(0px, 0px) translateZ(0px);">
+						</ul>
+						</div>
+					</div>
+					<div class="total_bx">
+						<strong class="sum"></strong><em>원</em>
+						<span class="add_tex">+배송비 <em></em>원</span>
+						<a href="@Urls.MescrowUrl/ko/cart" class="btn blue">장바구니로</a>
+					</div>
+					<button type="button" class="layer_close click_a" onclick="popBlockUI('hplus_cal');return false;">close</button>
+				</div>
+			</div>
+		</div>
+		<!--// [D] 카트계산기 레이어 -->
+		<!-- [D] homeplus 배송주소 설정 팝업 -->
+		<div id="hplus_address" class="layer_hplus plus_addr bef2">
+			<div class="l_wrap">
+				<div class="hgroup">
+					<h4 class="tit">배송주소 설정</h4>
+					<a href="#" class="layer_close" onclick="popBlockUI('hplus_address');return false;"></a>
+				</div>
+				<div class="l_cont">
+					<form>
+						<ul class="addr_tab">
+							<li class="sel_addr on"><a href="#sel_addr">배송지 선택</a></li>
+							<li class="new_addr"><a href="#new_addr">새로운 주소</a></li>
+						</ul>
+						<!-- [D] 배송지 선택 -->
+						<div id="sel_addr" class="htab_view">
+							<div id="fixed_scroll_addr" class="fixed_scroll_addr scroll">
+								<ul class="h_lst_addr" id="hplus_address_ul">
+								</ul>
+							</div>
+							<div class="ft_box">
+								<span class="market_txt"></span><button id="btnSetBranch" onclick="javascript:setMyHomePlusBranch();return false;" class="btn_gray chk click_a">확인</button>
+							</div>
+						</div>
+						<!--// [D] 배송지 선택 -->
+						<!-- [D] 새로운 주소 -->
+						<div id="new_addr" class="new_addr_bx htab_view">
+							<div class="ipt_sec">
+								<ul class="lst_srch">
+									<li>
+										<label for="u_name">이름</label>
+										<div class="input_area"><input type="text" id="u_name" class="click_a input_txt" /></div>
+									</li>
+									<li>
+										<label for="txtZipCodeFront">주소</label>
+											<div class="code">
+												<div class="input_area"><input type="text" id="txtZipCodeFront" class="click_a input_txt" readonly="readonly" title="우편번호 앞자리" /></div>
+												<span class="dash">-</span>
+												<div class="input_area"><input type="text" id="txtZipCodeBack" class="click_a input_txt" readonly="readonly" title="우편번호 뒷자리" /></div>
+												<a href="javascript:;" class="click_a btn_zip"><span>주소찾기</span></a>
+											</div>
+										<div class="input_area sec"><input type="text" id="txtBasicAddr" readonly="readonly" class="click_a input_txt" title="기본주소" /></div>
+										<div class="input_area sec"><input type="text" id="" class="click_a input_txt" title="상세주소" /></div>
+									</li>
+									<li>
+										<label for="u_phone">연락처</label>
+										<div class="phone">
+											<div class="input_area"><input type="number" id="u_phone" class="click_a input_txt" title="전화번호 맨 앞 자리" maxlength="4" max="9999" oninput="maxLengthCheck(this)"/></div>
+											<span class="dash">-</span>
+											<div class="input_area"><input type="number" class="click_a input_txt" title="전화번호 가운데 자리" maxlength="4" max="9999" oninput="maxLengthCheck(this)"/></div>
+											<span class="dash">-</span>
+											<div class="input_area"><input type="number" class="click_a input_txt" title="전화번호 마지막 자리" maxlength="4" max="9999" oninput="maxLengthCheck(this)"/></div>
+										</div>
+									</li>
+								</ul>
+								<div class="ft_box">
+									<!-- [D] 새로운 주소 인풋에 모두 입력완료시 해당버튼 class의 disabled 와  속성 disabled 제거 처리 부탁드립니다. -->
+									<button id="btnSetBranchWithNewAddr" onclick="javascript:setMyHomePlusBranchWithNewAddr();return false;" class="btn_gray chk click_a">확인</button>
+								</div>
+							</div>
+							<!-- [D] 우편번호 검색 -->
+							<div id="zip_code" class="ser_zip">
+								<div class="adr_find">
+									<p>찾고자 하는 주소의 동(읍/면/리/가)명을 입력하세요.</p>
+									<div class="find_area">
+										<label for="adr_name">지역명</label>
+										<div class="input_area"><input type="text" id="adr_name" class="input_txt click_a"></div>
+										<button type="button" class="btn_find click_a" onclick="javascript:findZipCode();return false;">찾기</button>
+									</div>
+								</div>
+								<h5 class="noti" style="display:none">아래의 주소 중에서 해당 되는 주소를 선택해 주세요.</h5>
+								<div id="fixed_scroll_addr2" class="fixed_scroll_addr2 scroll">
+								<ul class="zip_lst" id="zip_lst_ul"></ul>
+								</div>
+							</div>
+							<!-- // [D] 우편번호 검색 -->
+						</div>
+						<!--// [D] 새로운 주소 -->
+					</form>
+				</div>
+			</div>
+		</div>
+		<!--// [D] homeplus 배송주소 설정 팝업 -->
+		<!-- [D] homeplus 배송가능 시간 레이어 -->
+		<div id="hplus_dtime" class="layer_hplus plus_time bef2"></div>
+		<!--// [D] homeplus 배송가능 시간 레이어 -->
+		@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "homeplus", ShareFcdCode = "", ShortcutFcdCode = "", TargetUrl = Urls.MobileWebUrl + "/HomePlus", Title = "[G마켓] 홈플러스 당일배송관" })
+@if (!PageAttr.IsApp)
+{		<a href="#" class="btn_top_bar">Top으로 이동</a>	}
+	</div>
+	<!-- //CONTENT -->
+
+	<div id="hplus_cart" class="layer_hplus cart" style="display:none;">
+    <div class="l_wrap">
+        <div class="hgroup">
+            <h4 class="tit">장바구니 바로담기</h4>
+            <div class="l_cont">
+                <h5 class="item_tit"></h5>
+                <p class="item_sub"></p>
+                <div class="quantity">
+                    <span class="count"><label for="count">수량</label></span>
+                    <span class="box">
+                        <button type="button" class="minus click_a" onclick="HomeplusAddCart.addOrderQty('down');"><em class="sp_hplus">-</em></button><input type="text" id="count" class="num" onchange="HomeplusAddCart.numberCheck();"/><button type="button" class="plus click_a" onclick="HomeplusAddCart.addOrderQty('up');"><em class="sp_hplus">+</em></button>
+                    </span>
+                </div>
+				<input type="hidden" id="hidItemNoToCart" value="" />
+            </div>
+            <div class="total_bx">
+                <strong class="sum"></strong><em>원</em>
+                <button id="btnAddCart" onclick="javascript:addCart()" class="btn blue click_a">바로담기</button>
+
+            </div>
+            <button type="button" class="layer_close click_a" onclick="popBlockUI('hplus_cart');return false;">close</button>
+        </div>
+    </div>
+	</div>
+    <div id="hplus_cart_end" class="layer_cart_end">  
+        <p>상품을 장바구니에 <br>담았습니다.</p>  
+    </div>  
+
+
+	@Html.Partial("_Footer3")
+
+</div>
+<!-- //WRAPPER -->
+</body>
+@Html.Partial("_Script3")
+<script id="tmpl_setting_delivery_address" type="text/x-handlebars-template">
+{{#each addrList}}
+<li class="chk_f">
+	<input type="radio" name="adr" id="{{AddrNo}}" class="input_rdo click_a" onclick="javascript:getHomePlusBranchName('list','{{FriendZipCode}}')";/>
+	<label for="{{AddrNo}}">
+        {{#if IsDefaultAddress}}
+		<span class="default">기본</span>
+		{{/if}}
+		<strong class="name_tit">{{FriendAddrAlias}} /</strong> <span>{{FriendHpNo}}</span>
+        <span class="sec_line">{{FriendFrontAddress}} {{FriendBackAddress}}</span>
+    </label>
+</li>
+{{/each}}
+</script>
+<script id="tmpl_branch_timetable" type="text/x-handlebars-template">
+<div class="l_wrap">
+    <div class="hgroup">
+        <h4 class="tit">홈플러스 당일배송 점포</h4>
+        <a href="#" class="layer_close" onclick="popBlockUI('hplus_dtime');return false;"></a>
+    </div>
+    <div class="l_cont">
+        <div class="sub_hd">
+            <strong>배송주소 :</strong> <span class="store_name"> {{branchInfo.shippingAddr.FriendFrontAddress}} {{branchInfo.shippingAddr.FriendBackAddress}} (<em>{{branchInfo.branchNm}}</em>) </span><a href="javascript:editMyHomePlusBranch();" class="btn_white small">변경</a>
+        </div>
+        <div class="time">
+            <h5 class="tit">배송가능시간</h5>
+			<p class="dsc">아래의 배송가능 시간은 현재 시각 기준이며, 주문 시점에 따라 마감될 수 있습니다.</p>
+			<table>
+                <caption>배송가능시간</caption>
+                <colgroup>
+                <col class="cell_1" />
+                <col class="cell_2" />
+                <col class="cell_3" />
+                <col class="cell_4" />
+                <col class="cell_5" />
+                </colgroup>
+				{{renderTimeTable branchInfo.timeTable branchInfo.timeSlot}}
+			</table>
+        </div>
+    </div>
+</div>
+</script>
+
+<script id="tmpl_zipcode_address" type="text/x-handlebars-template">
+{{#each zipList}}
+<li class="chk_f">
+    <a onclick="javascript:getHomePlusBranchName('search', '{{Zipcode}}','{{City}} {{Gu}} {{Dong}}');return false;">
+	<input type="radio" name="adr" id="zip{{@@index}}" class="input_rdo click_a" />
+    <label for="zip{{@@index}}">
+        <span class="z_num">{{Zipcode}}</span>
+        <span>{{City}} {{Gu}} {{Dong}} {{BunJi}}</span>
+    </label>
+	</a>
+</li>
+{{/each}}
+</script>
+<script id="tmpl_homeplus_cartlist" type="text/x-handlebars-template">
+{{#each cartList}}
+{{#if IsOrderFail}}
+<li id={{OrderIdx}} class="not">
+{{else}}
+<li id={{OrderIdx}}>
+{{/if}}
+	<a href="{{ItemLinkUrl}}" class="">
+		<span class="thumb"><img src="{{ItemImageUrl}}" alt=""></span>
+		<span class="item_tit">{{ItemInfo.ItemName}}</span>
+			
+		{{#if IsOrderFail}}
+		<span class="sub_tit">상품정보 변경/재고부족 등으로 주문이 불가합니다.</span>
+		<span class="count">
+			<button onclick="javascript:removeCartItem('{{OrderIdx}}', '{{ItemLinkUrl}}');" class="btn_gray again click_a">다시담기</button>
+		</span>
+		{{else}}
+		{{#each OptionInfo}}
+		<span class="sub_tit">{{OptionName}} {{OptionValue}} {{OptionValue2}}</span>
+		{{/each}}
+		<span class="count">
+			<strong>{{strPrice}}</strong><span>원</span> / <em>{{OrderQty}}</em><span>개</span>
+		</span>
+		{{/if}}
+	</a>
+	<!-- [D] 삭제 클릭시 장바구니 리스트에서도 삭제 -->
+	<button onclick="javascript:removeCartItem('{{OrderIdx}}');" class="sp_hplus lst_cls click_a">삭제</button>
+</li>
+{{/each}}
+</script>
+
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+
+	<script type="text/javascript">
+	    $(document).ready(function () {
+	        $('#btnHomePlusSrch').click(function () {
+	            $('#frmHomePlusSrch').submit();
+	        });
+
+	        KakaoInit();
+	        ShareTo("kakaotalk");
+	        MyHomeplusBranchInfo();
+	    });
+
+		var ShareTo = function (type) {
+			var dataName = "G마켓 - 홈플러스 당일배송관";
+			switch (type) {
+				case MobileSnsUtil.snsType().KAKAOTALK:
+					dataName = "홈플러스 당일배송관";
+					break;
+				default:
+					break;
+			}
+			var data = {
+				"name": dataName,
+				"url": "@Urls.MobileWebUrl" + "/HomePlus",
+				"title": ""
+			};
+			if (type == "kakaotalk") {
+				KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+			}
+			else {
+				var sender = MobileSnsUtil.sns(type).sender;
+				sender.send(type, new SnsParam(type, data))
+			}
+        };
+
+        var MyHomeplusBranchInfo = function () {
+            $.ajax({
+                url: mobileWebUrl + "/HomePlus/GetMyBranchInfo",
+                type: "GET",
+                //data: {},
+                //contentType: "application/javascript; charset=utf-8",
+                //scriptCharset: "utf-8",
+                //dataType: "jsonp",
+                crossdomain: true,
+                success: function (result) {
+                    if (result.success) {
+                        // alert(result.branchInfo.BranchNm);
+                        $("#content .tx").text(result.branchInfo.BranchNm);
+                    }
+                },
+                error: function (result) {
+                    alert("홈플러스 지점이름을 가져오던 중에 오류가 발생했습니다.");
+                }
+            });
+        }
+
+		function maxLengthCheck(object) {
+			if (object.value.length > object.maxLength) {
+				object.value = object.value.slice(0, object.maxLength);
+			}
+		}
+	</script>
+</html>

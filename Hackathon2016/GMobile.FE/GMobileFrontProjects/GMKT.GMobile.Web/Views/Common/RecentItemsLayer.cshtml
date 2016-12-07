@@ -1,0 +1,92 @@
+﻿@{
+    Layout = null;
+}
+
+
+<!--[D] 최근본 상품이 있을 경우 btn_recent 버튼안에 img 넣어주세요 -->
+<button type="button " class="btn_recent sp_hd click_a"><img id="rviRepImage" alt="상품이미지" /></button>
+			
+<!--[D] 편집 버튼 누를 시 int_edit 클래스 추가 -->
+<div class="ly_recent">
+	<div class="art_titbx">
+		<h2 class="art_tit">최근 본 상품</h2>
+		<div class="btn_wrap">
+			<button class="btn edit">편집</button>
+			<a href="#" class="btn favor" id="rviGoFavoritePage">관심상품</a>
+		</div>
+		<div class="btn_wrap type2" style="display:none">
+			<button class="btn edit">취소</button> 
+			<button class="btn all" id="rviCheckAll">ALL</button>			<button class="btn favor" id="rviAddFavoritePage">관심상품</button>
+			<button class="btn share">공유하기</button>
+			<button class="btn del">삭제하기</button>
+		</div>
+	</div>
+	<div class="art_cntbx" id="recent-scr">
+		<div class="recen_bx">
+			<ul class="recen_lst" id="rvi_lst">
+			</ul>
+		</div>
+	</div>
+
+	<!--[D] 관심상품 등록 레이어 -->
+	<div class="ly_inter"><img src="@Urls.MobileImagePics/mobile/img_inter_chk.png" alt="" /></div>
+	
+	<!--[D] 최근본 상품 삭제 레이어 -->
+	<div class="ly_del" style="display:none">
+		<p class="ly_intxt">해당 최근 본 상품을 <br />삭제하시겠습니까?</p>
+		<button type="button" class="btn_gray cancel">아니요</button>
+		<button type="button" class="btn_blue">예</button>
+	</div>
+	
+	<!--[D] 최근본 상품 삭제 된 후 노출 레이어 -->
+	<div class="ly_del comp" style="display:none">
+		<p class="ly_intxt">삭제되었습니다.</p>
+	</div>
+</div>
+
+<div class="share_sns" id="rvi_layer_sns">
+	<h4 class="tit">공유하기</h4>
+	<div class="sns">
+		<a href="javascript:if(CheckPc(MobileSnsUtil.snsType().KAKAOTALK) != false){RviShare(MobileSnsUtil.snsType().KAKAOTALK)};" class="cco">카카오톡</a>
+		<a href="javascript:RviShare(MobileSnsUtil.snsType().FACEBOOK);" class="face">페이스북</a>
+		<a href="javascript:RviShare(MobileSnsUtil.snsType().TWITTER);" class="twt">트위터</a>
+		<a href="javascript:RviShare(MobileSnsUtil.snsType().KAKAOSTORY);" class="ccos">카카오스토리</a>
+	</div>
+	<a href="#" class="close_sns" onclick="popBlockUI('rvi_layer_sns');return false;">닫기</a>
+</div>
+
+<iframe id="extGetRecentItemsIframe" width="0" height="0" style="border: 0; display: none;" title="빈프레임"></iframe>
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+@if(PageAttr.Exid != null && PageAttr.Exid != GMKT.Web.Membership.ExIdAppEnum.None)
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mitem/iscroll_y.js"></script>
+}
+<script type="text/javascript">	
+	document.domain = "gmarket.co.kr";
+	var VipDomain = "@Urls.MItemWebURL";
+	var MmygDomain = "@Urls.MMyGUrl";
+	var LoginUrl = "@Urls.LoginUrl";
+	var InsDateObj = {};
+
+	setTimeout(function () {
+		KakaoInit();
+	}, 900);
+	
+</script><script type="text/x-handlebars-template" id="recently_viewed_items_template">	{{#each this}}
+	{{#ifDateHasNotChanged insDate}}
+	<li>
+		<a href="{{vipUrl}}" class="inner"><img src="{{imageUrl}}" alt="상품이미지" /></a>
+		<input type="checkbox" id="re_chk{{@@index}}" class="inp_chk" data-goodscode="{{goodsCode}}"/>
+		<label for="re_chk{{@@index}}" class="chk_re">최근본 상품 선택</label>
+	</li>
+	{{else}}
+	<li>
+		<span class="date">{{insDate.month}}/{{insDate.date}}</span>
+		<a href="{{vipUrl}}" class="inner"><img src="{{imageUrl}}" alt="상품이미지" /></a>
+		<input type="checkbox" id="re_chk{{@@index}}" class="inp_chk" data-goodscode="{{goodsCode}}"/>
+		<label for="re_chk{{@@index}}" class="chk_re">최근본 상품 선택</label>
+	</li>
+	{{/ifDateHasNotChanged}}
+	{{/each}}</script>

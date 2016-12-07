@@ -1,0 +1,248 @@
+﻿@using GMKT.GMobile.Constant;
+@model dynamic
+@{
+	string pCache = this.GetPCache();	
+}
+<script type="text/javascript">
+var JAVASPT_GMW_CONTEXT_NM = "@Const.GMW_CONTEXT_NM";
+var JAVASPT_GMW_HTTP_CONTEXT_URL = "@Const.GMW_HTTP_CONTEXT_URL";
+
+function doSubmit() {
+		//뒤공백 제거 후 비교
+		if( (document.searchForm.topKeyword.value).replace(/\s*$/,"") == ""){
+			alert("검색어를 입력해 주세요");
+		}else{
+@if (PageAttr.IsMain == true) 
+{
+			@:location.href = "http://sna.gmarket.co.kr/?fcd=701000002&url=" + encodeURIComponent("@Urls.MobileWebUrl/Search/Search?topKeyword=" + encodeURIComponent(searchForm.topKeyword.value));
+}
+else
+{
+			@:document.searchForm.submit();
+}
+		}
+}
+
+function displayResult() {
+	if (httpRequest.readyState == 4) {
+		if (httpRequest.status == 200) {
+			var html = httpRequest.responseText;
+			if (html.length > 100) {
+				var listView = document.getElementById('recommand_keyword');
+				listView.innerHTML = html;
+				displayLayer('sch_txtList','block');
+			} else {
+				listView.innerHTML = '';
+				displayLayer('sch_txtList','none');
+			}
+		} else {
+			displayLayer('sch_txtList','none');
+		}
+	}
+}
+
+function goSearch(keyword) {
+	searchForm.topKeyword.value = keyword;
+	doSubmit();
+}
+/*
+function setSnSInfo (conf) {
+		var desc = (conf.desc) ? conf.desc: "G마켓";
+
+		var meta = document.createElement("meta");
+		meta.setAttribute("name","description");
+		meta.setAttribute("content",desc);
+		document.getElementsByTagName("head")[0].appendChild(meta);
+
+		if (conf.title) {
+				meta = document.createElement("meta");
+				meta.setAttribute("name","title");
+				meta.setAttribute("content",conf.title);
+				document.getElementsByTagName("head")[0].appendChild(meta);
+		}
+
+		if (conf.imgSrc) {
+				var link = document.createElement("link");
+				link.setAttribute("rel","image_src");
+				link.setAttribute("href",conf.imgSrc);
+				document.getElementsByTagName("head")[0].appendChild(link);
+		}
+}
+*/
+</script>
+
+<!-- WRAPPER -->
+<div id="wrapper">
+		@if (PageAttr.ViewHeader == true){
+		<!-- HEADER -->
+		<div id="header">
+				<!-- SEARCH -->
+				<div class="logo_search">
+						<h1><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000001", Urls.MobileWebUrl+"/?" + pCache)" title="Gmarket"><img src="@Urls.MobileImageUrl/480/gnb_logo.png" class="top_logo" alt="gmarket"/></a></h1>
+						<h2 class="hp">검색</h2>
+						<!-- search -->
+						<form id="search" name="searchForm" action="/Search/Search" method="post" onsubmit="doSubmit(); return false;">
+								<fieldset>
+										<legend>Gmarket 검색</legend>
+										<div class="search_group">
+												<div class="search_input">
+														<span class="keyword_wrap">
+																<input id="top_search" type="text" name="topKeyword" onclick="if(this.value)displayLayer('sch_txtList','block');" onkeydown="startSuggest();" onkeyup="addTopSearchKeyEvent();" value="" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" />
+																<a id="top_search_del" class="deletable" href="javascript:clearInput('top_search');" alt="삭제" ><img src="@Urls.MobileImageUrl/480/btn_search_del.png" width="25" height="25" /></a>
+														</span>
+														<button type="submit" title="검색"></button>
+												</div>
+
+												<!-- 최근검색어 -->
+											<div class="sch_txtList" id="sch_txtList">
+												<ul id="recommand_keyword">
+												</ul>
+												<p class="close">
+													<a href="javascript:displayLayer('sch_txtList','none');">
+														<img src="/Images/480/recent_keyword_close.png" alt="닫기" /></a></p>
+											</div>
+										</div>
+								</fieldset>
+						</form>
+						<!--// search -->
+				</div>
+
+				<!-- GNB -->
+				<div id="gnb">
+						<ul class="top_navigation">
+								<li class="menu1"><a href="javascript:showLCategoryLayer();">카테고리</a></li>
+								<li class="menu2"><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000004", Urls.MobileWebUrl+"/Display/BestSellerList?" + pCache)">G마켓베스트</a></li>
+								<li class="menu3"><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000005", Urls.MWebUrl + "/order/mpay/basket.asp?" + pCache)">장바구니</a></li>
+								<li class="menu4"><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000006", Urls.MWWebUrl +"/mypage/myMain.do?" + pCache)">나의쇼핑정보</a></li>
+						</ul>
+				</div>
+				<!--// GNB -->
+
+				<!-- MENU -->
+				<div id="menu">
+						<!-- MENU ROW1 -->
+						<ul class="l_category">
+								<li id="l_category1" class="column1"><a href="javascript:showMCategoryLayer(1);"><span><img src="@Urls.MobileImageUrl/480/common_m_category1.png" alt="패션의류" /></span></a></li>
+								<li id="l_category2" class="column2"><a href="javascript:showMCategoryLayer(2);"><span><img src="@Urls.MobileImageUrl/480/common_m_category2.png" alt="잡화 화장품" /></span></a></li>
+								<li id="l_category3" class="column3"><a href="javascript:showMCategoryLayer(3);"><span><img src="@Urls.MobileImageUrl/480/common_m_category3.png" alt="유아동 식품" /></span></a></li>
+						</ul>
+
+						<div id="m_category1" class="m_category">
+								<ul>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000003&" + pCache)" class="v_line">여성의류</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000046&" + pCache)">남성의류</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000063&" + pCache)" class="v_line">스몰/빅사이즈 의류</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000070&" + pCache)">언더웨어/잠옷</a></li>
+								</ul>
+						</div>
+
+						<div id="m_category2" class="m_category">
+								<ul>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000049&" + pCache)" class="v_line">신발/구두/운동화</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000064&" + pCache)">가방/지갑/패션잡화</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000027&" + pCache)" class="v_line">쥬얼리/시계/선글라스</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000005&" + pCache)">화장품/향수/이미용</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000071&" + pCache)" class="v_line">바디/헤어/목욕/위생</a></li>
+										<li class="last"><a href="#"></a></li>
+								</ul>
+						</div>
+
+						<div id="m_category3" class="m_category">
+								<ul>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000058&" + pCache)" class="v_line">골프클럽/의류/용품</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000017&" + pCache)">등산/낚시/캠핑/스키</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000037&" + pCache)" class="v_line">스포츠/헬스/수영/자전거</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000043&" + pCache)">스포츠의류/운동화</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000030&" + pCache)" class="v_line">자동차용품/모터싸이클</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000079&" + pCache)">네비/하이패스/블랙박스</a></li>
+								</ul>
+						</div>
+						<!--// MENU ROW1 -->
+
+						<!-- MENU ROW2 -->
+						<ul class="l_category">
+								<li id="l_category4" class="column1"><a href="javascript:showMCategoryLayer(4);"><span><img src="@Urls.MobileImageUrl/480/common_m_category4.png" alt="가구 리빙 건강"  /></span></a></li>
+								<li id="l_category5" class="column2"><a href="javascript:showMCategoryLayer(5);"><span><img src="@Urls.MobileImageUrl/480/common_m_category5.png" alt="스포츠 자동차" /></span></a></li>
+								<li id="l_category6" class="column3"><a href="javascript:showMCategoryLayer(6);"><span><img src="@Urls.MobileImageUrl/480/common_m_category6.png" alt="디지탈 가전" /></span></a></li>
+						</ul>
+
+						<div id="m_category4" class="m_category">
+								<ul>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000002&" + pCache)" class="v_line">노트북/데스크탑</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000055&" + pCache)">PC부품/액세서리</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000082&" + pCache)" class="v_line">모니터/프린터/잉크</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000075&" + pCache)">저장장치/메모리</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000056&" + pCache)" class="v_line">휴대폰/액세서리</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000033&" + pCache)">디카/DSLR/캠코더</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000072&" + pCache)" class="v_line">MP3/PMP/사전</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000078&" + pCache)">게임기/타이틀</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000032&" + pCache)" class="v_line">TV/냉장고/세탁기/에어컨</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000008&" + pCache)">주방/생활/이미용가전</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000077&" + pCache)" class="v_line">매트/히터/가습기/난방가전</a></li>
+										<li class="last"><a href="#"></a></li>
+
+
+								</ul>
+						</div>
+
+						<div id="m_category5" class="m_category">
+								<ul>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000057&" + pCache)" class="v_line">기저귀/분유/이유식</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000073&" + pCache)">물티슈/생리대/성인기저귀</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000006&" + pCache)" class="v_line">유아용품/출산용품/임부복</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000035&" + pCache)">유아동의류/신발/가방</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000042&" + pCache)" class="v_line">장난감/교육완구/인형</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000020&" + pCache)">쌀/과일/정육/수산물</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000036&" + pCache)" class="v_line">차/음료/과자/가공식품</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000068&" + pCache)">건강식품/다이어트/홍삼</a></li>
+
+								</ul>
+						</div>
+
+						<div id="m_category6" class="m_category">
+								<ul>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000031&" + pCache)" class="v_line">가구/DIY</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000039&" + pCache)">침구/커튼/인테리어</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000014&" + pCache)" class="v_line">생활/수납/욕실/청소</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000085&" + pCache)">주방/조리기구/식기</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000074&" + pCache)" class="v_line">세제/세면/제지/일용잡화</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000076&" + pCache)">공구/안전용품/산업/기계</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000083&" + pCache)" class="v_line">건강/안마/비데/의료용품</a></li>
+										<li class="last"><a href="#"></a></li>
+
+								</ul>
+						</div>
+						<!--// MENU ROW2 -->
+
+						<!-- MENU ROW3 -->
+						<ul class="l_category">
+								<li id="l_category7" class="column1"><a href="javascript:showMCategoryLayer(7);"><span><img src="@Urls.MobileImageUrl/480/common_m_category7.png" alt="도서 문구" /></span></a></li>
+								<li id="l_category8" class="column2"><a href="javascript:showMCategoryLayer(8);"><span><img src="@Urls.MobileImageUrl/480/common_m_category8.png" alt="e쿠폰" /></span></a></li>
+								<li id="l_category9" class="column3"></li>
+						</ul>
+
+						<div id="m_category7" class="m_category">
+								<ul>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000028&" + pCache)" class="v_line">도서/음반/DVD</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000045&" + pCache)">문구/학용품/사무/용지</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000038&" + pCache)" class="v_line">애완/악기/취미/프라모델</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000041&" + pCache)">꽃배달/화분/팬시</a></li>
+								</ul>
+						</div>
+
+						<div id="m_category8" class="m_category">
+								<ul>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000048&" + pCache)" class="v_line">외식/미용실/생활쿠폰</a></li>
+										<li><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000003", Urls.MobileWebUrl+"/Category/Category?lcId=100000013&" + pCache)">여행/레저/호텔/항공권</a></li>
+										<li class="last"><a href="#"></a></li>
+								</ul>
+						</div>
+						<!--// MENU ROW3 -->
+
+						<a href="javascript:showLCategoryLayer();" class="btn_cate_close"><img src="@Urls.MobileImageUrl/480/common_category_close.png" height="43" width="46" alt="카테고리 닫기" /></a>
+
+				</div>
+				<!--// MENU -->
+		</div>
+		<!--// HEADER -->}
+		<div id="progress_icon"><img src="@Urls.MobileImageUrl/480/loading.gif" alt="loading" /></div>

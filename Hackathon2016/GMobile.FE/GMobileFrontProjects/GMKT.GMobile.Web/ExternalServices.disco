@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<discovery xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.xmlsoap.org/disco/">
+	<contractRef ref="http://mobilecomdev.gmarket.co.kr/GMobile.Smart.webservice/exa100/Ad/AdBannerService.asmx?wsdl" docRef="http://test6tspapi.auction.co.kr/Sellling.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+	<contractRef ref="http://mobilecomdev.gmarket.co.kr/GMobile.Smart.webservice/exa100/shop/etcshop.asmx?wsdl" docRef="http://test6tspapi.auction.co.kr/Shipping.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+	<contractRef ref="http://ticketdev.gmarket.co.kr/GTicketWebService/StdBookingService.asmx?wsdl" docRef="http://ticketdev.gmarket.co.kr/GTicketWebService/StdBookingService.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+	<contractRef ref="http://ticketdev.gmarket.co.kr/GTicketWebService/SeatService.asmx?wsdl" docRef="http://ticketdev.gmarket.co.kr/GTicketWebService/SeatService.asmx" xmlns="http://schemas.xmlsoap.org/disco/scl/" />
+</discovery>

@@ -1,0 +1,237 @@
+﻿@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Util;
+@using GMobile.Data.Tiger;
+@using GMobile.Data.Diver;
+@model GMKT.GMobile.Web.Models.HomeModel
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#bnList").touchwipe({
+			wipeLeft: function () { $("#bnNext").click(); event.preventDefault(); },
+			wipeRight: function () { $("#bnPrev").click(); event.preventDefault(); },
+			preventDefaultEvents: false
+		});
+		$("#bnList2").touchwipe({
+			wipeLeft: function () { $("#bnNext2").click(); event.preventDefault(); },
+			wipeRight: function () { $("#bnPrev2").click(); event.preventDefault(); },
+			preventDefaultEvents: false
+		});
+
+		$("#bnList3").touchwipe({
+			wipeLeft: function () { $("#bnNext3").click(); event.preventDefault(); },
+			wipeRight: function () { $("#bnPrev3").click(); event.preventDefault(); },
+			preventDefaultEvents: false
+		});
+
+		//0525
+		$("#bnList").bind("touchstart", function () {
+			objRotationAll1.stopTimer();
+		});
+
+		$("#bnList").bind("touchend", function () {
+			objRotationAll1.startTimer();
+		});
+
+		$("#bnList2").bind("touchstart", function () {
+			objRotationAll2.stopTimer();
+		});
+
+		$("#bnList2").bind("touchend", function () {
+			objRotationAll2.startTimer();
+		});
+
+		$("#bnList3").bind("touchstart", function () {
+			objRotationAll.stopTimer();
+		});
+
+		$("#bnList3").bind("touchend", function () {
+			objRotationAll.startTimer();
+		});
+
+	});
+</script>
+<script type="text/javascript">
+	window.onload = function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+			window.scrollTo(0, 1);
+		}, 100);
+		//GNB_layoutFix("#gnbList");
+	}
+
+</script>
+
+	<!-- CONTENTS -->
+	<div id="contents" class="cts">
+
+@{
+	// 메인 배너
+	/*
+	AdBannerData[] adBannerDataArray = Model.AdBannerDataArray;
+	int adBannerDataCnt = adBannerDataArray.Length;
+	*/
+}
+@if (Model.AdBannerList.Count > 0)
+{
+			<!-- BANNER -->
+			<div class="main_banner">
+				<div class="bim" id="bnWrap">
+					<ul id="bnList">
+	@foreach (AdBannerT adBanner in Model.AdBannerList)
+ {
+							<li><a href="http://sna.gmarket.co.kr/?fcd=701000007&url=@TextUtil.SafeString(adBanner.BnLinkUrl, "")">
+								<img src="@Const.GMW_WEB_IMG_URL@TextUtil.SafeString(adBanner.BnImgPath, "")@adBanner.BnImgNm" alt="@TextUtil.SafeString(adBanner.BnTitle, "")%>" onError="this.src='/images/480/no_img_208.png';" /></a></li>
+ }						
+					</ul>
+				</div>
+				<div class="rotation_page">
+					<img id="bnPrev" src="/images/480/btn_main_prev.png" alt="이전" width="40" height="33"
+						style="display: none;" />
+					<span id="tPage" class="cnt"></span>
+					<img id="bnNext" src="/images/480/btn_main_next.png" alt="다음" width="40" height="33"
+						style="display: none;" />
+				</div>
+			</div>
+			<script type="text/javascript">
+			//<![CDATA[
+				var objRotationAll1 = new ImageRotation();
+				objRotationAll1.objName = 'objRotationAll';
+				objRotationAll1.scrollDirection = 'direction';
+				objRotationAll1.setScrollType('horizontal');
+				objRotationAll1.autoScroll = "auto";
+				objRotationAll1.scrollGap = 4000;
+				objRotationAll1.listNum = 1;
+				objRotationAll1.wrapId = "bnWrap";
+				objRotationAll1.listId = "bnList";
+				objRotationAll1.btnNext = "bnNext";
+				objRotationAll1.btnPrev = "bnPrev";
+				objRotationAll1.cntPage = "tPage";
+				objRotationAll1.sRoll = "sRoll";
+				objRotationAll1.mg = 0;
+				objRotationAll1.initialize();
+			//]]>
+			</script>
+}
+		<div class="spacer20"><!-- empty : height 20px --></div>
+		<!-- TODAY -->
+		<div class="section_today">
+			<h3>오늘만 특가</h3>
+			<!-- <a href="http://sna.gmarket.co.kr/?fcd=701000008&url=<%=Const.GMW_HTTP_CONTEXT_URL%>/display/todaySpecial.do" class="more">더보기</a>  -->
+			<div id="bnWrap2" class="ovw1">
+				<ul id="bnList2">
+@{
+	// 오늘만 특가
+	/*
+	TodaySpecialOfferGoods[] todaySpecialOfferGoodsArray = Model.TodaySpecialOfferGoodsArray;
+	int todaySpecialOfferGoodsCnt = todaySpecialOfferGoodsArray.Length;
+	*/
+}
+@if (Model.TodaySpecialList.Count > 0)
+{
+	foreach (TodaySpecialT todaySpecial in Model.TodaySpecialList)
+	{
+					<li><a href="http://sna.gmarket.co.kr/?fcd=701000008&url=@HttpUtility.UrlEncode(@ConstDef._GMW_OLD_MOBILEWEB_GOOD_URL + TextUtil.SafeString(todaySpecial.GdNo, ""))"><img src="@TextUtil.SafeString(todaySpecial.SpecialImg, "")" alt="@TextUtil.SafeString(todaySpecial.GdNm, "")" onError="this.src='/images/480/no_img_208.png';" /></a></li>
+	}
+}
+				</ul>
+			</div>
+			<div class="rotation_page">
+				<img id="bnPrev2" class="left" src="/images/480/btn_main_prev.png" alt="이전" width="40" height="33" /> <!-- 20120709 임세창 alt="이전" 추가 -->
+				<span id="tPage2" class="cnt"></span>
+				<img id="bnNext2" class="right" src="/images/480/btn_main_next.png" alt="다음" width="40" height="33" /> <!-- 20120709 임세창 alt="다음" 추가 -->
+			</div>
+
+			<script type="text/javascript">
+			//<![CDATA[
+				var objRotationAll2 = new ImageRotation();
+				objRotationAll2.objName = 'objRotationAll';
+				objRotationAll2.scrollDirection = 'direction';
+				objRotationAll2.setScrollType('horizontal');
+				objRotationAll2.autoScroll = "auto";
+				objRotationAll2.scrollGap = 5000;
+				objRotationAll2.listNum = 2;
+				objRotationAll2.wrapId = "bnWrap2";
+				objRotationAll2.listId = "bnList2";
+				objRotationAll2.btnNext = "bnNext2";
+				objRotationAll2.btnPrev = "bnPrev2";
+				objRotationAll2.cntPage = "tPage2";
+				objRotationAll2.sRoll = "sRoll2";
+				objRotationAll2.mg = 26;
+				objRotationAll2.initialize();
+			//]]>
+			</script>
+		</div>
+
+		<div class="spacer20"><!-- empty : height 20px --></div>
+
+		<!-- BEST -->
+		<div id="sBest" class="section_best">
+			<h3>G마켓 베스트</h3>
+			<img class="logo_best" src="../images/480/icon_main_best.png" alt="GMARKET BEST" width="91" height="63px" />
+			<a href="http://sna.gmarket.co.kr/?fcd=701000009&url=@Urls.MobileWebUrl/Display/BestSellerList" class="more">더보기</a>
+			<div id="bnWrap3" class="ovw1">
+				<ul id="bnList3" class="product_3item">
+@{
+	// 베스트
+	/*
+	BestSellerGoods[] bestSellerGoodsArray = Model.BestSellerGoodsArray;
+	int bestSellerGoodsCnt = bestSellerGoodsArray.Length;
+	*/
+}
+@if (Model.BestSellerList.Count > 0)
+{
+	int count = 1;
+
+    foreach (SearchGoods bestSeller in Model.BestSellerList)
+	{
+				<li>
+						<a href="http://sna.gmarket.co.kr/?fcd=701000009&url=@HttpUtility.UrlEncode(ConstDef._GMW_OLD_MOBILEWEB_GOOD_URL + bestSeller.gd_no)">
+							<!-- m_pic -->
+							<span class="m_pic">
+								<span class="flag_orange">@(count++)</span>
+								<img src="@BizUtil.GetGoodsImagePath(bestSeller.gd_no, "M2")" width="138" height="138" alt="" onError="this.src='/images/480/no_img_208.png';" />
+							</span>
+							<!--// m_pic -->
+
+							<span class="pdTitle">@bestSeller.gd_nm</span>
+							<span class="disc_price">@CurrencyUtil.ToMoney(bestSeller.sell_price - bestSeller.disc_price, true)</span>
+						</a>
+					</li>
+
+		if (count > 12)
+		{
+			break;
+		}
+	}
+}
+
+				</ul>
+			</div>
+			<div class="rotation_page">
+				<img id="bnPrev3" class="left" src="/images/480/btn_main_prev.png" alt="이전" width="40" height="33" />
+				<span id="tPage3" class="cnt"></span>
+				<img id="bnNext3" class="right" src="/images/480/btn_main_next.png" alt="다음" width="40" height="33" />
+			</div>
+			<script type="text/javascript">
+			//<![CDATA[
+				var objRotationAll = new ImageRotation();
+				objRotationAll.objName = 'objRotationAll';
+				objRotationAll.scrollDirection = 'direction';
+				objRotationAll.setScrollType('horizontal');
+				objRotationAll.autoScroll = "auto";
+				objRotationAll.scrollGap = 6000;
+				objRotationAll.listNum = 3;
+				objRotationAll.wrapId = "bnWrap3";
+				objRotationAll.listId = "bnList3";
+				objRotationAll.btnNext = "bnNext3";
+				objRotationAll.btnPrev = "bnPrev3";
+				objRotationAll.cntPage = "tPage3";
+				objRotationAll.sRoll = "sRoll3";
+				objRotationAll.mg = 15;
+				objRotationAll.widthNoChange = "yes";
+				objRotationAll.initialize();
+			//]]>
+		</script>
+		</div>
+	</div>
+	<!--// CONTENTS -->

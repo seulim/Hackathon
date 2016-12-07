@@ -1,0 +1,19 @@
+﻿@using GMKT.GMobile.Web.Models;
+@model NoticeListModel
+
+	<ul id="ntc">
+@foreach(var notice in Model.NoticeList)
+{
+		<li><span>공지사항</span><a href="http://sna.gmarket.co.kr/?fcd=703700001&url=@Urls.MobileWebUrl/Etc/NoticeDetail?seq=@notice.Seq">@notice.Title</a></li>
+}
+	</ul>
+@{
+    string SnaEtcNoticeList = "703700002";
+}
+		<a href="http://sna.gmarket.co.kr/?fcd=703700002&url=@Urls.MobileWebUrl/Etc/NoticeList" class="ntc_more">더보기</a>
+
+<script type="text/javascript">
+    function SnaUrlEtc(fcd) {
+        $.post("http://sna.gmarket.co.kr/?fcd=" + fcd);
+    }
+</script>

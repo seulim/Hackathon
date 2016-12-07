@@ -1,0 +1,27 @@
+﻿@model GMKT.GMobile.Web.Models.BannerAllM
+
+@section Css
+{
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/delivery.css" />
+}
+
+<!-- CONTENT -->
+<div id="content" class="ctns">		
+	<div class="del_cont">
+		<ul class="lst_pro">
+@foreach (var eachBanner in Model.BannerList)
+{
+			<li>
+				<a href="@eachBanner.LinkUrl" class="lnk_prd">
+					<div class="bx_tit">
+						<strong class="tit">@eachBanner.BannerName</strong>
+					</div>
+					<div class="bx_img">
+						<img src="@eachBanner.ImageUrl" alt="@eachBanner.BannerName" />
+					</div>
+				</a>
+			</li>
+}			
+		</ul>
+	</div>
+</div>

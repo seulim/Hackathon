@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+    <meta http-equiv="content-Type" content="text/html; charset=utf-8" /> 
+	<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+    <meta http-equiv="Pragma" content="no-cache" />
+	<meta http-equiv="Cache-Control" content="no-cache" />
+	<meta http-equiv="Cache-Control" content="max-age=0" />
+	<meta http-equiv="Expires" content="Sat, 01 Dec 2001 00:00:00 GMT" />
+	<meta name="format-detection" content="telephone=no" />
+	<title>@ViewBag.Title</title>
+	<link rel="apple-touch-icon-precomposed" href="@Urls.MobileImageUrlV2/icon_01.png" />
+    <link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/common.css?v=3" />
+    <link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/cpplpsrp.css?v=1" />
+
+    @if (PageAttr.Exid != GMKT.Web.Membership.ExIdAppEnum.None)
+{
+	<style type="text/css">
+		.bnr_w
+		{
+			-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		}
+		#head.head_simple
+		{
+			display: none;
+		}
+	</style>           
+}
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".close").on("click", function (e) {
+                window.close();
+            });
+        });
+    </script>
+</head>
+<body>
+    <div id="wrap" class="w_blank">
+        <div class="head_blank">
+            <h1 class="logo"><a href="@Urls.MobileWebUrl">Gmarket</a></h1>
+            <a href="#" class="close"><span>닫기</span></a>
+        </div>
+        @RenderBody()
+        <hr />
+    </div>
+</body>
+</html>

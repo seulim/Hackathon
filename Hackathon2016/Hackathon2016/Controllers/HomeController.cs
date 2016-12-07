@@ -67,7 +67,9 @@ namespace Hackathon2016.Controllers
 		[HttpPost]
 		public ActionResult ImageDetect(string filepath)
 		{
-			string retText = "";
+			string result = "";
+			
+
 			filepath = filepath.Replace("\\", "/");
 
 			TextDetectionBiz biz = new TextDetectionBiz();
@@ -76,7 +78,12 @@ namespace Hackathon2016.Controllers
 			IList<AnnotateImageResponse> response = biz.DetectText(client, filepath);
 
 			if (response != null && response[0].TextAnnotations != null && response[0].TextAnnotations[0].Description != null)
-				retText = response[0].TextAnnotations[0].Description;
+			{
+				result = response[0].TextAnnotations[0].Description;
+				
+			}
+
+			string[] retText = retText = result.Split('\n');
 
 			return Json(retText);
 		}

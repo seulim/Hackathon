@@ -1,0 +1,412 @@
+﻿@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Models;
+
+@using GMKT.Web.Context 
+
+@model DisplayModel
+@{
+    //ViewData["Title"] = "BestSellerList";
+    // 성인여부 체크
+    // Login 시 Adult 체크
+    bool isAdult = false;
+    if (PageAttr.IsLogin)
+    {
+			@* 
+			2013-06-10 이윤호 
+			GMKTWebContext -> GMobileWebContext
+			*@
+			isAdult = BizUtil.IsAdultUser(GMobileWebContext.Current.UserProfile.CustNo);
+    }
+
+    //string listUrl = Const.GMW_HTTP_CONTEXT_URL + "/Display/bestSellerList";
+    string listUrl = "/Display/BestSellerList";
+}
+
+<script type="text/javascript" src="@Urls.MobileWebUrl/js/common/front.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript">
+	window.onload = function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+	}
+
+    var url = "Intent://CreateGServiceShortcut?page=BestSellerList#Intent;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;scheme=gmarket;package=com.ebay.kr.gmarket;end";
+
+    function getAndroidVersion() {
+        var androidVersion = -1; // def value, for non-Android devices
+        var ua = navigator.userAgent.toLowerCase();
+        var androidIndex = ua.indexOf('android');
+
+        if (androidIndex != -1) {
+            var versionStartIndex = androidIndex + 8;
+            var versionEndIndex = ua.indexOf(';', versionStartIndex);
+
+            androidVersion = parseFloat(ua.slice(versionStartIndex, versionEndIndex));
+        }
+
+        return androidVersion;
+    }
+
+    function checkApplicationInstall() {
+        if (getAndroidVersion() >= 4.3) window.location.href = url;
+        else {
+            var iframe = document.createElement("iframe");
+            iframe.id = "checkframe";
+            iframe.name = "checkframe";
+            iframe.style.width = "0px";
+            iframe.style.height = "0px";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+
+            document.checkframe.location = "gmarket://CreateGServiceShortcut?page=BestSellerList";
+            setTimeout("checkApplicationInstall_callback()", 500);
+        }
+    }
+
+    function checkApplicationInstall_callback() {
+        try {
+
+            var s = document.checkframe.document.body.innerHTML;
+            $("#checkframe").remove();
+        } catch (e) {
+            document.location = "market://details?id=com.ebay.kr.gmarket";
+        }
+    }
+
+    function sendScheme() {
+
+        var appVersion = checkAppVersion();
+
+        if (appVersion != '' && parseInt(appVersion) <= 335) {
+            if (confirm("고객님 G마켓 앱의 업데이트가 필요합니다.") == false) {
+                return;
+            } else {
+                document.location = "market://details?id=com.ebay.kr.gmarket";
+            }
+        }
+        else {
+            var iframe = document.createElement("iframe");
+            iframe.id = "checkframe";
+            iframe.name = "checkframe";
+            iframe.style.width = "0px";
+            iframe.style.height = "0px";
+            iframe.style.display = "none";
+            document.body.appendChild(iframe);
+
+            document.checkframe.location = "gmarket://CreateGServiceShortcut?page=BestSellerList";
+            setTimeout("checkApplicationInstall_callback2()", 500);
+        }
+    }
+
+    function checkApplicationInstall_callback2() {
+        try {
+
+            var s = document.checkframe.document.body.innerHTML;
+            $("#checkframe").remove();
+        } catch (e) {
+
+        }
+    }
+
+    function checkAppVersion() {
+        var sName = "appversion";
+        var aCookie = document.cookie.split("; ");
+
+        for (var i = 0; i < aCookie.length; i++) {
+            var aCrumb = aCookie[i].split("=");
+            if (sName == aCrumb[0])
+                return unescape(aCrumb[1]);
+        }
+        return null;
+    }
+
+
+    $(document).ready(function () {
+
+    });
+
+	$(document).ready(function () {
+		$("img.thumbnail").lazyload();
+	});
+</script>	
+    
+	<!-- CONTENTS -->
+	<div id="contents" class="cts">
+
+		<!-- G_CATEGORY -->
+		<div class="g_category">
+@{
+    if (Model.pageKind.Equals("A"))
+    {
+			<!-- GBEST MENU -->
+			<div id="gmtt" class="gmtt">
+				<h3><span class="tit">G마켓 베스트</span></h3>
+				<div class="mnw">
+					<ul>
+						<li class="curr"><a href="#" class="gmenuAll"><img src="@Urls.MobileImageUrlV2/480/btn_gcate1_on.gif" alt="TOP 100" /> <span class="tit">TOP 100</span></a></li>
+						<li><a href="#gmenu" class="gmenuBtn"><img src="@Urls.MobileImageUrlV2/480/btn_gcate2.gif"  alt="그룹별" /> <span class="tit">그룹별</span></a></li>
+						<li class="last"><a href="#gmenu2" class="gmenuBtn"><img src="@Urls.MobileImageUrlV2/480/btn_gcate3.gif"  alt="카테고리별" /> <span class="tit">카테고리별</span></a></li>
+					</ul>
+				</div>
+			</div>
+
+			<!-- GMENU IMAGE -->
+			<div id="gmenu" class="best">
+				<ul>
+					<li><a href="@listUrl?pageKind=G&groupCode=0&listView=@Model.listView"><img src="@Urls.MobileImageUrlV2/480/icon_best_group1.png" width="90" height="65" alt="패션의류" /></a></li>
+					<li><a href="@listUrl?pageKind=G&groupCode=1&listView=@Model.listView"><img src="@Urls.MobileImageUrlV2/480/icon_best_group2.png" width="90" height="65" alt="화장품/헤어" /></a></li>
+					<li><a href="@listUrl?pageKind=G&groupCode=2&listView=@Model.listView"><img src="@Urls.MobileImageUrlV2/480/icon_best_group3.png" width="90" height="65" alt="스포츠/자동차" /></a></li>
+					<li><a href="@listUrl?pageKind=G&groupCode=3&listView=@Model.listView"><img src="@Urls.MobileImageUrlV2/480/icon_best_group4.png" width="90" height="65" alt="컴퓨터/전자" /></a></li>
+				</ul>
+				<ul>
+					<li><a href="@listUrl?pageKind=G&groupCode=4&listView=@Model.listView"><img src="@Urls.MobileImageUrlV2/480/icon_best_group5.png" width="90" height="65" alt="식품/유아동" /></a></li>
+					<li><a href="@listUrl?pageKind=G&groupCode=5&listView=@Model.listView"><img src="@Urls.MobileImageUrlV2/480/icon_best_group6.png" width="90" height="65" alt="가구/침구" /></a></li>
+					<li><a href="@listUrl?pageKind=G&groupCode=6&listView=@Model.listView"><img src="@Urls.MobileImageUrlV2/480/icon_best_group7.png" width="90" height="65" alt="도서/음반" /></a></li>
+					<li><a href="@listUrl?pageKind=G&groupCode=7&listView=@Model.listView"><img src="@Urls.MobileImageUrlV2/480/icon_best_group8.png" width="90" height="65" alt="e쿠폰/티켓" /></a></li>
+				</ul>
+			</div>
+    
+			<!-- GMENU LIST -->
+			<div id="gmenu2">
+				<ul>
+        @foreach (System.Collections.Generic.KeyValuePair<string,string> cate in Model.dicData)
+        {
+            // 100000088 이베이쇼핑 , 100000081 물류 서비스 노출제외 2013-05-22
+            if (!cate.Key.Equals("100000051") && !cate.Key.Equals("100000087") && !cate.Key.Equals("100000088") && !cate.Key.Equals("100000081"))
+            {
+					<li><a href="@listUrl?pageKind=L&ecp_gdlc=@cate.Key&listView=@Model.listView">@cate.Value</a></li>
+            }
+        }
+
+		@if (Model.dicData.Count%2 == 1)
+		{
+			<li><a href="#" class="notxt"></a></li>
+		}
+		
+				</ul>
+				<a href="#" class="btn_more"><span>더보기</span></a>
+				<a href="#" class="btn_close"><span>닫기</span></a>
+			</div>
+
+			<script type="text/javascript">
+			    gMktBestTab();
+			</script>
+    }
+    else if (@Model.pageKind.Equals("G"))
+    {
+        	<!-- GBEST MENU -->
+			<div class="mhgroup4" style="margin-bottom:0;">
+				<h3 class="longText">@Model.ListName 그룹 베스트</h3>
+			</div>
+    }
+    else
+    {
+			<!-- GBEST MENU -->
+			<div class="mhgroup4" style="margin-bottom:0;">
+				<h3 class="longText">@Model.ListName 카테고리 베스트</h3>
+			</div>
+
+        if (Model.dicData != null)
+        {
+            string categoryLinkUrl = "";
+
+    		<!-- CATE_LIST -->
+			<div class="cate_listW" id="cate_listW">
+				<ul class="cate_list">
+            @foreach (System.Collections.Generic.KeyValuePair<string, string> cate in Model.dicData)
+            {
+                if (Model.pageKind.Equals("L"))
+                {
+                    categoryLinkUrl = listUrl + "?pageKind=M&ecp_gdlc=" + Model.ecp_gdlc + "&ecp_gdmc=" + cate.Key + "&listView=" + Model.listView;
+                }
+                else if (Model.pageKind.Equals("M") || Model.pageKind.Equals("S"))
+                {
+                    categoryLinkUrl = listUrl + "?pageKind=S&ecp_gdlc=" + Model.ecp_gdlc + "&ecp_gdmc=" + Model.ecp_gdmc + "&ecp_gdsc=" + cate.Key + "&listView=" + Model.listView;
+                }
+
+                if ((cate.Key.Equals("200000117") || BizUtil.isAdultCategory(cate.Key.ToString())) && !PageAttr.IsLogin)
+                {
+                    categoryLinkUrl = ConstDef._GMW_LOGIN_AD_URL + "?rtnurl=" + HttpUtility.UrlEncode(categoryLinkUrl, System.Text.Encoding.GetEncoding("euc-kr")) + "&adultUseLoinCheck=Y";
+                }
+                
+                <li><a href="@categoryLinkUrl">@cate.Value</a></li> 
+            }
+				</ul>
+				<a href="#" class="btn_more"><span>더보기</span></a>
+				<a href="#" class="btn_close"><span>닫기</span></a>
+			</div>
+        }
+    
+   			<script type="text/javascript">
+    	        $("#cate_listW").moreCategory2(".btn_more", 5);
+			</script>
+    }        
+}
+		</div>
+		<!--// G_CATEGORY -->
+
+		<!-- PRODUCT ALIGN -->
+		<div class="view_type">
+			<div class="view_type_sub">
+				<div class="p_right">
+					<div class="viewmd">
+						<ul>
+							<li><a href="@listUrl?pageKind=@Model.pageKind&groupCode=@Model.groupCode&ecp_gdlc=@Model.ecp_gdlc&ecp_gdmc=@Model.ecp_gdmc&ecp_gdsc=@Model.ecp_gdsc&listView=H"><img src="@Urls.MobileImageUrlV2/480/btn_view_img@(Model.listView.Equals("H")?"_on":"").gif" alt="이미지리스트"/></a></li>
+							<li><a href="@listUrl?pageKind=@Model.pageKind&groupCode=@Model.groupCode&ecp_gdlc=@Model.ecp_gdlc&ecp_gdmc=@Model.ecp_gdmc&ecp_gdsc=@Model.ecp_gdsc&listView=V"><img src="@Urls.MobileImageUrlV2/480/btn_view_list@(Model.listView.Equals("V")?"_on":"").gif" alt="리스트"/></a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="@(Model.listView.Equals("H")?"horizontal_list":"vertical_list")">
+			<ul>
+@{
+    int i = 1;
+
+    foreach (var item in Model.Items)
+    {
+        string goodsImagePath = "";
+        string linkUrl = Urls.MItemWebURL + "/Item?goodscode=" + item.gd_no;
+        //string linkUrl = "http://item2.gmarket.co.kr/M/Goods/Goods.aspx?goodscode=" + item.gd_no; 
+        string onClickStr = "";
+        if (item.adult_yn.Equals("Y"))
+        {
+            if (PageAttr.IsAdultUse && PageAttr.IsLogin)
+            {
+                goodsImagePath = BizUtil.GetGoodsImagePath(item.gd_no.ToString(), "M3");
+            }
+            else if (PageAttr.IsLogin && !isAdult) // 미성년자
+            {
+                goodsImagePath = Model.listView.Equals("H") ? Const.ADULT_IMAGE_210 : Const.ADULT_IMAGE_210;
+                onClickStr = "alert('죄송합니다.\\n성인만 구매 가능한 상품입니다.'); return false;";
+            }
+            else if (PageAttr.IsLogin && !PageAttr.IsAdultUse && isAdult)  // 성인이지만 성인인증 절차 필요
+            {
+                goodsImagePath = Model.listView.Equals("H") ? "http://image.gmarket.co.kr/Gmarket_Mobile_v2" + Const.ADULT_IMAGE_210.Replace("images/", string.Empty) : "http://image.gmarket.co.kr/Gmarket_Mobile_v2" + Const.ADULT_IMAGE_210.Replace("images/", string.Empty);
+                //goodsImagePath = Model.listView.Equals("H") ? Const.ADULT_IMAGE_210 : Const.ADULT_IMAGE_210;
+                //linkUrl = "/Common/AdultGoodsViewAgree?goodsNo=" + @item.gd_no;
+            }
+            else if (!PageAttr.IsLogin) // Login 필요
+            {
+                goodsImagePath = Model.listView.Equals("H") ? "http://image.gmarket.co.kr/Gmarket_Mobile_v2" + Const.ADULT_IMAGE_210.Replace("images/", string.Empty) : "http://image.gmarket.co.kr/Gmarket_Mobile_v2" + Const.ADULT_IMAGE_210.Replace("images/", string.Empty);
+                //goodsImagePath = Model.listView.Equals("H") ? Const.ADULT_IMAGE_210 : Const.ADULT_IMAGE_210;
+                linkUrl = ConstDef._GMW_LOGIN_AD_URL + "?rtnurl=" + HttpUtility.UrlEncode(linkUrl) + "&adultUseLoinCheck=Y";
+            }
+            else
+            {
+                goodsImagePath = BizUtil.GetGoodsImagePath(item.gd_no.ToString(), "M3");
+            }
+        }
+        else
+        {
+            goodsImagePath = BizUtil.GetGoodsImagePath(item.gd_no.ToString(), "M3");
+        }
+				<li>
+					<a class="anchor" href="@linkUrl" onclick="@onClickStr">
+						<span class="thumbnail_wrap">
+							<img class="thumbnail" src="@Urls.MobileImageUrlV2/lazy_200x200.gif" data-original="@goodsImagePath" alt="" onerror="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" />
+							<span class="flag_sky">@i</span>
+						</span>
+						<span class="goods_name">@item.gd_nm</span>
+						<span class="goods_info">
+        @if (item.disp_price == 0)
+        {
+            if (Model.listView.Equals("H"))
+            {
+							<span class="price" style="text-decoration:none;">&nbsp;</span>
+            }
+
+            if (item.gstamp > 0)
+            {
+							<span class="sale_price">G스탬프 @item.gstamp 장</span>
+            }
+        }
+        else if (item.disp_price == 1)
+        {
+            if (Model.listView.Equals("H"))
+            {
+							<span class="price" style="text-decoration:none;">&nbsp;</span>
+            }
+							<span class="sale_price">무료</span>
+        }
+        else
+        {
+            if (item.gstamp > 0)
+            {
+							@:<span class="sale_price">G스탬프 @item.gstamp 장</span> or
+            }
+            else
+            {
+                if (item.sell_price.Equals(item.disp_price))
+                {
+                    if (Model.listView.Equals("H"))
+                    {
+							<span class="price" style="text-decoration:none;">&nbsp;</span>
+                    }
+                }
+                else
+                {
+							<span class="price">@CurrencyUtil.ToMoney(@item.sell_price.ToString(), true)</span>
+                }
+            }
+							<span class="sale_price">@CurrencyUtil.ToMoney(@item.disp_price.ToString(), true)</span>
+        }
+
+        @if (Model.pageKind.Equals("A"))
+        {
+            if (item.delivery_fee.Equals("0"))
+            {
+							<span class="free">무료배송</span>
+            }
+        }
+        else
+        {
+            if (item.delivery_info.Equals("무료"))
+            {
+							<span class="free">무료배송</span>
+            }
+            else if (Char.IsNumber(item.delivery_info, 0))
+            {
+							<span class="fee">배송비 @item.delivery_info</span>
+            }
+            else
+            {
+							<span class="pay">@Html.Raw(@item.delivery_info.Replace("디지털쿠폰<br/>(방문사용)", "e쿠폰"))</span>
+            }
+        }
+						</span>
+					</a>
+				</li>
+        i++;
+    }
+}
+				<div id="dataListAjax"></div>
+			</ul>
+
+		</div>
+
+		<script type="text/javascript">
+		    UL_layoutFix(".horizontal_list", true);
+		</script>
+
+        <!--모바일 홈 바로가기-->        
+        @*class="go_homebnr"*@
+        @if ( !PageAttr.IsIphone ) {
+              if (PageAttr.IsAndroidApp)
+              {
+                <div class="go_homebnr"><a onclick="sendScheme()" ><img src="@Urls.MobileImageUrlV2/640/banner/go_home5.jpg" alt="G마켓베스트 홈화면 바로가기 추가" /></a>
+                </div>      
+              }
+              else
+              {
+			    <div class="go_homebnr"><a onclick="checkApplicationInstall()" ><img src="@Urls.MobileImageUrlV2/640/banner/go_home5.jpg" alt="G마켓베스트 홈화면 바로가기 추가" /></a>
+                </div>
+              }
+         } 
+	    <!--모바일 홈 바로가기-->
+
+	</div>
+	<!--// CONTENTS -->

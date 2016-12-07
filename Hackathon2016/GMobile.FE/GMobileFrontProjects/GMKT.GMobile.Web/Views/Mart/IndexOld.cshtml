@@ -1,0 +1,272 @@
+﻿@model GMKT.GMobile.Web.Models.MartViewModel
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+	<div class="ecpn_tit mart">
+		<h3>
+			<a href="javascript:ViewMartBestItem();" class="tit">마트</a>
+			<div class="tit_wrap">
+				<div class="s_tit"><a onclick="javascript:MartTitleCode();"><span class="in_txt">마트BEST</span> <span class="ico_arr">전체보기</span></a></div>
+				<div class="t_dep"><a onclick="javascript:SnaUrlFooter(706000003);"><span class="in_txt">전체</span> <span class="ico_arr">전체보기</span></a></div>
+			</div>
+		</h3>
+		<div class="cate_area">
+			@if (Model != null && Model.CategoryList != null && Model.CategoryList.Count > 0)
+			{
+			<div class="cate_view">
+				<ul class="cate_lst mart">
+				@{
+					int GROUP_COUNT = 4;
+					string selected = "";
+					string all = "";
+					int martItemFcdcode = 705900001;
+					for (int lineIndex = 0; lineIndex < Model.CategoryList.Count / GROUP_COUNT; lineIndex++)
+					{
+					<li>
+						@for (int i = lineIndex * GROUP_COUNT; i < (lineIndex + 1) * GROUP_COUNT; i++)
+						{
+						if (Model.CategoryList[i] != null)
+						{ selected = i == 0 ? "selected" : ""; all = i == 0 ? "all" : "";
+						<div class="cate_sect @selected">
+							<a href="#" class="btn_cate @all" onclick="javascript:ViewMartItem('@Model.CategoryList[i].Code', @martItemFcdcode);"><span class="sp_mart @Model.CategoryList[i].CssName"></span>@Model.CategoryList[i].Name</a>
+							<ul class="cate_sub_lst">
+							@if (Model.CategoryList[i].ChildCategoryList != null)
+							{
+								foreach(GMKT.GMobile.Data.CategoryInfo ci in Model.CategoryList[i].ChildCategoryList)
+								{
+								<li><a href="javascript:ViewMartItem('@ci.Code', 706000004);">@ci.Name</a></li>
+								}
+							}
+							</ul>
+						</div>
+						}
+						martItemFcdcode++;
+						if (i == Model.CategoryList.Count -1)
+						{
+							break;
+						}
+						}
+					</li>
+					}
+				}
+				</ul>
+			</div>
+			}
+		</div>
+	</div>
+		
+	<!-- 상품리스트 -->
+	<div class="mprd_wrap">
+		<span class="ico_loading" style="display:none">로딩중</span>
+		<ul id="mprd_lst" class="mprd_lst">
+		@if (Model.Items != null && Model.Items.Count > 0)
+		{
+			string noSale = "";
+			foreach (GMKT.GMobile.Data.MartItem item in Model.Items)
+			{ noSale = item.DiscountRate == 0 ? "no_sale" : "";
+			<li>
+				<a href="@GlobalFunction.GetSnaUrl(true, "706100001", item.LinkURL)">
+					<div class="img_bx">
+						<img src="@item.ImageURL" alt="" />
+						@if (item.DeliveryInfo.Equals("무료배송"))
+						{
+						<span class="ico_del">무료배송</span>
+						}
+					</div>
+					<div class="info_bx @noSale">
+						<strong class="tit">@item.ItemTitle</strong>
+						@if (item.DiscountRate > 0)
+						{
+						<span class="per">@item.DiscountRate<span>%</span><span class="blind">할인</span></span>
+						}
+						<div class="price_box">
+							@if (item.DiscountRate > 0)
+							{
+							<span class="per_price"><span class="blind">정가</span>@item.OriginalPrice</span>
+							}
+							<strong class="price"><span class="blind">할인가</span>@item.Price</strong>
+						</div>
+					</div>
+				</a>
+			</li>
+			}
+		}
+		</ul>
+		
+	</div>
+	<!-- //상품리스트-->
+
+	@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "mart", ShareFcdCode = "704600007", ShortcutFcdCode = "704600008", TargetUrl = string.Empty, Title = string.Empty })
+</div>
+<!-- //CONTENT -->
+
+@section scripts
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+<script id="mart_item_template" type="text/x-handlebars-template">
+{{#each Items}}
+	<li>
+		<a href="{{getLinkUrl LinkURL}}">
+			<div class="img_bx">
+				<img src="{{ImageURL}}" alt="" />
+				{{renderFreeDelivery DeliveryInfo}}
+			</div>
+			{{#if DiscountRate}}
+			<div class="info_bx">
+			{{else}}
+			<div class="info_bx no_sale">
+			{{/if}}
+				<strong class="tit">{{ItemTitle}}</strong>
+				{{#if DiscountRate}}
+				<span class="per">{{DiscountRate}}<span>%</span><span class="blind">할인</span></span>
+				{{/if}}
+				<div class="price_box">
+					{{#if DiscountRate}}
+					<span class="per_price"><span class="blind">정가</span>{{OriginalPrice}}</span>
+					{{/if}}
+					<strong class="price"><span class="blind">할인가</span>{{Price}}</strong>
+				</div>
+			</div>
+		</a>
+	</li>	
+{{/each}}
+</script>
+<script type="text/javascript">
+	$(document).ready(function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+
+		/* landing Banner */
+		var em = eModule
+                    , apps = em.apps
+                    , landing = apps.landing;
+
+		landing.init({
+			pageName: 'Mart',
+			landingType: '@Model.LandingBanner.Type',
+			imageUrl: '@Model.LandingBanner.ImageUrl',
+			description: '@Model.LandingBanner.Description',
+			campaign: '@Model.Campaign.Name',
+			medium: '@Model.Campaign.Medium',
+			mediumSource: '@Model.Campaign.MediumSource',
+			mediumContent: '@Model.Campaign.MediumContent',
+			term: '@Model.Campaign.Keyword'
+		});
+
+		$("#lay_notice").on('click', '#goToApp', function (e) {
+			e.preventDefault();
+			landing.installApp();
+		}).on('click', '#landingClose', function (e) {
+			e.preventDefault();
+			landing.close();
+		});
+		/* landing Banner */
+
+		KakaoInit();
+		ShareTo("kakaotalk");
+	});
+
+	var ShareTo = function (type) {
+		var dataName = "G마켓 마트";
+		switch (type) {
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "마트";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name": dataName,
+			"url": "@Urls.MobileWebUrl" + "/Mart",
+			"title": ""
+		};
+
+		if (type == "kakaotalk") {
+			KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+		}
+		else {
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data));
+		}
+	}
+
+	var selectedMartCode = "000000000";
+
+	Handlebars.registerHelper('renderFreeDelivery', HHrenderFreeDelivery);
+	Handlebars.registerHelper('getLinkUrl', HHgetLinkUrl);
+
+	function HHrenderFreeDelivery(deliveryInfo) {
+		if (deliveryInfo == "무료배송") {
+			return new Handlebars.SafeString('<span class="ico_del">무료배송</span>');
+		}
+	}
+
+	function HHgetLinkUrl(url) {
+		var linkUrl = url;
+
+		if (url != undefined && url != null && url != "") {
+			linkUrl = "http://sna.gmarket.co.kr/?fcd=706100001" + "&url=" + encodeURIComponent(linkUrl);
+		} 
+
+		return new Handlebars.SafeString(linkUrl);
+	}
+
+	function ViewMartBestItem() {
+		if (selectedMartCode == "000000000") {
+			return;
+		}
+		$('.cate_lst .all .btn_cate').trigger('click');
+		ViewMartItem('000000000');
+		SnaUrlFooter(706000001);
+
+		$('.ecpn_tit.mart h3').show();
+		$('.cate_area .cate_view').hide();
+	}
+
+	function MartTitleCode() {
+		var title = $('.s_tit .in_txt').text();
+		var isSubCategoryStyle = $('.t_dep').attr('style');
+		if (title == "마트BEST" && isSubCategoryStyle == "display: none;") {
+			SnaUrlFooter(705800001);
+		} else {
+			SnaUrlFooter(706000002);
+		}
+	}
+
+	function ViewMartItem(code, fcdCode) {
+		if (selectedMartCode == code) {
+			return;
+		}
+
+		if (fcdCode != undefined && fcdCode != "") {
+			SnaUrlFooter(fcdCode);
+		}
+
+		$(".ico_loading").show();
+		$.ajax({
+			type: "POST",
+			url: "/Mart/GetMartItems",
+			dataType: "json",
+			data: {
+				categoryCode: code
+			},
+			error: function (request, status, error) {
+				$(".ico_loading").hide();
+			},
+			success: function (result) {
+				if (result != null && result != undefined) {
+					$('#ico_loading').hide();
+					var template = Handlebars.compile($('#mart_item_template').html());
+					$('#mprd_lst').html(template({ Items: result }));
+				}
+				$(".ico_loading").hide();
+				selectedMartCode = code;
+			}
+		});
+	}
+</script>
+}

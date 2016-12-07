@@ -1,0 +1,85 @@
+﻿@{
+	Layout = "_HomePlusLayout.cshtml";
+}
+@model GMKT.GMobile.Data.HomePlus.HomePlusSpecialShopT
+
+<div class="wrap_xscroll menu type_move">
+	<div class="xscroller_wrap">
+		<ul class="cate_info">
+			<!-- [D] 활성화 on 선택한 항목이 맨 앞으로 노출 -->
+			@foreach( var i in Model.Navigations)
+			{
+				if(i.PageSeq != ViewBag.Id)
+				{
+			<li><a href="@Url.Action("SpecialShop", "HomePlus", new { id = i.PageSeq })">@i.PageName</a></li>
+				}
+				else
+				{
+			<li class='on'><a href="#">@i.PageName</a></li>
+				}
+			}
+		</ul>
+	</div>
+</div>
+<div class="exh_banner">
+	@foreach( var i in Model.Banners)
+	{
+	<img src="@i.MobileTopImagePath" alt="@i.PageName" />
+	}
+</div>
+<div class="week_bx">
+	<ul class="item_bx">
+		@foreach(var i in Model.Items)
+		{
+			<li class="item">
+				<a href="@i.LinkURL"><span class="thumb">
+					<img src="@i.ImageURL" alt="@i.GoodsName" /></span>
+					<span class="item_tit">@i.GoodsName</span> <span class="price">@i.SalePrice</span>
+					@if(!String.IsNullOrEmpty(i.Branch.Prmt1CdImageUrl))
+					{
+					<span class="tag">
+						<img src="@i.Branch.Prmt1CdImageUrl" alt="" />
+					</span>
+					}
+				</a>
+			@if(i.OptSellDetailNonusePoint == 100)
+	 {
+			<a href="#" onclick="setCartLayer('@i.GoodsName','@i.SalePrice', '@i.GoodsCode'); return false;"  class="btn_cart">바로담기</a>
+	 }
+			</li>
+		}
+	</ul>
+	@if(Model.ItemTotalSize > ViewBag.itemListSize)
+ {
+	<div class="see_more"><a href="#" onclick="moreItem(); return false;">상품 더 보기</a></div>	
+ }
+</div>
+
+<script type="text/javascript">
+	stuff.setMenuName('specialshop');
+	stuff.setIsLogin(@(PageAttr.IsLogin == false ? Html.Raw("false") : Html.Raw("true")));
+	stuff.setHasBranchCode(@(ViewBag.hasBranchCode == false ? Html.Raw("false") : Html.Raw("true")));
+	moreParameters.setItemListTotalSize(@(Model.ItemTotalSize));
+	moreParameters.setPageSize(@(ViewBag.itemListSize));
+	moreParameters.setPageSeq('@ViewBag.Id');
+</script>
+
+<script id="item-template" type="text/x-handlebars-template">
+{{#each this}}
+	<li class="item">
+		<a href="{{LinkURL}}">
+			<span class="thumb">
+				<img src="{{ImageURL}}" alt="상품이미지 ">
+			</span>
+			<span class="item_tit">{{GoodsName}}</span> 
+			<span class="price">{{SalePrice}}</span>
+			{{#if Branch.Prmt1CdImageUrl}}
+			<span class="tag"><img src="{{Branch.Prmt1CdImageUrl}}" alt="" /></span>
+			{{/if}}
+		</a>
+		{{#ifOptSellDetailNonusePoint OptSellDetailNonusePoint}}
+		<a href="#" onclick="setCartLayer('{{GoodsName}}','{{SalePrice}}', '{{GoodsCode}}'); return false;" class="btn_cart">바로담기</a>
+		{{/ifOptSellDetailNonusePoint}}
+	</li>
+{{/each}}
+</script>

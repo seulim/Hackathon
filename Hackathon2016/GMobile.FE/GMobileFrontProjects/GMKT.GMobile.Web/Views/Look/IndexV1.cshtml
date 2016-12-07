@@ -1,0 +1,206 @@
+﻿@using Newtonsoft.Json
+
+@model GMKT.GMobile.Web.Models.LookModel
+
+<style type="text/css">
+	.tab_supd, #btn_more { display: none; }
+</style>
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+	<h2 class="blind">LOOK</h2>
+	<div class="look_box">
+		<div class="lk_banner">
+@*			<div class="lk_title">
+				<strong id="contents_title"></strong>
+				<span id="contents_groupname"></span>
+			</div>*@
+
+			<div class="display_bnr">
+				<div class="bnr_w">
+					<div id="bnrList" class="lst">
+					</div>
+
+					<div class="h_page">
+						<a href="#" id="hotPrev" class="prev">이전</a>
+						<a href="#" id="hotNext" class="next">다음</a>
+
+						<div id="bnrPage" class="page"><span class="pag" id="contents_pageno"></span>/<span class="pag2">@Model.ContentsSection.ContentsList.Count</span></div>
+
+						<a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "705300002", Urls.MobileWebUrl + "/Look/ContentsAll")" class="bnr_all">배너모두보기</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<ul class="lk_tab" id="tab_wrapper">
+			<li class="selected"><a href="#" id="tab_the_look" data-fcd="705400001"><span>The LOOK</span></a></li>
+			<li><a href="#" id="tab_trendy_daily" data-fcd="705400002"><span>Trendy Daily</span></a></li>
+			<li><a href="#" id="tab_basic_missy" data-fcd="705400003"><span>Modern Basic</span></a></li>
+			<li><a href="#" id="tab_spa" data-fcd="705400004"><span>SPA select#</span></a></li>
+		</ul>
+			
+		<div class="tab_supd" id="category_section">
+			<div class="box_wp" id="supdTab">
+				<div id="supdTabCnt" class="supd_cnt">
+					<ul id="category_list_wrapper">
+					</ul>
+				</div>
+
+				<button type="button" id="category_prev" class="prev_p off">왼쪽으로</button>
+				<button type="button" id="category_next" class="next_p off">오른쪽으로</button>
+			</div>
+		</div>
+		
+		<div class="lk_cont">
+			<div id="item_list_wrapper">
+			</div>
+
+			<button type="button" class="btn_more" id="btn_more" data-fcd="705700001">더보기</button>
+			<span class="ico_loading" id="ico_loading">로딩중</span>
+		</div>
+
+		@Html.Partial("_ShareAndShortcutLayer", new GMKT.GMobile.Web.Models.ShareAndShortcutModel { SchemeName = "look", ShareFcdCode = "704600005", ShortcutFcdCode = "704600006", TargetUrl = string.Empty, Title = string.Empty })
+	</div>
+	<a href="#" class="btn_top_main">Top으로 이동</a>
+	<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+</div>
+<!-- //CONTENT -->
+
+@section scripts
+{
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function () {
+			/* landing Banner */
+			var em = eModule
+						, apps = em.apps
+						, landing = apps.landing;
+
+			landing.init({
+				pageName: 'Look',
+				landingType: '@Model.LandingBanner.Type',
+				imageUrl: '@Model.LandingBanner.ImageUrl',
+				description: '@Model.LandingBanner.Description',
+				campaign: '@Model.Campaign.Name',
+				medium: '@Model.Campaign.Medium',
+				mediumSource: '@Model.Campaign.MediumSource',
+				mediumContent: '@Model.Campaign.MediumContent',
+				term: '@Model.Campaign.Keyword'
+			});
+
+			$("#lay_notice").on('click', '#goToApp', function (e) {
+				e.preventDefault();
+				landing.installApp();
+			}).on('click', '#landingClose', function (e) {
+				e.preventDefault();
+				landing.close();
+			});
+			/* landing Banner */
+
+			KakaoInit();
+			ShareTo("kakaotalk");
+		});
+
+		var ShareTo = function (type) {
+			var dataName = "G마켓 LOOK";
+			switch (type) {
+				case MobileSnsUtil.snsType().KAKAOTALK:
+					dataName = "LOOK";
+					break;
+				default:
+					break;
+			}
+			var data = {
+				"name": dataName,
+				"url": "@Urls.MobileWebUrl" + "/Look",
+				"title": ""
+			};
+			if (type == "kakaotalk") {
+				KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+			}
+			else {
+				var sender = MobileSnsUtil.sns(type).sender;
+				sender.send(type, new SnsParam(type, data))
+			}
+		};
+
+		(function (GMobile, undefined) {
+			(function (Look, undefined) {
+				(function (Data, undefined) {
+					Data.ContentsSection = @Html.Raw(JsonConvert.SerializeObject(Model.ContentsSection));
+					Data.LookSection = @Html.Raw(JsonConvert.SerializeObject(Model.LookSection));
+				})(Look.Data = Look.Data || {});
+			})(GMobile.Look = GMobile.Look || {});
+		})(window.GMobile = window.GMobile || {});
+	</script>
+
+	<script id="tmpl_look_category" type="text/x-handlebars-template">
+		{{#each this}}
+			<li><a href="#" data-category="{{CategoryCode}}">{{Name}}</a></li>
+		{{/each}}
+	</script>
+	
+	<script id="tmpl_look_item" type="text/x-handlebars-template">
+		{{#each ItemGroupList}}
+			{{#ifTypeA this}}
+				{{#each ItemList}}
+					<a href="{{getSnaUrlForItem LandingUrl LogicType "705600001" "705600002"}}" class="img_box">
+						<img src="{{ImageUrl}}" alt="" />
+					</a>
+				{{/each}}
+			{{else}}
+				{{#ifTypeB this}}
+					<div class="{{lookItemType this.Type}}">
+						<ul class="lk_lst">
+							{{#eachBTop ItemList}}
+								{{> PartialLookItem}}
+							{{/eachBTop}}
+						</ul>
+						<ul class="lk_lst2">
+							{{#eachBBottom ItemList}}
+								{{> PartialLookItem}}
+							{{/eachBBottom}}
+						</ul>
+					</div>
+				{{else}}
+					<div class="{{lookItemType this.Type}}">
+						<ul class="lk_lst2">
+							{{#each ItemList}}
+								{{> PartialLookItem}}
+							{{/each}}
+						</ul>
+					</div>
+				{{/ifTypeB}}
+			{{/ifTypeA}}
+		{{/each}}
+	</script>
+
+	<script id="tmpl_partial_look_item" type="text/x-handlebars-template">
+		<li>
+			<a href="{{getSnaUrlForItem LandingUrl LogicType "705600001" "705600002"}}">
+				<img src="{{ImageUrl}}" alt="" />
+
+				{{#if IsShopIconVisible}}
+					<span class="lk_info"><span class="ico_shop"></span>{{Message}}</span>
+				{{else}}
+					{{#if Message}}
+						<span class="lk_info">{{Message}}</span>
+					{{/if}}
+				{{/if}}
+			</a>
+		</li>
+	</script>
+
+	<script id="tmpl_contents" type="text/x-handlebars-template">
+		<div class="li"><a href="{{getSnaUrl LandingUrl "705300001"}}"><img src="{{BannerImageUrl}}" alt="{{Title}}" /></a></div>
+	</script>
+
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/LookController.js"></script>
+}

@@ -1,0 +1,48 @@
+﻿@using GMKT.GMobile.Constant;
+@{
+	string SnaService = "703700008";  //이용약관 FCD 코드
+	string SnaPayInfo = "703700005";    //결제안내 FCD 코드
+}<!-- G마켓 Footer -->
+	<div id="ft">
+		<div class="ntc">
+			<ul id="ntc">
+				<li><span>공지사항</span><a href="#">[쇼핑팁] 가로모드와 간편결제서비스 이용안내</a></li>
+				<li><span>공지사항</span><a href="#">[10월] 카드 무이자 할부 이벤트 안내</a></li>
+				<li><span>공지사항</span><a href="#">G마켓 모바일App 업데이트 안내</a></li>
+				<li><span>공지사항</span><a href="#">애플 iOS6 신용카드 결제시 보안키보드 오류 해결방법</a></li>
+				<li><span>공지사항</span><a href="#">애플 iOS6 안심클릭 카드 결제 오류시 해결방법</a></li>
+			</ul>
+			<a href="#" class="ntc_more">더보기</a>
+		</div>
+		<div class="fnb">
+			<ul>
+				<li>
+                  @if (PageAttr.IsLogin == true)
+									{
+					<a href="@ConstDef._GMW_LOGOUT_URL">로그아웃</a>
+									}
+									else
+									{
+                      <a href="@Urls.LoginUrl">로그인</a>
+									}
+				</li>
+				<li><a href="javascript:getUrl('@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "703700004", "http://www.gmarket.co.kr/?sL=MW")')">PC버전 보기</a></li>
+				<li><a onclick="SnaUrlFooter(@SnaPayInfo);"  href="@Urls.MobileWebUrl/Home/PayInfo">결제안내</a></li>
+				<li><a href="http://sna.gmarket.co.kr/?fcd=703700006&url=#" onclick="window.scrollTo(0, 1);return false;">맨위로</a></li>
+			</ul>
+		</div>
+		<div class="addr">
+			<address><span>(주)</span><em>이베이코리아</em> 대표이사 : 변광윤<br>사업자등록번호 : 220-81-83676 통신판매업신고 : 강남 10630호<br>서울시 강남구 역삼동 737 강남파이낸스센터 34층</address>
+			<p>고객센터 : <em>1566-5701</em><br>상담가능시간 : 오전9시-오후6시(토요일, 공휴일 휴무)</p>
+			<a href="http://www.ftc.go.kr/info/bizinfo/communicationList.jsp" class="bsn" onclick="javascript:SnaUrlFooter('703700007');"><span>사업자정보확인</span></a>
+			<a onclick="SnaUrlFooter(@SnaService);"  href="http://www.gmarket.co.kr/challenge/neo_help/policy01.asp" class="bsn" style="width:130px;">
+				<span style="width:120px">개인정보 취급방침</span>
+			</a>
+			<a onclick="SnaUrlFooter(@SnaService);"  href="@Urls.MMyGUrl/Service" class="terms" style="margin-left:1px;">
+				<span>이용약관</span>
+			</a>
+			<p style="font-size:0.6em;padding-top:8px;">G마켓은 통신판매중개자이며 통신판매의 당사자가 아닙니다. 따라서 G마켓은 상품 · 거래정보 및 거래에 대하여 책임을 지지 않습니다.</p>
+			<p class="copy">Copyright ©<em>eBay Korea Co., Ltd.</em> All rights reserved</p>
+		</div>
+	</div>
+	<!-- //G마켓 Footer -->

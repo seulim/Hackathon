@@ -1,0 +1,39 @@
+﻿@{
+	CheckAppVersion checkAppVersion = new CheckAppVersion();
+	AppVersionDigit recentItemAppVersion = checkAppVersion.GetAppVersion("5.4.2");
+	bool isRecentItemAppVersion = checkAppVersion.CheckOverVersion(PageAttr.AppVersion, recentItemAppVersion);
+
+}
+
+<h3 class="blind">백화점</h3>
+<div class="display_subbnr">
+	<div class="sch_dept">
+		<form id="departmentStoreSearchForm" action="Search" method="get">
+			<input type="text"  title="검색어 입력" placeholder="백화점 상품 검색" value="@(ViewBag.primeKeyword ?? "")" id="primeKeyword" name="primeKeyword" />
+			<button type="button" class="ip_delete">검색어 삭제</button>
+            <button type="submit" class="btn_sch" id="departmentStoreSearchButton">백화점 검색</button>            
+		</form>
+	</div>
+</div>
+<script type = "text/javascript">
+	$(document).ready(function () {
+		var srpUrl = "@Urls.MobileWebUrl/DepartmentStore/Search?primeKeyword=";
+
+		$("#departmentStoreSearchForm").bind("submit",function(event){
+			if ($("#primeKeyword").val().trim()) {
+				var encode = encodeURIComponent($("#primeKeyword").val());				
+				pdsClickLog('200000302','utility',{'keyword':encode});
+				location.href = srpUrl+encode;
+			}
+			else{
+				alert("검색어를 입력해주세요.");
+			}
+			event.preventDefault();
+		});
+
+		$(".sch_dept .ip_delete").click(function () {
+			$(this).removeClass('ip_delete_active');
+			$(".sch_dept input[type=text]").val('').focus();
+		});
+	});
+</script>

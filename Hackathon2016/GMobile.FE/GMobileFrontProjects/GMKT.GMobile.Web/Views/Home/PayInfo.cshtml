@@ -1,0 +1,114 @@
+﻿    <script type="text/javascript">
+        window.onload = function () {
+            setTimeout(function () {
+                displayLayer("progress_icon", "none");
+            }, 100);
+        }
+	</script>
+
+    <hr />
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		
+		<!-- 결제안내 -->
+		<div class="pay_info">
+			<h3>결제안내</h3>
+
+			<div class="tit_wrap">
+				<p class="tit"><strong>G마켓모바일 결제</strong> 이용안내</p>
+				<p class="txt">G마켓 모바일에서 제공하는<br />4가지 결제 방법으로<br /><em>안전하고 간편한 서비스</em>이용하세요!</p>
+			</div>
+			
+			<!-- 신용카드 -->
+			<h4><span class="h4 pay1">신용카드</span></h4>
+			<div class="pay_grp">				
+				<ul>
+					<li><em>공인인증서 없이</em> 결제 가능 <span>(30만원 미만)</span></li>
+					<li><em>간편결제</em> 이용시, <em>카드번호 입력 없이 결제 가능</em></li>
+					<li>카드사별 상세 안내</li>
+				</ul>
+				<table summary="KB국민/비씨카드의 결제방법 및 유의사항에 대한 설명">
+					<caption>KB국민/비씨카드의 결제방법 및 유의사항</caption>
+						<thead>
+							<tr>
+								<th scope="col">신용카드</th>
+								<th scope="col">결제 방법</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="tr1">
+								<td>KB국민 / 비씨</td>
+								<td>안전결제 (ISP)</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<em>안전결제 (ISP) 유의사항</em><br />별도의 어플 설치후, 결제가 가능합니다.<br />
+									<a href="market://details?id=kvp.jjy.MispAndroid320" class="andr">안드로이드용 ISP설치<span></span></a>
+									<a href="https://itunes.apple.com/kr/app/mobail-anjeongyeolje-isp/id369125087?mt=8" class="ios">iOS ISP설치<span></span></a>
+								</td>
+							</tr>
+						</tbody>
+				</table>
+				<table summary="현대/롯데/신한/삼성/시티/외환/하나SK/NH카드의 결제방법 및 유의사항에 대한 설명">
+					<caption>현대/롯데/신한/삼성/시티/외환/하나SK/NH카드의 결제방법 및 유의사항</caption>
+						<thead>
+							<tr>
+								<th scope="col">신용카드</th>
+								<th scope="col">결제 방법</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr class="tr1">
+								<td>현대 / 롯데 / 신한 / 삼성 / 시티 / 외환 / 하나SK / NH</td>
+								<td>안심클릭</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<em>안심클릭 유의사항</em><br />안드로이드에서는 백신 설치후 이용 가능합니다.<br />
+									<a href="https://ansimclick.hyundaicard.com/droidx/DroidXAntivirus.apk" class="vac">백신설치 바로가기<span></span></a>
+								</td>
+							</tr>
+						</tbody>
+				</table>
+			</div>
+			<!-- //신용카드 -->
+
+			<!-- G통장(현금잔고) -->
+			<h4><span class="h4 pay2">G통장 <span>(현금잔고)</span></span></h4>
+			<div class="pay_grp">
+				<ul>
+					<li>G마켓에서 상품 구매시 사용할 수 있는 <em>고객님 만의 가상계좌</em>입니다.</li>
+					<li>현금잔고의 충전은 G마켓 고객님만을 위해 제공된<br /><em>전용계좌를 통해 입금</em>하시면 됩니다.<br /><span>(내 전용계좌 보기는 PC <img src="@Urls.MobileImageUrlV2/640/bu_arr10.png" alt="" /> G마켓 <img src="@Urls.MobileImageUrlV2/640/bu_arr10.png" alt="" /> 나의쇼핑정보 <img src="@Urls.MobileImageUrlV2/640/bu_arr10.png" alt="" /> G통장에서 가능합니다)</span></li>
+				</ul>
+			</div>
+			<!-- //G통장(현금잔고) -->
+
+			<!-- 은행송금(전용계좌) -->
+			<h4><span class="h4 pay3">은행송금 <span>(전용계좌)</span></span></h4>
+			<div class="pay_grp">
+				<ul>
+					<li>고객님이 인터넷뱅킹이나 은행송금으로 구매금액을<br /><em>G마켓에 직접 입금</em>하는 결제방식 입니다.</li>
+					<li>주문 후 <em>7일내 입금확인</em>이 되어야, 주문하신 상품 배송에 문제가<br />없습니다. <span>(상품별 변동가능)</span></li>
+				</ul>
+			</div>
+			<!-- //은행송금(전용계좌) -->
+
+			<!-- 휴대폰 소액결제 -->
+			<h4><span class="h4 pay4">휴대폰 소액결제</span></h4>
+			<div class="pay_grp pay_grp2">
+				<ul>
+					<li>구매금액이 고객님 <em>휴대폰 사용료에 포함되는 결제</em>방식 입니다.</li>
+					<li>SMS로 전달되는 <em>인증번호만 입력하시면 완료</em>되는<br />간편한 방식 입니다.</li>
+					<li>아이폰 유의사항<br />아이폰 사용 고객님은 휴대폰내 브라우저를 통해 G마켓에 접속할 때만<br />이용가능 합니다. <em>(어플 접속시 불가)</em></li>
+				</ul>
+			</div>
+			<!-- //휴대폰 소액결제 -->
+			
+		</div>
+		<!-- //결제안내 -->
+
+	</div>
+	<!-- //CONTENT -->
+
+	<hr />

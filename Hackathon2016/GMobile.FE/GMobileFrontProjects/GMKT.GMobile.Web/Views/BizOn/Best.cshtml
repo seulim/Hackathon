@@ -1,0 +1,75 @@
+﻿<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/bizon.css" />
+
+<div class="bizon_head" onclick="javascript:goBizOnHome();">
+	<div class="logo_wrap">
+		<h2 class="logo">biz on</h2>
+		<p class="tx">사업자 회원의 합리적인 선택</p>
+	</div>
+</div>
+<!-- //HEADER -->
+
+<hr />
+
+<!-- CONTENT -->
+<div id="content">
+	<div class="biz_cont">
+		<div class="cont_tit">
+			<p class="tx">베스트 100</p>
+		</div>
+		<div class="mbest_wrap">
+			<ul class="mbest_lst">
+			@if (Model != null && Model.Count > 0)
+			{
+				int index = 1;
+				foreach(GMKT.GMobile.Data.BizOnItem item in Model)
+				{
+				<li>
+					<a href="@item.LinkURL">
+						<span class="rank">@index</span>
+						<div class="img_bx">
+							<img src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@item.ImageURL" />
+						</div>
+						<div class="info_bx">
+							<strong class="tit">@item.ItemTitle</strong>
+							<div class="price_box">
+								<span class="per_price"><span class="blind">정가</span>@item.OriginalPrice</span>
+								<strong class="price"><span class="blind">할인가</span>@item.Price</strong>
+							</div>
+							@if (!String.IsNullOrEmpty(item.DeliveryString) && item.DeliveryString.Equals("무료배송"))
+							{
+							<span class="ico_del">무료배송</span>
+							}
+						</div>
+					</a>
+				</li>
+					index++;
+				}
+			}
+			</ul>
+		</div>
+	</div>
+@if (PageAttr.IsApp == false)
+{
+	<a href="javascript:;" class="btn_top_bar">Top으로 이동</a>
+}
+</div>
+<!-- //CONTENT -->
+<hr />
+
+
+@section scripts
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript">
+	function goBizOnHome() {
+		location.href = "@Urls.MobileWebUrl/BizOn";
+	}
+
+	$(document).ready(function () {
+		$("div.img_bx img").lazyload({
+			effect: "fadeIn",
+			threshold: 350
+		});
+	});
+</script>
+}

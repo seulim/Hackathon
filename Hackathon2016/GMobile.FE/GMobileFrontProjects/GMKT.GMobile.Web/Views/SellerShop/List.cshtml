@@ -1,0 +1,269 @@
+﻿@using GMKT.GMobile.Data;
+@using GMKT.GMobile.Data.SellerShop;
+@using GMKT.GMobile.Web.Models;
+
+@model SellerShopLPSRPModel
+
+<!-- 샵 영역 -->
+<div id="content" class="mshopCtns">
+
+	@Html.Partial("_SellerShopHeaderPartial")
+
+	<!-- 샵 바디 -->
+	<div class="shop--body">
+
+        <!-- 카테고리 배너 -->
+        <div class="category--banner" id="LpCategoryBanner" style="display:none;"></div>
+        <!-- //카테고리 배너 -->
+        @if (Model.MenuName == "SRP")
+        {   
+        <!-- 검색결과 (검색어, Count)  -->
+		<!--div class="shop--search_category">
+			<div class="shop-category">
+				<div class="category_header" id="searchHader" style="display:none;"></div>
+			</div>
+		</div//-->
+		<!-- //검색결과 (검색어, Count)  -->
+        }
+
+        <!-- 정렬/필터 -->
+        <div class="shop-item_filter">
+		    <div class="shop--list_filter">
+                <div class="result_count">
+					<button type="button" class="button button--item-count" id="btnTotalCount"></button>
+				</div>                <div class="filter">
+                    <div class="sorting">
+						<select id="selListSort">
+							<option value="@Convert.ToInt32(SellerShopSortType.SellPointDesc)">판매인기순</option>
+						    <option value="@Convert.ToInt32(SellerShopSortType.New)">신규등록순</option>
+						    <option value="@Convert.ToInt32(SellerShopSortType.ConPointDesc)">상품평많은순</option>
+						    <option value="@Convert.ToInt32(SellerShopSortType.SellPriceDesc)">높은가격순</option>
+						    <option value="@Convert.ToInt32(SellerShopSortType.SellPriceAsc)">낮은가격순</option>
+						</select>
+						<label for="selListSort" class="sorting_icon">정렬</label>
+					</div>                    <ul class="filter_view">
+					    <li class="view-item" id="liViewTypeList"><a href="javascript:changeListType('list');"><span class="icon_listing_2">갤러리형</span></a></li>
+					    <li class="view-item" id="liViewTypeGallery"><a href="javascript:changeListType('img');"><span class="icon_listing_1">리스트형</span></a></li>
+				    </ul>
+                    <button type="button" class="button button--item-filter"><span class="icon_detail_search">상세검색</span></button>
+			    </div>
+
+			    
+			    
+		    </div>
+        </div>
+		<!-- //정렬/필터 -->
+
+		<div class="shop--list_category">
+			<!-- LP 카테고리 -->
+			<div class="shop-category">
+				<div class="category_header" id="categoryHeader"></div>
+				<div class="swipe--conatiner" id="LpCategoryList" ></div>
+			</div>
+			<!-- //LP 카테고리 -->
+		</div>
+
+		<div class="dp-filter--detail" id="detailSearchLayer">
+			<div class="ui_detail-search">
+				<div class="detail-search_area">
+					<dl class="detail-search_item detail-search_item__keyword">
+						<dt>상세검색</dt>
+						<dd>
+							<ul class="search-type">
+								<li><label><input type="radio" class="ui_radio" name="searchType" checked="" value="N">결과 내 재검색</label></li>
+								<li><label><input type="radio" class="ui_radio" name="searchType" value="Y">제외 키워드</label></li>
+							</ul>
+							<div class="search-input">
+								<span class="has_inputbox-icon ui_search-input">
+									<input type="text" class="ui_inputbox ui_inputbox--full" placeholder="검색어를 입력하세요" id="scKeyword">
+									<button type="button" class="ui_inputbox-icon-button ui_search-input__clear">
+										<span class="icon_search_reset">검색어 삭제</span>
+									</button>
+								</span>
+							</div>
+						</dd>
+					</dl>
+					<dl class="detail-search_item detail-search_item-benefit">
+						<dt>혜택/배송</dt>
+						<dd>
+							<ul class="search-type">
+								<li><label><input type="checkbox" class="ui_checkbox" id="free_delivery"> 무료배송</label></li>
+								<li><label><input type="checkbox" class="ui_checkbox" id="smart_delivery"> 스마트배송</label></li>
+								<li><label><input type="checkbox" class="ui_checkbox" id="discount"> 상품할인</label></li>
+								<li><label><input type="checkbox" class="ui_checkbox" id="mileage"> Smile Point</label></li>
+							</ul>
+						</dd>
+					</dl>
+					<dl class="detail-search_item detail-search_item-price">
+						<dt>가격대</dt>
+						<dd>
+							<div class="range">
+								<input type="number" class="ui_inputbox ui_inputbox--full" placeholder="입력하세요" value="" id="minPrice">
+							</div>
+							<span class="dash">~</span>
+							<div class="range">
+								<input type="number" class="ui_inputbox ui_inputbox--full" placeholder="입력하세요" value="" id="maxPrice">
+							</div>
+						</dd>
+					</dl>
+				</div>
+				<div class="detail-search__btns">
+					<button type="button" class="ui_button" id="resetDetail">초기화</button>
+					<button type="button" class="ui_button ui_button--quiet" id="searchDetail">검색하기</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- LP/SRP 전시영역 -->
+		<div class="shop--display-list">
+			<div class="product-list-view" id="productListView" data-product-list-view="listing_gallery">
+				<ul class="product-list" id="productListWrap"></ul>
+                <ul class="product-list" id="productListLoading" style="display:none;">
+                    <li class="product-list__etc">
+	                    <div class="result_message">
+		                    <p class="title">로딩중입니다.<br>잠시만 기다려 주십시오.</p>
+	                    </div>
+                    </li>
+                </ul>
+                <div class="pagination" id="paginationWrap" style="display:none;"></div>
+			</div>
+		</div>
+		<!-- //LP/SRP 전시영역 -->
+
+	</div>
+	<!-- //샵 바디 -->
+
+	<div class="shop--overlay"></div>
+@if (!PageAttr.IsApp)
+{
+	<a href="javascript:;" class="btn_top_bar">Top으로 이동</a>
+}
+</div>
+<!-- //샵 영역 -->
+
+<script id="item-template" type="text/x-handlebars-template">
+{{#each Item}}
+<li class="product-list__item{{getPurchaseClass this}}">
+	<div class="product">
+		<div class="product__image">
+			<a href="javascript:;" onclick="sellershopController.addHistoryAndGo('item', '{{GoodsName}}', '@Urls.MItemUrl?goodsCode={{GoodsCode}}', '{{ImageUrl}}', '');">
+				<img src="{{ImageUrl}}" alt="">
+			</a>
+		</div>
+		<div class="product__body">
+			<div class="product__title">{{Delivery.DeliveryCode}}
+				<a href="javascript:;" onclick="sellershopController.addHistoryAndGo('item', '{{GoodsName}}', '@Urls.MItemUrl?goodsCode={{GoodsCode}}', '{{ImageUrl}}', '');">{{#if BrandNameTag}}{{BrandNameTag}} {{/if}}{{GoodsName}}</a>
+			</div>
+            <div class="product__body-btm">
+				<div class="product__price">{{getItemPrice AdCouponPrice}}</div>
+				<div class="product__purchase">구매 <em>{{BuyCount}}</em></div>
+                {{#ifDeliveryShow Shipping}}
+				<div class="product__delivery">{{getDeliveryText this}}</div>
+                {{/ifDeliveryShow}}
+			</div>
+			
+            <button type="button" class="button button--favorite" data-goodscode="{{GoodsCode}}"><span class="icon_favorite">관심상품</span></button>
+			
+			{{#ifCartVisible IsCartVisible}}
+			<button type="button" class="button button--cart" data-goodscode="{{GoodsCode}}"><span class="icon_cart">장바구니 담기</span></button>
+			{{/ifCartVisible}}
+		</div>
+	</div>
+</li>
+{{/each}}
+</script>
+
+<script id="no-item-template" type="text/x-handlebars-template">
+{{#if isLP}}
+	<li class="product-list__etc"><div class="result_message">검색 결과가 없습니다.</div></li>
+{{else}}
+    <li class="product-list__etc">
+	    <div class="result_message">
+		    <p class="title"><strong class="txt-keyword">{{keyword}}</strong> (으)로 검색된 상품이 없습니다.</p>
+		    <p class="description">입력하신 검색어를 다시 한번 확인해 주세요.</p>
+	    </div>
+    </li>
+{{/if}}
+</script>
+
+<script id="pagination-template" type="text/x-handlebars-template">
+<a href="javascript:;" class="{{prevClass}}" onclick="getPageListAndGoTop(params.pageNo - 1)">이전</a>
+<span class="pagination_pages">
+{{#each pages}}
+<a href="javascript:;" class="{{cssStyle}}" onclick="getPageListAndGoTop({{no}})">{{no}}</a>
+{{/each}}
+</span>
+<a href="javascript:;" class="{{nextClass}}" onclick="getPageListAndGoTop(params.pageNo + 1)">다음</a>
+</script>
+
+<script id="search-header-template" type="text/x-handlebars-template">
+<em class="txt-keyword">{{keyword}}</em><span class="txt-name">검색결과</span>
+<em class="txt-count">{{categoryCount}}</em><span class="txt-text">카테고리</span>
+<em class="txt-count">{{totalCount}}</em><span class="txt-name">상품</span>
+</script>
+
+<script id="category-header-template" type="text/x-handlebars-template">
+{{#if isLP}}{{else}}<span class="txt-category" onclick="selectParent('A');">전체</span>{{/if}}
+{{#ifCatetory data.LcId}}<span class="txt-category" onclick="selectParent('L', '{{data.LcId}}');">{{data.LcIdName}}</span>{{/ifCatetory}}
+{{#ifCatetory data.McId}}<span class="txt-category" onclick="selectParent('M', '{{data.McId}}');">{{data.McIdName}}</span>{{/ifCatetory}}
+{{#ifCatetory data.ScId}}<span class="txt-category" onclick="selectParent('S', '{{data.ScId}}');">{{data.ScIdName}}</span>{{/ifCatetory}}
+</script>
+
+<script id="category-template" type="text/x-handlebars-template">
+<div class="swipe--unit">
+    {{#each data.Category}}
+    {{getCategoryListStartTag}}
+	<li><a href="javascript:void(0);" onclick="selectChild({{../depth}}, '{{CategoryId}}');"><span class="txt-name">{{CategoryNm}}</span><em class="txt-count">({{CategoryCount}})</em></a></li>
+    {{getCategoryListEndTag}}
+    {{setCategoryIndex}}
+    {{/each}}
+</div>
+</script>
+
+<script id="category-banner-template" type="text/x-handlebars-template">
+<a href="javascript:;" onclick="categoryBannerLnk('{{ImageLnkUrl}}');"><img src="{{ImagePath}}" alt=""></a>
+</script>
+
+<script id="total-count-template" type="text/x-handlebars-template">
+    <em class="count_cateogrys">{{categoryCount}}</em>&nbsp;카테고리&nbsp;<em class="count_items">{{goodsCount}}</em>&nbsp;상품
+</script>
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/shop/jqueryCookie.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/shop/SellerShopList_v2.js"></script>
+<script type="text/javascript">
+var PAGE_SIZE = 20;
+var PAGENATION_SIZE = 5;
+var MENU_NAME = "@Model.MenuName";
+var IS_SHOP_CATEGORY = @Model.IsShopCategory.ToString().ToLowerInvariant();
+
+var params =
+{
+	shopAlias: Const.ALIAS	
+	, keyword: "@Model.Keyword"
+	, scKeyword: ""
+	, shopCategory: "@Model.ShopCategory"
+	, lcId: "@Model.LcId"
+	, mcId: "@Model.McId"
+	, scId: "@Model.ScId"
+	, pageNo: 1
+	, pageSize: PAGE_SIZE
+	, lastPage: 1
+	, sort: @Model.Sort
+	, minPrice: 0
+	, maxPrice: 0
+	, isExKeyword: "N"
+	, isFreeDelivery: "N"
+	, isMileage: "N"
+	, isDiscount: "N"
+	, isStamp: "N"
+	, isSmartDelivery: "N"
+	, listType: "img"	
+	, isAjax : true
+};
+
+var isLogin = @ViewBag.IsLogin;
+var hashParams = ['scKeyword','shopCategory','pageNo','sort','minPrice','maxPrice','lcId','mcId','scId','listType','isExKeyword','isFreeDelivery','isMileage','isDiscount','isStamp','isSmartDelivery'];
+
+
+$(document).ready(function() {    renderSearchTextBox("@Model.MenuName");});
+</script>

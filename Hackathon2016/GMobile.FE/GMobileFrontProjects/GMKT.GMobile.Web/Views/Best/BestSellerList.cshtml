@@ -1,0 +1,175 @@
+﻿@using GMKT.GMobile.Data;
+@{
+	string listUrl = String.Format("{0}/Best/BestSellerList?type={1}&code={2}", Urls.MobileWebUrl, Model.BestType, Model.Code);
+	string adultImageUrl = Urls.MobileImageUrlV2 + GMKT.GMobile.Constant.Const.ADULT_IMAGE_280.Replace("images/", string.Empty);
+}
+
+
+<!-- CONTENTS -->
+<div id="contents" class="cts">
+	<!-- G_CATEGORY -->
+	<div class="g_category">
+        <!-- GBEST MENU -->
+		<div class="mhgroup4" style="margin-bottom:0;">
+			<h3 class="longText">@Model.ListName</h3>
+		</div>
+    @if (Model.SearchResultCategory != null && Model.SearchResultCategory.Count > 0)
+	{
+    	<!-- CATE_LIST -->
+		<div class="cate_listW" id="cate_listW">
+			<ul class="cate_list">
+        @foreach (CategoryInfo category in Model.SearchResultCategory)
+		{
+			string categoryLinkUrl = String.Format("{0}/Best/BestSellerList?type={1}&code={2}&listView={3}", Urls.MobileWebUrl, category.Type, category.Code, Model.ListViewType);
+			if ((category.Code.Equals("200000117") || BizUtil.isAdultCategory(category.Code)) && !PageAttr.IsLogin)
+			{
+				categoryLinkUrl = GMKT.GMobile.Constant.ConstDef._GMW_LOGIN_AD_URL + "?rtnurl=" + HttpUtility.UrlEncode(categoryLinkUrl, System.Text.Encoding.GetEncoding("euc-kr")) + "&adultUseLoinCheck=Y";
+			}
+			<li><a href="@categoryLinkUrl">@category.Name</a></li> 
+		}
+			</ul>
+			<a href="#" class="btn_more"><span>더보기</span></a>
+			<a href="#" class="btn_close"><span>닫기</span></a>
+		</div>
+	}
+	</div>
+	<!--// G_CATEGORY -->
+
+	<!-- PRODUCT ALIGN -->
+	<div class="view_type">
+		<div class="view_type_sub">
+			<div class="p_right">
+				<div class="viewmd">
+					<ul>
+						<li><a href="@listUrl&listView=H"><img src="@Urls.MobileImageUrlV2/480/btn_view_img@(Model.ListViewType.Equals("H") ? "_on" : "").gif" alt="이미지리스트"/></a></li>
+						<li><a href="@listUrl&listView=V"><img src="@Urls.MobileImageUrlV2/480/btn_view_list@(Model.ListViewType.Equals("V") ? "_on" : "").gif" alt="리스트"/></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="@(Model.ListViewType.Equals("H") ? "horizontal_list" : "vertical_list")">
+		<ul>
+        @if (Model.BestItems != null && Model.BestItems.Count > 0)
+		{
+			int i = 1;
+			foreach (SearchItemModel sm in Model.BestItems)
+			{
+				string vipUrl = sm.LinkURL;
+				if (sm.IsAdult && !PageAttr.IsLogin)
+				{
+					vipUrl = GMKT.GMobile.Constant.ConstDef._GMW_LOGIN_AD_URL + "?rtnurl=" + HttpUtility.UrlEncode(sm.LinkURL) + "&adultUseLoinCheck=Y";
+				}
+			<li>
+			    <a class="anchor" href="@vipUrl">
+					<span class="thumbnail_wrap">
+                        @if (sm.IsAdult && Model.ShowAdultImage)
+						{
+						<img class="thumbnail" src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@adultImageUrl" alt="" onerror="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" />
+						}
+						else
+						{
+						<img class="thumbnail" src="@Urls.MobileImageUrlV2/shop/img/lazy_395x395.gif" data-original="@sm.ImageUrl" alt="" onerror="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" />
+						}
+						<span class="flag_sky">@i</span>
+					</span>
+					<span class="goods_name">@sm.GoodsName</span>
+					<span class="goods_info">
+                    @if (sm.DispPrice == 0)
+					{
+						if (Model.ListViewType.Equals("H"))
+						{
+						<span class="price" style="text-decoration:none;">&nbsp;</span>
+						}
+						if (sm.GStampCount > 0)
+						{
+						<span class="sale_price">G스탬프 @sm.GStampCount 장</span>
+						}
+					}
+					else if (sm.DispPrice == 1)
+					{
+						if (Model.ListViewType.Equals("H"))
+						{
+						<span class="price" style="text-decoration:none;">&nbsp;</span>
+						}
+						<span class="sale_price">무료</span>
+					}
+					else
+					{
+						if (sm.SellPrice.Equals(sm.DispPrice))
+						{
+							if (Model.ListViewType.Equals("H"))
+							{
+							<span class="price" style="text-decoration:none;">&nbsp;</span>
+							}
+						}
+						else
+                        {
+							<span class="price">@CurrencyUtil.ToMoney(sm.SellPrice.ToString(), true)</span>
+						}
+						<span class="sale_price">@CurrencyUtil.ToMoney(sm.DispPrice.ToString(), true)</span>
+					}
+					@if (sm.DeliveryFee == 0 && sm.DeliveryInfo.Equals("무료배송"))
+                    {
+						<span class="free">무료배송</span>
+					}
+                    else if (sm.DeliveryFee > 0 && sm.DeliveryInfo.IndexOf("원") > 0)
+                    {
+                        <span class="fee">배송비 @CurrencyUtil.ToMoney(sm.DeliveryFee.ToString(), true)</span>
+					}
+					@*else if (sm.DeliveryFee > 0)
+					{
+						<span class="fee">배송비 @CurrencyUtil.ToMoney(sm.DeliveryFee.ToString(), true)</span>
+					}*@
+                    else
+                    {
+						<span class="pay">@Html.Raw(sm.DeliveryInfo.Replace("디지털쿠폰<br/>(방문사용)", "e쿠폰"))</span>
+                    }
+					</span>
+				</a>
+			</li>
+            i++;
+			}
+		}
+		</ul>
+
+	</div>
+    <!--모바일 홈 바로가기-->
+    @if (!PageAttr.IsIphone && !PageAttr.IsIpad && !PageAttr.IsIpod)
+	{
+		if (PageAttr.IsAndroidApp)
+		{
+		<div class="go_homebnr"><a onclick="javascript:MobileAppUtil.SendScheme('bestseller')" ><img src="@Urls.MobileImageUrlV2/640/banner/go_home5.jpg" alt="G마켓베스트 홈화면 바로가기 추가" /></a>
+		</div>
+		}
+		else
+		{
+		<div class="go_homebnr"><a onclick="javascript:MobileAppUtil.CheckApplicationInstall('bestseller')" ><img src="@Urls.MobileImageUrlV2/640/banner/go_home5.jpg" alt="G마켓베스트 홈화면 바로가기 추가" /></a>
+		</div>
+		}
+	}
+	<!--모바일 홈 바로가기-->
+</div>
+<!--// CONTENTS -->
+
+@section scripts
+{
+<script type="text/javascript" src="@Urls.MobileWebUrl/js/common/front.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+<script type="text/javascript">
+	UL_layoutFix(".horizontal_list", true);
+
+	$(document).ready(function () {
+		$("#cate_listW").moreCategory2(".btn_more", 5);
+		$("img.thumbnail").lazyload();
+	});
+
+	window.onload = function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+	}
+</script>
+}

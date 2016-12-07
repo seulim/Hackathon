@@ -1,0 +1,41 @@
+﻿@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Controllers;
+@using GMKT.GMobile.Membership
+
+@if (PageAttr.ViewHeader == true)
+{
+	<!-- SKIP NAVI -->
+	<div class="hp">
+		<a href="#content">본문 바로가기</a>
+	</div>
+	<!-- //SKIP NAVI -->
+
+	<!-- HEADER -->
+	<div id="head" class="v2">
+		<div id="header_wrapper">
+	@if (PageAttr.Exid == ExIdAppEnum.None)
+ {
+			<div class="hd_wrap" id="header_st">
+			</div>
+ }
+		</div>
+		<script type="text/javascript">
+			var gmHeader = new GMHeader(@PageAttr.IsMain.ToString().ToLower(), true);
+		</script>		<a href="@Urls.MobileWebUrl/Mart" class="sp_head ico_back">마트 페이지로 이동</a>	</div>
+	<!--// HEADER -->
+}
+else
+{
+    if (PageAttr.Exid == ExIdAppEnum.SFC)
+    {
+        <script type="text/javascript">
+			var gmHeader = new GMHeader(@PageAttr.IsMain.ToString().ToLower(), @Convert.ToInt32(PageAttr.HeaderType), "@PageAttr.HeaderCode");
+			@if (ViewBag.HeaderTitle != null && ViewBag.HeaderTitle is String && !String.IsNullOrEmpty(ViewBag.HeaderTitle))
+           {
+			                    <text>
+			                    gmHeader.setAppHeaderTitle("@ViewBag.HeaderTitle");
+			                    </text>
+           }
+		</script>
+    }
+}

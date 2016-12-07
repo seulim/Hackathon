@@ -1,0 +1,59 @@
+﻿@model GMKT.GMobile.Web.Models.BrandListModel
+@using GMKT.GMobile.Data.ShopBest;
+
+<!-- CONTAINER -->
+<div id="sb_container">
+	
+	@Html.Partial( "Shared/_ShopBestHeader", Model, new ViewDataDictionary { { "HasOnlyFavoriteShopButton", false }, { "HasBestGroup", true }, { "MenuIndex", "2" } } )
+	
+	<div class="sb-body">
+		<!-- 브랜드 목록 -->
+		<div class="sb-brand_container">
+			<ul class="sb-brand_list" id="sb-brand_list">
+			@foreach (Brand brand in Model.BrandList)
+			{
+				<li>
+					<a href="@Urls.MobileWebUrl/ShopBest/BrandShop/@(Model.GroupCode)?brandNo=@(brand.ID)&brandName=@(brand.Name)" class="sb-brand_link">
+						<span class="sb-brand_rank">@brand.Rank</span>
+						<span class="sb-brand_logo">
+							@if( String.IsNullOrEmpty( brand.BRAND_IMAGE ) )
+							{
+								@Html.Raw(brand.Name);
+							}
+							else
+							{
+							<img src="@brand.BRAND_IMAGE" alt="@brand.Name"/>
+							}
+						</span>
+					</a>
+				</li>
+			}
+			</ul>
+		</div>
+		<!-- //브랜드 목록 -->
+	</div>
+</div>
+
+<!-- CONTAINER -->
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/shopbest.js?v=1"></script>
+<script id="brand_template" type="text/x-handlebars-template">
+{{#each Items}}
+	<li>
+		<a href="@Urls.MobileWebUrl/ShopBest/BrandShop/{{../groupCode}}?brandNo={{ID}}&brandName={{Name}}" class="sb-brand_link">
+			<span class="sb-brand_rank">{{Rank}}</span>
+			<span class="sb-brand_logo"><img src="{{BRAND_IMAGE}}" alt="{{Name}}"/></span>
+		</a>
+	</li>	
+{{/each}}
+</script>
+<script type="text/javascript">
+	var selectedGroupCode = "";
+
+	$('#sb_cate_selector').bind('change', function (event) {
+		var groupCode = $('#sb_cate_selector option:selected').val();
+		if (selectedGroupCode == groupCode) return;
+		
+		_ubLog('2-' + this.selectedIndex + 1, _ubLogActEnum.click);
+		window.location.href = '/ShopBest/Brand/' + groupCode;
+	});
+</script>

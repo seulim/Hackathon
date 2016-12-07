@@ -1,0 +1,36 @@
+@charset "utf-8";
+#hd{position:relative; background:#f9f9f9; border-bottom: 1px solid #d5d5d7}
+#hd h1{ }
+#hd h1 img { width: 57px;}
+#hd h1 a {display: inline-block; padding: 5px 6px; }
+#hd .gnb{overflow:hidden;position:absolute; top:6px;right:3px;}
+#hd .gnb li{float:left;padding:0 3px 0 2px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/shop/bg/bu_line_gnb.gif") no-repeat right 5px;background-size:1px 8px;-webkit-background-size:1px 8px;}
+#hd .gnb li a{display:block;padding:3px 5px 3px 5px;color:#6d6c6c;font-size:0.75em;letter-spacing:-1px;line-height:1.3em;}
+#hd .gnb li:last-child{background:none;}
+#hd .gnb li:first-child a{padding:3px 5px 3px 4px;}
+#hd .gnb li:last-child a{padding:3px 3px 3px 4px;}
+
+
+#ft{background:#8c8c8c;}
+#ft .ntc{position:relative;height:35px;border-top:1px solid #9a9fa6;background:#fff;}
+#ft .ntc ul{overflow:hidden;height:24px;padding:11px 70px 0 9px;}
+#ft .ntc ul li{overflow:hidden;height:24px;font-size:0.75em;font-weight:normal;letter-spacing:-1px;line-height:1.2em;text-overflow:ellipsis;white-space:nowrap;}
+#ft .ntc ul li a{margin:0 0 0 9px;color:#555;}
+#ft .ntc ul li span{color:#005dc6;}
+#ft .ntc .ntc_more{display:block;position:absolute;top:0;right:0;width:50px;height:22px;padding:13px 10px 0 10px;color:#959595;font-size:0.8em;font-weight:normal;line-height:11px;letter-spacing:-1px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/shop/bg/bu_arr1.png") no-repeat 47px 13px;background-size:6px 10px;-webkit-background-size:6px 10px;}
+#ft .fnb{overflow:hidden;height:32px;border-top:2px solid #333;border-bottom:1px solid #333;background:#626262;}
+#ft .fnb li{float:left;width:25%;}
+#ft .fnb li a{display:block;height:22px;padding:10px 0 0 0;border-right:1px solid #4a4a4a;color:#fff;font-size:0.75em;text-align:center;letter-spacing:-1px;line-height:12px;vertical-align:top;}
+#ft .fnb li:last-child a{border:0;}
+#ft .addr{padding:8px 0 16px 8px;}
+#ft .addr em{font-style:normal;font-weight:bold;}
+#ft .addr address{color:#fff;font-style:normal;font-size:0.7em;font-weight:normal;letter-spacing:-1px;line-height:13px;}
+#ft .addr address span{font-size:0.75em;}
+#ft .addr p{padding:4px 0 0 0;color:#fff;font-size:0.7em;font-weight:normal;line-height:13px;}
+#ft .addr .bsn{display:inline-block;width:78px;height:16px;margin:5px 0 0 0;padding:4px 0 0 7px;border:1px solid #5d5d5d;color:#fff;font-size:0.625em;font-weight:normal;letter-spacing:-1px;line-height:11px;background:#717171;box-shadow:0 1px 0 #878787;-webkit-box-shadow:0 1px 0 #878787;}
+#ft .addr .bsn span{display:block;width:72px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/shop/bg/bu_arr2.png") no-repeat right 1px;background-size:6px 9px;-webkit-background-size:6px 9px;}
+#ft .addr .terms{display:inline-block;width:53px;height:16px;margin:5px 0 0 7px;padding:4px 0 0 7px;border:1px solid #5d5d5d;color:#fff;font-size:0.625em;font-weight:normal;letter-spacing:-1px;line-height:11px;background:#717171;box-shadow:0 1px 0 #878787;-webkit-box-shadow:0 1px 0 #878787;}
+#ft .addr .terms span{display:block;width:46px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/shop/bg/bu_arr2.png") no-repeat right 1px;background-size:6px 9px;-webkit-background-size:6px 9px;}
+#ft .addr .copy{padding:3px 0 0 0;color:#fff;font-size:0.55em;font-weight:normal;line-height:17px;}
+#ft .addr .btn_info {display:inline-block;height:16px;margin:5px 0 0 7px;padding:4px 5px 0 7px;border:1px solid #5d5d5d;color:#fff;font-size:0.625em;font-weight:normal;letter-spacing:-1px;line-height:11px;background:#717171;box-shadow:0 1px 0 #878787;-webkit-box-shadow:0 1px 0 #878787;}
+#ft .addr .btn_info span{display:block; padding-right:10px;background:url("http://image.gmarket.co.kr/Gmarket_Mobile_v2/shop/bg/bu_arr2.png") no-repeat right 1px;background-size:6px 9px;-webkit-background-size:6px 9px;}

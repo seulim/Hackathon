@@ -1,0 +1,113 @@
+﻿@using GMKT.GMobile.Data
+
+@model LookV2BrandGalleryMain
+
+@section scripts{	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+}
+
+
+<!-- CONTENT -->
+<div id = "content">
+	<h2 class="blind">LOOK</h2>
+	<div class="look_renewal">
+		<div id="LookV2BrandGallery">
+			<ul class = "look_tab v2">
+				<li><a href="#" class="on" id="btnFashionBrandGallery"><span>Gallery</span></a></li>
+				<li><a href="#" id="btnFashionBrandBest"><span>Best</span></a></li>
+			</ul>
+			<div class="look_cate_wrap" id="BrandCategory"></div>
+			<div class="look_cont sub_cont">
+				<div class = "look_list_box brand" id="BrandGalleryDetail"></div>
+				<div class = "look_list_box brand v2">
+					<div id="BrandBestDetail"></div>
+					<div id="btnBrandBestMore"><a href="#" class="btn_look_more">Brand Best 더보기<span></span></a></div>
+				</div>
+			</div>
+		</div>
+		<a href="#" class="btn_top_main">Top으로 이동</a>
+	</div>
+	<script type = "text/javascript">
+		window.GMobile = window.GMobile || {};
+		window.GMobile.Look = window.GMobile.Look || {};
+
+		window.GMobile.Look.BrandPageType = "@ViewBag.pageType";
+		window.GMobile.Look.BrandMenuType = "@ViewBag.menuType";
+
+		$(document).ready(function(){
+			Handlebars.registerHelper("ifNotZero", function(a, opts){
+				if (typeof a === 'undefined' || a == null || a == '')
+					a = 0;
+
+				if (parseInt(a) != 0)
+					return opts.fn(this);
+				else
+					return opts.inverse(this); 
+			});
+		});
+	</script>
+
+	<script id="brand_gallery_template" type="text/x-handlebars-template">
+		<ul>
+			{{#each GalleryItems}}
+				{{#ifBrandGalleryExposeTypeBanner ExposeType}}
+					<li class="wide">
+						<a href= "{{LandingUrl}}">
+							<span class="img_box"><img src="{{ImageUrl}}" alt=""/>
+							<span class="txt">{{GoodsName}}</span>
+						</a>
+					</li>
+				{{else}}
+					<li>
+						<a href="{{LandingUrl}}">
+							<span class="img_box"><img src = "{{ImageUrl}}" alt=""/>
+							<span class="info_box">
+								<span class="info01">{{GoodsName}}</span>
+								<strong class="price">{{Price}}
+								{{#ifNotZero DiscountRate}}
+									<span>
+										{{DiscountRate}}%
+									</span>
+								{{/ifNotZero}}
+								</strong>
+							</span>
+						</a>
+					</li>
+				{{/ifBrandGalleryExposeTypeBanner}}
+			{{/each}}
+		</ul>
+	</script>
+	<script id="brand_best_template" type="text/x-handlebars-template">
+		<ul>
+			{{#each BestItems}}
+				<li>
+					<a href="{{LandingUrl}}">
+						<span class="img_box"><img src="{{ImageUrl}}" alt=""/></span>
+						<span class="info_box">
+							<strong class="m_txt">{{BrandName}}</strong>
+							<span class="info01">{{GoodsName}}</span>
+							<strong class="price">{{Price}}
+							{{#ifNotZero DiscountRate}}
+								<span>
+									{{DiscountRate}}%
+								</span>
+							{{/ifNotZero}}
+							</strong>
+						</span>
+					</a>
+				</li>
+			{{/each}}
+		</ul>
+	</script>
+	<script id="brand_category_template" type="text/x-handlebars-template">
+		<ul class="look_cate brand">
+			{{#each Category}}
+				<li><a href="#" value="{{LCategoryCode}}">{{LCategoryName}}</a></li>
+			{{/each}}
+		</ul>
+	</script>
+	
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/LookV2BrandController.js"></script>
+</div>

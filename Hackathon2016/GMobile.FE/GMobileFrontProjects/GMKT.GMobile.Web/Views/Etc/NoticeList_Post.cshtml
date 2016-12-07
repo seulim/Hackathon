@@ -1,0 +1,9 @@
+﻿@using GMKT.GMobile.Constant;
+@{
+    Layout = "";
+
+    foreach (var list in Model.NoticeList)  
+    {
+				<li><a href="@Urls.MobileWebUrl/Etc/NoticeDetail?seq=@list.Seq">@list.Title<span>@list.RegDt</span></a></li>
+    }
+}

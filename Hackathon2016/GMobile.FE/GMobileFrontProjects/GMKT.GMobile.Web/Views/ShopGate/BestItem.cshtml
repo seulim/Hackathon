@@ -1,0 +1,84 @@
+﻿@using GMKT.GMobile.Web.Models;
+@model List<BestItemModel>
+
+@{
+	Layout = null;
+	bool hasBestItem = (Model != null && Model.Count > 0) ? true : false;
+}
+
+
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0, user-scalable=yes, target-densitydpi=medium-dpi, width=device-width" />
+	<meta name="format-detection" content="telephone=no" />
+
+	<title>미니샵</title>
+
+	<link href="@Urls.ScriptUrl/css/mitem/320/common_2013_10.css" rel="stylesheet"/>
+	<style type="text/css">
+		.shop_best_item { padding-bottom: 8px; border: 1px solid #d7d7d7; background: #fff;}
+		.shop_best_item h3 { color:#252525; padding: 13px 13px 10px 13px;}
+		.shop_best_item ul { overflow: hidden; margin: 0 1.7%}
+		.shop_best_item ul li { float: left; width: 33.3%; vertical-align: top;}
+		.shop_best_item ul li a { display: block; width: 82px;margin: 0 auto;}
+		.shop_best_item ul li img { display: block; margin-bottom: 5px; width: 80px; height: 80px; border: 1px solid #e3e3e3}
+		.shop_best_item ul li .name {display: block; overflow:hidden; font-size:0.72em;font-weight:normal;text-align:center; line-height:14px;color:#555;font-weight:normal; text-overflow: ellipsis;-webkit-box-orient: vertical;display: -webkit-box;word-wrap:break-word; -webkit-line-clamp: 2;}
+		.shop_best_item ul li .price {display: block; text-align: center; color: #000;font-size: .8em;}
+		.shop_best_item ul li .price strong { font-size: 1.15em; vertical-align: -1px}
+	</style>
+	<script type="text/javascript">
+		document.domain = "gmarket.co.kr";
+	</script>
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/guidGeneration.js"></script>
+</head>
+<body>
+<!-- 미니샵 Best Item -->
+@if (hasBestItem)
+{
+    int index = 0;
+	<div class="shop_best_item">
+		<h3>BEST ITEM</h3>
+		<ul>
+@foreach (var eachItem in Model)
+{
+			<li onclick="javacript:pdsClickLog('200000234','item',{'goodscode':'@ViewBag.GoodsCode','shop_goodscode':'@eachItem.GoodsCode','asn':'@index'});SnaUrlFooter('716600068');">
+				<a href="javascript:;" onclick="parent.location.href='@eachItem.LandingUrl'">
+					<img src="@eachItem.ImageUrl" alt="" >
+					<span class="name">@eachItem.Name</span>	
+					<span class="price"><strong>@eachItem.Price</strong>@eachItem.PriceAppendString</span>						
+				</a>
+			</li>
+    index++;
+}
+		</ul>
+	</div>
+}
+<!-- //미니샵 Best Item -->
+</body>
+</html>
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+@if (hasBestItem == false)
+{
+<script type="text/javascript">
+	$(document).ready(function () {
+		$("#bestIframe", parent.document).hide();		
+	});
+</script>	
+}
+else
+{
+	<script type="text/javascript">
+		function SnaUrlFooter(fcd) {
+			$.get("http://sna.gmarket.co.kr/?fcd=" + fcd);
+		}
+
+		function pdsClickLog(areaCode, areaType, areaValue) {
+		    if (pvprofiler && pvprofiler.sendEvt) {
+		        pvprofiler.sendEvt("click", areaCode, areaType, areaValue);
+		    }
+		}
+	</script>
+}

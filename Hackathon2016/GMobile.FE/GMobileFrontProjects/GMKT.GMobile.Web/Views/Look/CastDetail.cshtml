@@ -1,0 +1,179 @@
+﻿@using GMKT.GMobile.Data;
+
+<!-- CONTENT -->
+<div id="content">
+	<h2 class="blind">패션</h2>
+	<div class="look_renewal">
+		@if (Model != null && Model.Seq > 0)
+		{
+		<div class="cast_cont">
+			<div class="cast_info">
+				<img src="@Model.PublisherImageUrl" alt="" />
+				<span class="txt">
+					<strong>@Model.ContentsTitle</strong>
+					<span>@Model.PublisherName</span>
+				</span>
+				<a href="#" class="btn_share" onclick="popBlockUI('layer_sns');return false;">공유하기</a>
+			</div>
+			@if (Model.IsMovie && Model.IsValidMovie)
+			{
+			<div class="visual_box">	   
+				<div class="movie_box">
+					<img src="@Urls.MobileImagePics/mobile/main/bg_look_movie.jpg" alt="">
+					<div id="movieIframe" style="">@Html.Raw(Model.IframeHtml)</div>
+				</div>
+				<div id="agreeLayer" class="ly_data_alert">
+					<strong	>동영상은 무료이나 이동통신망(3G/LTE 등)으로 <br>접속 시 데이터 통화료가 발생할 수 있습니다.</strong>
+					<div class="btn_area">
+						<a href="javascript:;" class="btn_ok">확인</a>
+					</div>
+				</div>
+			</div>
+			}
+			else
+			{
+				if (String.IsNullOrEmpty(Model.IframeHtml))
+				{
+				<div class="new_area">
+					<img src="@Model.ImageUrl" onclick="" alt="" />		
+				</div>
+				}
+				else
+				{
+				<div class="new_area">		
+					@Html.Raw(Model.IframeHtml)
+				</div>
+				}
+			}
+		</div>
+		<ul class="look_tab v2">
+			<li><a href="javascript:;" onclick="javascript:selectTab('item');" class="on"><span>연관상품</span></a></li>
+			<li><a href="javascript:;" onclick="javascript:selectTab('cast');"><span>연관 Cast</span></a></li>
+		</ul>
+		<div class="look_cont sub_cont">
+			<div id="relatedItems" class="look_list_box brand v3">
+				@if (Model.RelatedItems != null && Model.RelatedItems.Count > 0)
+				{
+				<ul>
+					@foreach(LookV2CastRelatedItem ri in Model.RelatedItems)
+					{
+					<li>
+						<a href="@ri.LandingUrl">
+							<span class="img_box"><img src="@ri.ImageUrl" alt="" /></span>
+							<span class="info_box">
+								<span class="info01">@ri.GoodsName</span>
+								<strong class="price">@ri.Price
+								@if (!String.IsNullOrEmpty(ri.DiscountRate) && !ri.DiscountRate.Trim().Equals("0"))
+								{
+								<span>@ri.DiscountRate%</span>
+								}
+								</strong>
+							</span>
+						</a>
+					</li>
+					}
+				</ul>
+				}
+			</div>
+		</div>
+		<div class="look_cont sub_cont">
+			<div id="relatedCasts" class="look_list_box cast" style="display:none">
+				@if (Model.RelatedCasts != null && Model.RelatedCasts.Count > 0)
+				{
+				<ul>
+					@foreach(LookV2CastContents rc in Model.RelatedCasts)
+					{
+					<li>
+						<a href="@rc.LandingUrl">
+							<span class="img_box">
+								<img src="@rc.ImageUrl" alt="">
+							</span>
+							<span class="info_box">
+								<strong class="m_txt ch_line2">
+									<span class="ml2">@rc.ContentsTitle</span>
+								</strong>
+								<span class="info02"><img src="@rc.PublisherImageUrl" alt="">@rc.PublisherName</span>
+							</span>
+						</a>
+					</li>		 
+					}
+				</ul>
+				}
+			</div>
+		</div>
+		}
+		@if(!PageAttr.IsApp)
+		{
+		<a href="#" class="btn_top_main">Top으로 이동</a>
+		}		
+	</div>
+
+	<div class="share_sns" id="layer_sns">
+		<h4 class="tit">공유하기</h4>
+		<div class="sns">
+			<a href="javascript:CheckPc(MobileSnsUtil.snsType().KAKAOTALK);" class="cco" id="SnsKakaoTalk">카카오톡</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().FACEBOOK);" class="face">페이스북</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().TWITTER);" class="twt">트위터</a>
+			<a href="javascript:ShareTo(MobileSnsUtil.snsType().KAKAOSTORY);" class="ccos">카카오스토리</a>
+		</div>
+		<a href="#" class="close_sns" onclick="popBlockUI('layer_sns');return false;">닫기</a>
+	</div>
+</div>
+<!-- //CONTENT -->@section scriptfiles
+{
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js"></script>
+}@section scripts{<script type = "text/javascript">
+	var ShareTo = function (type) {
+		var dataName = "G마켓 LOOK 패션&뷰티 Cast";
+		switch (type) {
+			case MobileSnsUtil.snsType().KAKAOTALK:
+				dataName = "LOOK 패션&뷰티 Cast";
+				break;
+			default:
+				break;
+		}
+		var data = {
+			"name": dataName,
+			"url": location.href,
+			"title": ""
+		};
+		if (type == "kakaotalk") {
+			KakaoController('#SnsKakaoTalk', new SnsParam(type, data), 'home');
+		}
+		else {
+			var sender = MobileSnsUtil.sns(type).sender;
+			sender.send(type, new SnsParam(type, data))
+		}
+	};
+
+	$(function () {
+		KakaoInit();
+		ShareTo("kakaotalk");
+	});
+
+	function selectAgree(isAgree) {
+		$("#agreeLayer").hide();
+		if (isAgree) {
+			var $movieIframe = $("#movieIframe > iframe");
+			var youtubeUrl = $movieIframe.attr("src");
+			if (youtubeUrl && youtubeUrl.length > 0) {
+				youtubeUrl = youtubeUrl + "?autoplay=1";
+				$movieIframe.attr("src", youtubeUrl);
+				//$("#castImage").hide();
+				$("#movieIframe").show();
+			}
+		}
+	}
+
+	function selectTab(name) {
+		if (name == 'item') {
+			$("#relatedItems").show();
+			$("#relatedCasts").hide();
+		} else if (name == 'cast') {
+			$("#relatedItems").hide();
+			$("#relatedCasts").show();
+		}
+	}
+</script>
+}

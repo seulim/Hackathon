@@ -1,0 +1,375 @@
+﻿@{
+	string pCache = this.GetPCache();
+	string MwURL = Urls.MWWebUrl + "/mypage/myMain.do?pCache=" + pCache;
+}
+
+<!doctype html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+	<meta name="format-detection" content="telephone=no" />
+
+	<title>@ViewBag.Shop.Title 미니샵 - G마켓 모바일</title>
+
+	<link rel="stylesheet" href="@Urls.ShopStyleUrl/common.css"/>
+	<link rel="stylesheet" href="@Urls.ShopStyleUrl/prod.css"/>
+    <link rel="stylesheet" type="text/css" href="@Urls.ScriptUrl/mobile/css/common.css?v=8" /> 
+	@RenderSection("Css", required: false)
+
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery-1.7.1.min.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazy.min.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/shop/ui_minishop.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/handlebars-v1.1.2.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/front_v2.js"></script>
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/GMobile.js?v=20160817"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/header/httpAjaxRequest.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/guidGeneration.js"></script>
+	<script type="text/javascript">
+		var _ubLogActEnum = {
+			click: "click"
+		}
+		function _ubLog(code, act) {
+			if (typeof ubprofiler === 'object' && typeof ubprofiler.send === 'function') {
+				ubprofiler.send(
+            'event'         // behavior
+            , 'page'        // src
+            , 'm/1.0'       // id, version info
+            ,
+						{
+							'url': document.location.href,  // url, required 
+							'ref': document.referrer,       // referrer url, optional
+							'act': act,                 // action, required
+							'acode': code        // area code, required
+						});
+			}
+		}
+	</script>
+
+</head>
+
+<body @Html.Raw(String.Format("class='ms_color{0:00}'", ViewBag.ColorType))>
+
+	
+
+	<!-- 미니샵/스토어 Wrap -->
+	<div id="ms_wrap">
+
+        @Html.Partial("_Header3")
+		<div class="ms_wrap_extend">
+
+			<!-- 카테고리보기 -->
+			@Html.Action("SideMenu")
+			<!-- //카테고리보기 -->
+
+			<div id="ms_cont">
+
+				<!-- 미니샵/스토어 Header -->
+				<div class="ms_header">
+					<h2><a href="@Url.Action("Index", "Shop")">@ViewBag.Shop.Title</a></h2>
+					<div class="top_menu">
+						<ul class="menu" id="tab_wrapper">
+							<li id="tab_indicator_history"><a id="tab_history" href="javascript:;"><span>히스토리</span></a></li>
+@if (PageAttr.IsLogin)
+{
+							<li id="tab_indicator_myshop"><a id="tab_myshop" href="javascript:;"><span>나의쇼핑</span></a></li>
+}
+else
+{
+							<li id="tab_indicator_myshop"><a id="tab_myshop" href="@Urls.LoginUrl"><span>나의쇼핑</span></a></li>
+}
+							<li id="tab_indicator_sellerinfo"><a id="tab_sellerinfo" href="javascript:;"><span>판매자정보</span></a></li>
+@if (false == PageAttr.IsLogin)
+{
+							<li id="add_shop_interest"><a href="@Urls.LoginUrl" class="regular"><span><span class="ico_splt_2"></span>관심등록</span></a></li>
+	@:				</ul>
+}
+else if (ViewBag.Shop.Favorite != null && ViewBag.Shop.Favorite.IsFavoriteShop)
+{
+							<li id="del_shop_interest" class="on"><a href="javascript:;" class="regular"><span><span class="ico_splt_2"></span>관심해제</span></a></li>
+	@:				</ul>
+						<div style="display: none;">
+							<li id="add_shop_interest"><a href="javascript:;" class="regular"><span><span class="ico_splt_2"></span>관심등록</span></a></li>
+						</div>
+}
+else
+{
+							<li id="add_shop_interest"><a href="javascript:;" class="regular"><span><span class="ico_splt_2"></span>관심등록</span></a></li>
+	@:				</ul>
+						<div style="display: none;">
+							<li id="del_shop_interest" class="on"><a href="javascript:;" class="regular"><span><span class="ico_splt_2"></span>관심해제</span></a></li>
+						</div>
+}
+						
+					</div>
+					
+
+					<!-- 나의샵정보 -->
+					<div class="shop_info_wrap" id="shop_info" style="display: none;">
+						<!-- 히스토리 -->
+						<div class="info_history" id="tabcontents_history" style="display: none;">
+							<div class="history_list">
+								<ul id="history_wrapper">
+								</ul>
+
+								<ul id="history_fallback" style="display: none;">
+@if (PageAttr.IsAndroidApp)
+{
+									<li class="nodata">'안드로이드' 접속 시 사용 불가한 기능으로,<br />정상 작동 가능하도록 지원할 예정입니다.</li>
+}
+else
+{ 
+									<li class="nodata">히스토리를 지원하지 않는 기기입니다.</li>
+}
+								</ul>
+								
+								<button type="button" class="banner_turn banner_turn_prev" id="history_prev"><span>이전</span></button>
+								<button type="button" class="banner_turn banner_turn_next" id="history_next"><span>다음</span></button>
+							</div>
+						</div>
+						<!-- //히스토리 -->
+
+						<!-- 쇼핑이력조회 -->
+						<div class="info_myshop" id="tabcontents_myshop" style="display: none;">
+						</div>
+						<!-- //쇼핑이력조회 -->
+
+						<!-- 판매자정보 -->
+						<div class="info_seller" id="tabcontents_sellerinfo" style="display: none;">
+							<table class="info_tb">
+								<colgroup>
+									<col style="width:34%">
+									<col >
+								</colgroup>
+								<tr>
+									<th>상호</th>
+									<td>@ViewBag.Shop.Seller.CompanyName</td>
+								</tr>
+								<tr>
+									<th>대표자</th>
+									<td>@ViewBag.Shop.Seller.Manager</td>
+								</tr>
+								<tr>
+									<th>전화번호</th>
+									<td>@ViewBag.Shop.Seller.PhoneNumber</td>
+								</tr>
+								@if (!String.IsNullOrEmpty(ViewBag.Shop.Seller.FaxNo))
+				{
+								<tr>
+									<th>팩스번호</th>
+									<td>@ViewBag.Shop.Seller.FaxNo</td>
+								</tr>
+				}
+								@if (!String.IsNullOrEmpty(ViewBag.Shop.Seller.EmailAddress))
+				{
+								<tr>
+									<th>이메일</th>
+									<td><a href="mailTo:@ViewBag.Shop.Seller.EmailAddress">@ViewBag.Shop.Seller.EmailAddress</a></td>
+								</tr>
+				}
+								@if (!String.IsNullOrEmpty(ViewBag.Shop.Seller.BusinessNoText) && !String.IsNullOrEmpty(ViewBag.Shop.Seller.BusinessNo))
+				{
+								<tr>
+									<th>사업자번호</th>
+									<td><span class="vmid">@ViewBag.Shop.Seller.BusinessNoText</span> <a target="ftc" href="http://www.ftc.go.kr/info/bizinfo/communicationViewPopup.jsp?wrkr_no=@(ViewBag.Shop.Seller.BusinessNo.Replace("-", string.Empty))" class="btn_rnd">정보확인</a></td>
+								</tr>
+				}
+								@if (!String.IsNullOrEmpty(ViewBag.Shop.Seller.StreetAddress))
+				{
+								<tr>
+									<th>영업소재지</th>
+									<td>@ViewBag.Shop.Seller.StreetAddress</td>
+								</tr>
+				}
+							</table>
+						</div>
+						<!-- //판매자정보 -->
+
+						<div class="shop_info_close"><a id="tab_contents_wrapper_close" href="javascript:;" class="splt_close" onclick="$('#shop_info').hide(); return false;"><span class="ico_splt_2"></span><span class="txt">닫기</span></a></div>
+
+					</div>
+					<!-- //나의샵정보 -->
+
+					<div class="ms_sch_wrap">
+						<button class="btn_extend btn_bg splt_bg_2" id="ms_nav_extend">확장</button>
+						<!-- 검색 -->
+						<div class="sch_wrap">
+							<div class="sch_ms_prd">
+								<form _lpchecked="1">
+									<fieldset>
+										<div class="ip_keyword">
+											<span><input type="text" id="txtShopKeyword" placeholder="미니샵 상품을 검색해 보세요"/></span>
+										</div>
+										<button type="button" id="btnShopKeywordClear" class="btn_clear splt_bg_2 btn_bg" style="display:;">입력내용삭제</button><!-- 입력초기화(검색어가 입력되었을경우 노출) -->
+										<button type="submit" id="btnShopKeywordSubmit" class="btn_submit"><span class="splt_bg_2 btn_bg">검색</span></button>
+									</fieldset>
+								</form>
+							</div>
+						</div>
+						<!-- //검색 -->
+					</div>
+				</div>
+				<!-- //미니샵/스토어 Header -->
+
+				@RenderBody()
+	
+			</div>
+		</div>
+        @Html.Partial("_Footer3")
+	</div>
+	<!-- //미니샵/스토어 Wrap -->
+
+	
+
+	<script type="text/javascript">
+		//<![CDATA[
+			// lazyLoader
+			var loaders = function () {
+				var imgs = $('#ms_wrap img.lazyImage');
+				var onError = null;
+				if (typeof imageOnErrorHandler !== "undefined") {
+					onError = imageOnErrorHandler;
+				} else {
+					onError = function ($this) {
+						if ($this.data("onerror") && $this.attr("src") != $this.data("onerror")) {
+							$this.attr("src", $this.data("onerror"));
+						}
+					}
+				}
+				imgs.lazy({
+					effect: "fadeIn",
+					effectTime: 500,
+					threshold: 350,
+					attribute: "data-original",
+					onError: onError
+				});
+			}
+			//메인배너 사이즈
+			function mainBnrSize() {
+				var bannerWidth = $('#bnGrp').width();
+				var bannerHeight = 125;
+				if ($(window).width() > 528) bannerWidth = parseInt($(window).width() - $('#bnGrp4 .prod_list').width());
+				bannerHeight = parseInt(bannerWidth * 350 / 640);
+				$('#bnGrp').css({ "height": bannerHeight });
+			}
+
+			$(function () {
+				loaders(); //LazyLoader
+				mainBnrSize();
+				$('#bnGrp').find(".bnLoading").hide();
+				$('#bnGrp').find("ul.bnr").show();
+				$(window).resize(function () {
+					mainBnrSize();
+				})
+			});
+		//]]>
+
+		var isMain = "@PageAttr.IsMain";
+		var mwUrl = "@MwURL";
+
+		$(document).ready(function () {
+			clearBoxBtn();
+		});
+	</script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/shop/SimpleHeader.js?dummy=20131119130000"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/shop/ShopController.js?dummy=201312111000"></script>
+	<script type="text/x-handlebars-template" id="history_template">
+		{{#each data}}
+			{{#if ImageUrl}}
+				<li class="prod">
+					<a href="{{Url}}"><img src="{{ImageUrl}}" alt="" /></a>
+				</li>
+			{{else}}
+				<li class="word">
+					<a href="{{Url}}"><img src="@Urls.MobileImageUrlV2/shop/bg/blank.gif" alt="" /><span class="text"><strong class="ms_clr_font">{{historyActionName ActionName}}</strong>{{historyMessage ActionName Message}}</span></a>
+				</li>
+			{{/if}}
+		{{else}}
+			<li class="nodata">히스토리 이력이 없습니다.</li>
+		{{/each}}
+	</script>
+
+	<script type="text/x-handlebars-template" id="myshop_template">
+		<table class="info_tb">
+			<colgroup>
+				<col style="width:34%">
+				<col >
+			</colgroup>
+			<tr>
+				<th>구매횟수</th>
+				<td><strong class="ms_clr_font">{{BuyCount}}</strong>건</td>
+			</tr>
+			<tr>
+				<th>구매총액</th>
+				<td><strong class="ms_clr_font">{{BuyAmount}}</strong>원</td>
+			</tr>
+			<tr>
+				<th>장바구니</th>
+				<td><strong class="ms_clr_font">{{CartCount}}</strong>건</td>
+			</tr>
+			<tr>
+				<th>관심상품</th>
+				<td><strong class="ms_clr_font">{{InterestCount}}</strong>건</td>
+			</tr>
+		</table>
+	</script>
+
+	@RenderSection("Templates", required: false)
+
+	<script type="text/javascript">
+		var Const = {};
+		Const.ALIAS = "@ViewBag.Alias";
+		Const.MY_SHOP_URL = "@Url.Action("GetMyShoppingInfo", "Shop", new { alias = ViewBag.Alias })";
+		Const.ADD_SHOP_INTEREST = "@Url.Action("AddFavoriteShop", "Shop", new { alias = ViewBag.Alias })";
+		Const.DEL_SHOP_INTEREST = "@Url.Action("DelFavoriteShop", "Shop", new { alias = ViewBag.Alias })";
+		Const.SHOP_NAME = "@ViewBag.Shop.Title";
+		Const.LOGIN_URL = "@Urls.LoginUrl";
+	</script>
+	@RenderSection("ScriptConst", required: false)
+	
+	@RenderSection("Scripts", required: false)
+	<script type="text/javascript">
+		var shopController = new ShopController();
+		var queryKeyword = '@Request.QueryString["keyword"]';
+
+		if (queryKeyword === '') {
+			$("#txtShopKeyword").val('');
+			$("#btnShopKeywordClear").hide();
+		}
+		else {
+			$("#txtShopKeyword").val(queryKeyword);
+			$("#btnShopKeywordClear").show();
+		}
+
+		if (queryKeyword !== '') {
+			$("#txtShopKeyword").val(queryKeyword);
+		}
+		
+		$("#btnShopKeywordClear").click(function () {
+			$("#txtShopKeyword").val('');
+			$("#btnShopKeywordClear").hide();
+			return;
+		});
+
+		$("#txtShopKeyword").keyup(function (event) {
+			if ($("#txtShopKeyword").val() === '') {
+				$("#btnShopKeywordClear").hide();
+			}
+			else {
+				$("#btnShopKeywordClear").show();
+			}
+		});
+
+		$("#btnShopKeywordSubmit").click(function () {
+			if (!$("#txtShopKeyword").val()) {
+				alert('키워드를 입력해주세요');
+			}
+			else {
+				var strShopkeyword = '@Url.Action("Search", "Shop", new {keyword="param1"})';
+				location.href = strShopkeyword.replace("param1", $("#txtShopKeyword").val());
+			}
+			return false;
+		});
+	</script>
+</body>
+</html>

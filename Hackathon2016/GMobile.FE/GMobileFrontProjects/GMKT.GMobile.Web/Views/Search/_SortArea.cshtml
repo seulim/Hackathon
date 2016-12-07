@@ -1,0 +1,59 @@
+﻿@{
+	string data = String.Empty;
+	if ("SRP".Equals(ViewBag.menuName))
+	{
+		data = ViewBag.keyword;
+	}
+	else
+	{
+		data = ViewBag.categoryCode;
+	}
+}
+<div class="sort_area">
+	<a id="a_sort_layer_lpsrp" href="#sort_layer_lpsrp" class="btn_sort array" data-layer-ctrl="true" onclick="javascript:sendPDSLogFromSortArea('sort','@data');displayAdDetailLayer();">정렬</a>
+	<div id="sort_layer_lpsrp" class="sort_layer">
+		<ul class="sort_lst" id="sortOption">
+		<li class="selected" id="ACCURACY_LQS">
+			<a href="#" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000018" : "200000081")', 'Utility');selectSortOption('ACCURACY_LQS'); window.search(true);" class="btn_array">G마켓 랭크순</a>
+            <div class="ad_area">
+                <button type="button" class="btn_ad" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000022" : "200000085")', 'Utility');">광고포함<span class="sp_lpsrp"></span></button>
+                <span class="ad_layer">
+                    G마켓랭크순은 광고구매여부, 판매실적,@if("SRP".Equals(ViewBag.menuName)) { <text> 검색정확도,</text>} 서비스품질 등을 기준으로 정렬됩니다.<br />
+                    플러스상품, 파워클릭 영역은 광고 입찰가순으로 전시됩니다.                    
+                </span>
+            </div>
+		</li>
+		<li id="SELL_POINT_INFO">
+			<a href="javascript:;" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000019" : "200000082")', 'Utility');selectSortOption('SELL_POINT_INFO'); window.search(true);" class="btn_array">판매 인기순</a>
+		</li>
+		<li id="SELL_PRICE_ASC">
+			<a href="javascript:;" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000020" : "200000083")', 'Utility');selectSortOption('SELL_PRICE_ASC'); window.search(true);" class="btn_array">가격 낮은순</a>
+		</li>
+		<li id="SELL_PRICE_DESC">
+			<a href="javascript:;" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000260" : "200000262")', 'Utility');selectSortOption('SELL_PRICE_DESC'); window.search(true);" class="btn_array">가격 높은순</a>
+		</li>
+		<li id="CON_POINT_DESC">
+			<a href="javascript:;" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000021" : "200000084")', 'Utility');selectSortOption('CON_POINT_DESC'); window.search(true);" class="btn_array">상품평순</a>
+		</li>
+		</ul>
+	</div>
+
+@if (ViewBag.isDepartmentStore == null || ViewBag.isDepartmentStore == false)
+{
+	<a id="list_view_style" href="javascript:;" class="btn_sort list" onclick="javascript:sendPDSLogFromSortArea('view','@data', 'Gallery');changeViewStyle('Gallery')" style="display:none">리스트형</a>
+	<a id="gallery_view_style" href="javascript:;" class="btn_sort gallery" onclick="javascript:sendPDSLogFromSortArea('view','@data', 'List');changeViewStyle('List')" style="display:none">갤러리형</a>
+
+	if ("SRP".Equals(ViewBag.menuName))
+	{
+	<a id="atag_detail_layer_srp" href="#detail_layer_srp" onclick="javascript:sendPDSLogFromSortArea('detail');" class="btn_sort detail" data-layer-ctrl="true">상세</a>
+	<div id="detail_layer_srp" class="detail_layer" style="display: none;">
+		<ul class="detail_sch_lst">
+		</ul>
+	</div>
+	}
+	else if ("LP".Equals(ViewBag.menuName))
+	{
+	<a href="#detail" class="btn_sort detail side_call" onclick="javascript:sendPDSLogFromSortArea('detail');" data-layer-ctrl="true">상세</a>							
+	}
+}
+</div>

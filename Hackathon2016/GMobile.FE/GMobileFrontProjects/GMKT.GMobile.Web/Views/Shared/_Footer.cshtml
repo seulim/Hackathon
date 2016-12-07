@@ -1,0 +1,47 @@
+﻿@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+
+@if (PageAttr.ViewFooter == true)
+{
+    <!-- FOOTER -->
+    <div id="footer">
+        <ul class="btm_navigation">
+            <li class="menu1">
+            @if (PageAttr.IsLogin == true) 
+						{
+                <a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000010", ConstDef._GMW_LOGOUT_URL)"><span>로그아웃</span></a>
+            } 
+						else 
+						{
+                <a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000010", ConstDef._GMW_LOGIN_URL)"><span>로그인</span></a>
+            }
+            </li>
+            <li class="menu2"><a href="@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000011", "http://www.gmarket.co.kr/?sL=MW")"><span>PC버전</span></a></li>
+            <li class="menu3"><a href="javascript:fnSubFooterGoInstall()"><span>G마켓 앱 설치하기</span></a></li>
+            <li class="menu4"><a href="#" onclick="window.scrollTo(0, 1);return false;"><span>TOP</span></a></li>
+        </ul>
+        <div class="content">
+            <p class="address"><strong class="company">(주)이베이코리아</strong> 대표이사 :  변광윤<br />
+                사업자등록번호 : 220 - 81 - 83676   통신판매업신고 :  강남 10630호<br />
+                서울시 강남구 역삼동 737 강남파이낸스센터 34층</p>
+            <p class="customer_center">고객센터 : <strong>1566 - 5701</strong><br />
+                상담가능시간 : 오전 9시 - 오후 6시(토요일, 공휴일 휴무)</p>
+            <a href="http://www.ftc.go.kr/info/bizinfo/communicationList.jsp" class="cpny" target="_blank"><span>사업자정보확인</span></a>
+            <a href="@Const.GMW_HTTP_CONTEXT_URL/display/service.do" class="cpny use"><span>이용약관</span></a>
+            <p class="copyright">Copyright &copy; <strong>eBay Korea Co., Ltd.</strong> All rights reserved</p>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function fnSubFooterGoInstall()
+        {
+            if ( navigator.userAgent.indexOf("iPhone") > -1 || navigator.userAgent.indexOf("iPad") > -1 || navigator.userAgent.indexOf("iPod") > -1 )
+                location.href = "@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000012", "http://itunes.apple.com/kr/app/gmarket/id340330132?mt=8")";
+            else // 안드로이드
+                location.href = "@GlobalFunction.GetSnaUrl(PageAttr.IsMain, "701000012", "market://market.android.com/details?id=com.ebay.kr.gmarket")";
+        }
+    </script>
+    <!--// FOOTER -->
+}
+</div>
+<!--// WRAPPER -->

@@ -1,0 +1,110 @@
+﻿@using GMKT.GMobile.Data.SellerShop
+@model SellerShopPromotion
+<div id="content" class="mshopCtns">
+	<div class="view--brand slim">
+		<!-- 메인 상단 -->
+		<div class="shop-intro">
+
+			<!-- 샵 이름 -->
+			@Html.Partial("_SellerShopHeaderPartial")
+
+		<!-- //메인 상단 -->
+
+		<!-- 전시 (상품유형은 메인전시와 동일하나 페이지만 삭제) -->
+		<div class="brand_product-list">
+			@foreach(ShopDisplayInfoTuple i in Model.Main)
+			{
+				if(i.items == null && i.info != null)
+				{
+			<div class="promotion-img_item">
+				<a href="@i.info.ImageLinkUrl">
+					<img src="@i.info.ImageUrl" alt=""/>
+				</a>
+			</div>
+				}
+				else if(i.items != null && i.items.Count > 0)
+				{
+					if(i.info.DispType == 5)
+					{
+			<div class="product-list-view" data-product-list-view="main_magazine" data-display-idx="0">
+				<div class="product-title">
+					<h2 class="product-title__name">@i.info.Title</h2>
+				</div>
+				<div class="product-list">
+
+						@for(int k = 0; k < i.items.Count / 3; k++)
+						{
+					<div class="product-list__group">
+						<ul>
+							<li class="product-list__item">
+								<a href="@i.items[k].LandingUrl" data-open-dialog=""><img src="@i.items[k].Image400Url" alt=""></a>
+							</li>
+							<li class="product-list__item">
+								<a href="@i.items[k+1].LandingUrl" data-open-dialog=""><img src="@i.items[k+1].Image400Url" alt=""></a>
+							</li>
+							<li class="product-list__item">
+								<a href="@i.items[k+2].LandingUrl" data-open-dialog=""><img src="@i.items[k+2].Image400Url" alt=""></a>
+							</li>
+						</ul>
+					</div>
+						}
+				</div>
+			</div>
+					}
+					else
+					{
+						string css = "";
+						if(i.info.DispType == 1)
+						{
+							css = "main_default";
+						}
+						else if(i.info.DispType == 2)
+						{
+							css="main_list";
+						}
+						else if(i.info.DispType == 3)
+						{
+							css="main_box";
+						}
+						else if(i.info.DispType == 4)
+						{
+							css="main_mosaic";
+						}
+			<div class="product-list-view" data-product-list-view="@css">
+				<div class="product-title">
+					<h2 class="product-title__name">@i.info.Title</h2>
+				</div>
+				<ul class="product-list">
+						@foreach( SellerShopItem j in i.items)
+						{
+					<li class="product-list__item">
+						<div class="product">
+							<div class="product__image">
+								<a href="@j.LandingUrl"><img src="@j.ImageUrl" alt=""/></a>
+							</div>
+							<div class="product__body">
+								<div class="product__title">
+									<a href="@j.LandingUrl">@j.GoodsName
+								</div>
+									@if(j.DiscountRate > 0)
+									{
+								<div class="product__price-normal">
+									<del>@j.SellPrice</del>
+									<span class="rate">@j.DiscountRate%</span>
+								</div>
+									}
+								<div class="product__price">@j.AdCouponPrice</div>
+								<button type="button" class="button button--favorite" onclick="sellershopController.addFavoriteItem(@j.GoodsCode)" data-goodscode="@j.GoodsCode"><span class="icon_favorite">관심상품</span></button>
+							</div>
+						</div>
+					</li>
+						}
+				</ul>
+				</div>
+					}
+				}
+			}
+			</div>
+		</div>
+	</div>
+</div>

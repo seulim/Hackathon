@@ -1,0 +1,131 @@
+﻿@using GMKT.GMobile.Data;
+
+@{
+	bool isFashion = ViewBag.PageType == LookV2PageType.Fashion ? true : false;
+}
+<div id="content">
+	<h2 class="blind">패션</h2>
+	<div class="look_renewal">
+		<ul class="look_tab v2">
+			<li><a href="javascript:;" onclick="javascript:selectTab('Fashion');" class="@(isFashion ? "on" : "")"><span>패션</span></a></li>
+			<li><a href="javascript:;" onclick="javascript:selectTab('Beauty');" class="@(isFashion ? "" : "on")"><span>뷰티</span></a></li>
+		</ul>
+		<div class="look_cont sub_cont">
+			<div id="fashion_cast" class="look_list_box cast" style="@(isFashion ? "" : "display:none")">
+				<ul id="fashion_cast_ul">
+				</ul>
+				<a href="javascript:moreView('Fashion');" class="btn_look_more" id="fashion_cast_more">패션 Cast 더보기<span></span></a>
+			</div>
+		</div>
+		<div class="look_cont sub_cont">
+			<div id="beauty_cast" class="look_list_box cast" style="@(isFashion ? "display:none" : "")">
+				<ul id="beauty_cast_ul">
+				</ul>
+				<a href="javascript:moreView('Beauty');" class="btn_look_more" id="beauty_cast_more">뷰티 Cast 더보기<span></span></a>
+			</div>
+		</div>
+		@if(!PageAttr.IsApp)
+		{
+		<a href="#" class="btn_top_bar">Top으로 이동</a>
+		}
+	</div>
+</div>
+<!-- //CONTENT -->@section scripts{<script id="cast-item-template" type="text/x-handlebars-template">
+{{#each Cast}}
+	<li>
+		<a href="{{LandingUrl}}">
+			<span class="img_box">
+				<img src="{{ImageUrl}}" alt="" />
+				{{#ifMovie ContentsType}}
+				<span class="icon_play"></span>
+				{{/ifMovie}}
+			</span>
+			<span class="info_box">
+				<strong class="m_txt ch_line2">
+					<span class="ml2">{{ContentsTitle}}</span>					
+				</strong>
+				<span class="info02"><img src="{{PublisherImageUrl}}" alt="" />{{PublisherName}}</span>
+			</span>
+		</a>
+	</li>
+{{/each}}
+</script><script type = "text/javascript">
+	var fashionPageNo = 0;
+	var beautyPageNo = 0;
+
+	var reqParams = {
+		pageType: "@ViewBag.PageType",
+		pageNo : 1,
+		pageSize : 100
+	};
+
+	Handlebars.registerHelper("ifMovie", function (contentsType, opts) {
+		if (contentsType == "Movie")
+			return opts.fn(this);
+		else
+			return opts.inverse(this);
+	});
+
+	$(document).ready(function () {
+		moreView(reqParams.pageType);
+	});
+
+	function selectTab(pageType) {
+		reqParams.pageType = pageType;
+		if (pageType == "Fashion") {
+			$("#fashion_cast").show();
+			$("#beauty_cast").hide();
+			if (fashionPageNo == 0) {
+				moreView(pageType);
+			}
+		} else if (pageType == "Beauty") {
+			$("#fashion_cast").hide();
+			$("#beauty_cast").show();
+			if (beautyPageNo == 0) {
+				moreView(pageType);
+			}
+		}
+	}
+
+	function moreView(pageType) {
+		reqParams.pageType = pageType;
+		if (pageType == "Fashion") {
+			fashionPageNo = fashionPageNo + 1;
+			reqParams.pageNo = fashionPageNo;
+		} else if (pageType == "Beauty") {
+			beautyPageNo = beautyPageNo + 1;
+			reqParams.pageNo = beautyPageNo;
+		}
+		render();
+	}
+
+	function render() {
+		$.ajax({
+			url: "/Look/GetLookV2Cast",
+			data: reqParams,
+			type: "POST",
+			success: function (data) {
+				console.log(data);
+				if (data) {
+					if (data.Cast) {
+						var template = Handlebars.compile($('#cast-item-template').html());
+						if (reqParams.pageType == "Fashion") {
+							$("#fashion_cast_ul").append(template(data));
+						} else if (reqParams.pageType == "Beauty") {
+							$("#beauty_cast_ul").append(template(data));
+						}
+					}
+					if (!data || data.Paging.HasNext == false) {
+						if (reqParams.pageType == "Fashion") {
+							$("#fashion_cast_more").hide();
+						} else if (reqParams.pageType == "Beauty") {
+							$("#beauty_cast_more").hide();
+						}
+					}
+				}
+			},
+			error: function (e) {
+
+			}
+		});
+	}</script>}

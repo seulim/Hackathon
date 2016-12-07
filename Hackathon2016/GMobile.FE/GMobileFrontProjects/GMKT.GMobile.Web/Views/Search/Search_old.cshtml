@@ -1,0 +1,857 @@
+﻿@using GMKT.Web.Context;
+@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Models;
+@using Arche.Data.Voyager;
+
+@using GMKT.Web.Context 
+
+@model SearchModel
+@{
+	//ViewData["Title"] = "Search";
+
+	string searchTitle = "";
+
+	if (Model.Keyword.Length > 0)
+	{
+		searchTitle = Model.Keyword;
+	}
+
+	if (Model.PrevKeyword.Length > 0)
+	{
+		searchTitle = Model.Keyword + " " + Model.PrevKeyword;
+	}
+
+	string sellCustName = "";
+	string SellImageUrl = "";
+	string strCount = "";
+	int intCount = 4;
+}
+<script type="text/javascript" src="@Urls.MobileWebUrl/js/common/front.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+
+<script type="text/x-jscript-tmpl" id="smt_click_template">
+    <li>
+        <a class="anchor" href="{{ClickURL}}">
+			<span class="thumbnail_wrap">
+				<img class="thumbnail" src="{{ImageURL}}" width="118" height="118" alt="" />
+			</span>
+			<span class="goods_name">{{Name}}</span>
+			<span class="goods_info">
+				<span class="price">{{OriginalPrice}}</span>
+				<span class="sale_price">{{Price}}</span>
+				{{DeliveryInfo:showDeliveryInfo}}
+			</span>
+		</a>
+    </li>
+</script>
+
+<script type="text/javascript">
+	jQuery(document).ready(function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+
+		if (typeof gmHeader != "undefined" && gmHeader) {
+			gmHeader.setCurrentKeyword("@searchTitle");
+		}
+
+    	$("#goodsList img.thumbnail").lazyload();
+
+    	setTimeout(function () {
+    		$(window).trigger('resize');
+    	}, 2000);
+
+    	loadSmartClickAds();
+    });
+
+    function loadSmartClickAds() {
+
+    	var form = document.sCategoryFrm;
+
+    	var categoryCode = '';
+    	var categoryLevel = form.categoryLevel.value;
+
+    	if (categoryLevel == 1)
+    		categoryCode = form.lcId.value;
+    	else if (categoryLevel == 2)
+    		categoryCode = form.mcId.value;
+    	else if (categoryLevel == 3)
+    		categoryCode = form.scId.value;
+
+    	if (form.keyword.value == null || form.keyword.value == '') return;
+
+    	var keyword = encodeURIComponent(form.keyword.value);
+
+    	var userAgent = '';
+
+    	if (navigator != null && navigator.userAgent != null) {
+    		userAgent = encodeURIComponent(navigator.userAgent);
+    	}
+
+    	var ref = encodeURIComponent(document.referrer);
+    	if (ref == null || ref == 'undefined' || ref == '')
+    		ref = encodeURIComponent('@Urls.MobileWebUrl');
+
+    	var serverURL = encodeURIComponent(document.URL);
+    	if (serverURL == null || serverURL == 'undefined' || serverURL == '')
+    		serverURL = '@Urls.MobileWebUrl';
+
+    	var channelID = 'D002011001';
+
+		if ( categoryCode != null && categoryCode != 'undefined' && categoryCode != '' )
+    		channelID = 'D002013001';
+
+		var params = { channelID: channelID, adType: "keyword", serverURL: serverURL,
+    		category: categoryCode, keyword : keyword , UA: userAgent, Ref: ref
+    	};
+
+    	jQuery.ajax({
+    		type: "POST",
+    		url: "@Urls.MobileWebUrl/Category/LPSRPSmartClickAds",
+    		dataType: "json",
+    		data: params,
+    		xhrFields: {
+    			withCredentials: true
+    		},
+    		crossDomain: true,
+    		success: function (data) {
+
+    			if (data == null || data == 'undefined') return;
+    			if (data.length == null || data.length == 'undefined') return;
+
+    			if (data.length > 0) {
+    				$('.smt_click').show();
+    			}
+    			else {
+    				return;
+    			}
+
+    			$('#smt_click_items').render({
+    				template: 'smt_click_template',
+    				model: data
+    			});
+    		},
+    		error: function (jqXHR, textStatus, errorThrown) {
+
+    		}
+    	});
+    }
+
+    function showDeliveryInfo(deliveryInfo) {
+    	if (deliveryInfo == '무료')
+    		return '<span class="free">무료배송</span>';
+    	else
+    		return '';
+    }
+
+</script>
+<script type="text/javascript">
+	function actionInitDetail() {
+		var objBtn = null;
+		var btnId = null;
+		var form = document.sCategoryFrm;
+
+		form.scKeyword.value = '';
+		form.minPrice.value = '';
+		form.maxPrice.value = '';
+
+		for (var i = 1; i < 5; i++) {
+			btnId = 'tBtn1_con' + i;
+			objBtn = document.getElementById(btnId);
+			objBtn.className = objBtn.className.replace('on', 'off');
+			setValueByElementId(btnId + '_val', 'N');
+		}
+	}
+	function initCategoryData(form) {
+		//이전 화면 이동 시, 하위 카테고리 아이디 초기화
+		var cLevel = @Model.CategoryLevel;
+		if (cLevel == 0) {
+			form.lcId.value = '';
+			form.mcId.value = '';
+			form.scId.value = '';
+		}
+		else if (cLevel == 1) {
+			form.mcId.value = '';
+			form.scId.value = '';
+		}
+		else if (cLevel == 2) {
+			form.scId.value = '';
+		}
+	}
+	function initDetailSearchData(form) {
+		form.scKeyword.value = '';
+		form.minPrice.value = '';
+		form.maxPrice.value = '';
+		form.isFeeFree.value = '';
+		form.isMileage.value = '';
+		form.isDiscount.value = '';
+		form.isStamp.value = '';
+	}
+	function initDetailSearchData2(form) {
+		form.scKeyword.value = '';
+		//form.minPrice.value = '';
+		//form.maxPrice.value = '';
+		form.isFeeFree.value = '';
+		form.isMileage.value = '';
+		form.isDiscount.value = '';
+		form.isStamp.value = '';
+	}
+	function goCategory(lc, mc, sc) {
+        
+		var form = document.sCategoryFrm;
+		initDetailSearchData(form);
+		form.lcId.value = lc;
+		form.mcId.value = mc;
+		form.scId.value = sc;
+
+		form.pageNo.value = 1;
+		form.sellCustNo.value = "";
+		form.sortType.value = "";
+
+		var timestamp = new Date().getTime();
+		form.action = "/Search/Search?tValue=" + timestamp;
+
+		form.submit();
+	}
+	function changeViewType(mode) {
+		var form = document.sCategoryFrm;
+
+		//Refresh Ver.
+		{
+			initCategoryData(form);
+			initDetailSearchData2(form);
+			form.listType.value = mode;
+
+			var timestamp = new Date().getTime();
+			form.action = "/Search/Search?tValue=" + timestamp;
+
+			form.submit();
+		}
+
+		//No Refresh Ver.
+		{
+			/*
+			var objList = document.getElementById("goodsList");
+			var objTypeH = document.getElementById("viewTypeH");
+			var objTypeV = document.getElementById("viewTypeV");
+			if (mode == "V") {
+			objList.className = objList.className.replace('horizontal_list', 'vertical_list');
+			objTypeH.setAttribute("src", objTypeH.getAttribute("src").replace("img_on.gif", "img.gif"));
+			objTypeV.setAttribute("src", objTypeV.getAttribute("src").replace("list.gif", "list_on.gif"));
+			}
+			else {
+			objList.className = objList.className.replace('vertical_list', 'horizontal_list');
+			objTypeH.setAttribute("src", objTypeH.getAttribute("src").replace("img.gif", "img_on.gif"));
+			objTypeV.setAttribute("src", objTypeV.getAttribute("src").replace("list_on.gif", "list.gif"));
+			}
+			form.listType.value = mode;
+			*/
+		}
+	}
+	function changeSortType(el) {
+    
+		var form = document.sCategoryFrm;
+		initCategoryData(form);
+		initDetailSearchData2(form);
+
+		form.sortType.value = el.value;
+
+		var timestamp = new Date().getTime();
+		
+        form.action = "/Search/Search?tValue=" + timestamp;
+
+		form.submit();
+	}
+
+	function cateogrySearch() {
+		var form = document.sCategoryFrm;
+
+		if (form.scKeyword.value.replace(/(^\s*)|(\s*$)/gi, "") == "") {
+			if (form.keyword.value == "" && form.prevKeyword.value == "") {
+				alert('검색어를 입력해주세요.');
+				form.scKeyword.focus();
+				return false;
+			}
+		}
+
+		if (!checkNumberForInputObject(form.minPrice)) {
+			return false;
+		}
+
+		if (!checkNumberForInputObject(form.maxPrice)) {
+			return false;
+		}
+
+		initCategoryData(form);
+		form.pageNo.value = 1;
+
+		var timestamp = new Date().getTime();
+
+        form.action = "/Search/Search?tValue=" + timestamp;
+
+		form.submit();
+	}
+	function checkNumberForInputObject(objName) {
+		var obj = eval(objName);
+		if (isNaN(obj.value.replace(',', ''))) {
+			alert('숫자만 입력 하실 수 있습니다.');
+			obj.focus();
+			return false;
+		}
+		return true;
+	}
+
+    function goPartnerTab( sellCustNo, fcd )
+	{
+		if (fcd != "") {
+			SnaPartnerUrl(fcd);
+		}
+		
+		var form = document.sCategoryFrm;
+		form.sellCustNo.value = sellCustNo;
+		form.pageNo.value = 1;
+		form.scId.value = getParameterByName('scId');
+		form.sortType.value = getParameterByName('sortType');
+
+		var timestamp = new Date().getTime();
+		form.action = "/Search/Search?tValue=" + timestamp;
+
+		form.submit();
+	}
+
+	function getParameterByName(name) {
+		name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+							results = regex.exec(location.search);
+		return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	}
+
+	function SnaPartnerUrl(fcd){ 
+	   $.ajax({
+			type: 'GET',
+			dataType: 'json',
+			url: "http://sna.gmarket.co.kr",
+			data: {
+				"fcd": fcd
+			},
+			async: false
+		});
+	}
+</script>
+    <!-- CONTENTS -->
+    <div id="contents" class="cts">
+
+        <!-- G_CATEGORY -->
+        <div class="g_category">
+
+		@if (Model.SrpYN == "Y")
+  {
+			<div class="box_cate_location">
+				<strong class="flag_area">바로가기</strong>
+				<div class="cont"><a href="@Model.SrpUrl"><span>@Model.SrpText</span> - @Model.SrpDesc</a></div>
+			</div>
+  }
+
+            <!--131029-->
+			<div class="cg_mtt2">
+				<div class="cg_mtt2_2">
+					<h3 class="left1right2">
+						<span class="tit">@searchTitle</span>
+                        <span class="count">(<strong>@Model.CategoryGroups.Count</strong>개의 카테고리/<strong>@CurrencyUtil.ToMoney(@Model.TotalCount, false )</strong>개의 상품 )</span>
+					</h3>
+					<p><a href="javascript:history.back();" class="btn_cg1">이전</a></p>
+                @if (Model.CategoryGroups.Count > 2)
+				{ 
+					<a href="#" class="view_more"><span>더보기</span></a>
+				}
+                    <script type="text/javascript">
+                        $(".cg_mtt2").layerSlideToggle2(); //20120823
+					</script>
+				</div>
+			</div>
+
+            <!-- CATE_LIST -->
+			<div class="cate_listW" id="cate_listW">
+@if (Model.CategoryGroups.Count > 0 && Model.CategoryLevel < 3)
+{
+                <ul class="cate_list">
+    @foreach (HistogramEntry entry in Model.CategoryGroups)
+	{
+		if (Model.CategoryLevel == 0)
+		{
+					<li><a href="javascript:goCategory('@entry.Value','','');">@CategoryUtil.GetCategoryName(entry.Value.ToString()) (<strong class="point">@CurrencyUtil.ToMoney(@entry.Count,false)</strong>개)</a></li>
+		}
+		else if (Model.CategoryLevel == 1)
+		{
+					<li><a href="javascript:goCategory('@Model.LCode','@entry.Value','');">@CategoryUtil.GetCategoryName(entry.Value.ToString()) (<strong class="point">@CurrencyUtil.ToMoney(@entry.Count, false)</strong>개)</a></li>	
+		}
+		else
+		{
+					<li><a href="javascript:goCategory('@Model.LCode','@Model.MCode', '@entry.Value');">@CategoryUtil.GetCategoryName(entry.Value.ToString()) (<strong class="point">@CurrencyUtil.ToMoney(@entry.Count, false)</strong>개)</a></li>	
+		}
+	}
+                </ul>
+}
+			</div>
+
+			<script type="text/javascript">
+			    $("#cate_listW").moreCategory2(".view_more", 2);
+			</script>
+
+			@if (Model.PartnerList.Count > 0)
+			{
+			if (Request["sellCustNo"] == null)
+				{ 
+					<script type="text/javascript">
+						SnaPartnerUrl('703900001');
+					</script>
+				}
+
+			<div class="tab_pp">
+
+			@if ("".Equals(Model.SellCustNo))
+   {
+				<a href="javascript:goPartnerTab('','703900002');" class="whole on">전체</a>
+   }
+   else
+   {
+				<a href="javascript:goPartnerTab('','703900002');" class="whole">전체</a>
+   }
+
+				<div class="tab_wp" id="ppTab">
+					<div id="ppTabCnt" class="pp_cnt">
+						<ul>
+
+                @foreach (var item in Model.PartnerList)
+				{
+					if (intCount >= 10)   // FCD 코드 집계 추가 App 인식 오류로 인한 변수 값 지정
+					{
+						strCount = "7039000" + intCount;
+					}
+					else
+					{
+						strCount = "70390000" + intCount;
+					}
+
+					if (item.PpSellerNo == Model.SellCustNo)
+					{
+						sellCustName = item.PpNm;
+						SellImageUrl = item.PpMobileImageUrl;
+                        <li class="on"><a href="javascript:goPartnerTab('@EncodeUtil.custNoEncode(item.PpSellerNo)','@strCount');">@item.PpNm</a></li>
+					}
+					else
+					{
+					    <li><a href="javascript:goPartnerTab('@EncodeUtil.custNoEncode(item.PpSellerNo)','@strCount');">@item.PpNm</a></li>
+					}
+
+					
+					intCount++;
+
+				}
+                        </ul>
+					</div>
+					<button type="button" class="prev_p off" >왼쪽으로</button>
+					<button type="button" class="next_p off" >오른쪽으로</button>
+				</div>
+			</div>
+
+			}
+
+			<script type="text/javascript">
+			    var scrollTab;
+			    $(window).on("load resize", function () {
+
+					var numOfPartners = @Model.PartnerList.Count;
+
+					if (numOfPartners > 0)
+					{
+						var currentX = -1;
+				        var $maxItem = $('#ppTabCnt');
+				        var $maxItemLI = $('#ppTabCnt li');
+				        var $maxItemUL = $('#ppTabCnt ul');
+				        if (scrollTab) { scrollTab.destroy() }
+				        scrollTab = null;
+				        var wrapWidth = $maxItem.width();
+				        $maxItemLI.css('width', (wrapWidth / 2) - 1 + 'px');
+				        var maxValue = ($maxItemLI.width() + 1) * $maxItemLI.length; //border 1px
+				        $maxItemUL.css('width', maxValue + 'px');
+
+				        initIscroll('ppTabCnt', maxValue);
+
+				        if (scrollTab) {
+				            if (currentX > 0) {
+				                scrollTab.currPageX = currentX;
+				                scrollTab.scrollToPage(currentX, 0, 0);
+				            }
+				            if (currentX == -1) {
+				                var ppLI = document.getElementById('ppTabCnt').querySelectorAll('li');
+				                var index;
+				                for (var i = 0; i < ppLI.length; i++) {
+				                    if ($(ppLI)[i].className.indexOf('on') > -1) {
+				                        index = i;
+				                        break;
+				                    } else {
+				                        index = -1;
+				                    }
+				                }
+				                scrollTab.scrollToPage(index - 1, 0, 0);
+				            }
+				        }
+					}
+			    });
+
+			    function initIscroll(id, max) {
+			        var targetId = id;
+			        if (max > document.getElementById(targetId).offsetWidth) {
+			            if (scrollTab == null) scrollTab = new iScroll(targetId, { hScrollbar: false, vScrollbar: false, useTransform: false, snap: 'li',
+			                onScrollEnd: function () {
+			                    var ul = document.getElementById(targetId).querySelector('ul');
+			                    var sideBtns = document.getElementById('ppTab').querySelectorAll('button');
+			                    var pos = parseInt(ul.style.left.replace('px', ''));
+			                    if (pos < 0) {
+			                        $(sideBtns[0]).removeClass('off');
+			                        $(sideBtns[0]).attr('onclick', 'SnaPartnerUrl("703900003"); scrollTab.scrollToPage("prev", 0); return false;');
+			                    } else {
+			                        $(sideBtns[0]).addClass('off');
+			                        $(sideBtns[0]).attr('onclick', '');
+			                    }
+			                    if (document.getElementById(targetId).offsetWidth + Math.abs(pos) < ul.offsetWidth) {
+			                        $(sideBtns[1]).removeClass('off');
+			                        $(sideBtns[1]).attr('onclick', 'SnaPartnerUrl("703900003"); scrollTab.scrollToPage("next", 0); return false;');
+			                    } else {
+			                        $(sideBtns[1]).addClass('off');
+			                        $(sideBtns[1]).attr('onclick', '');
+			                    }
+			                }
+			            });
+			        } else {
+			            var sideBtns = document.getElementById(targetId).querySelectorAll('button');
+			            $(sideBtns[0]).addClass('off');
+			            $(sideBtns[0]).attr('onclick', '');
+			            $(sideBtns[1]).addClass('off');
+			            $(sideBtns[1]).attr('onclick', '');
+			        }
+			    }
+			</script>
+			<!--//131029-->               
+            
+                
+
+			<!-- PRODUCT ALIGN -->
+            <div class="view_type">
+            	<div class="view_type_sub">
+	                <div class="p_left">
+	                    <select name="sortType" onchange="changeSortType(this);">
+@{
+	string[] sortNames = { "G마켓랭크순", "판매인기순", "할인액높은순", "가격낮은순", "가격높은순", "상품평순", "신규상품순" };
+	string[] sortValues = { "rank_point_desc", "sell_point_desc", "disc_price_desc", "sell_price_asc", "sell_price_desc", "con_point_desc", "new" };
+}
+
+@for (int i = 0; i < sortNames.Length; i++)
+{
+	                        <option value="@sortValues[i]" @(sortValues[i].Equals(Model.SortType) ? "selected" : "")>@sortNames[i]</option>
+}
+	                    </select><a href="#" class="advice" onclick="displayLayer_posit('help_lyr',this);return false;"><span>도움말</span></a>
+	                </div>
+	                <div class="p_right">
+	                    <div class="viewmd">
+	                        <ul>
+@if ("H".Equals(Model.ListType))
+{
+	                            <li><a href="javascript:changeViewType('H');"><img id="viewTypeH" src="@Urls.MobileImageUrl/480/btn_view_img_on.gif" alt="이미지리스트"/></a></li>
+	                            <li><a href="javascript:changeViewType('V');"><img id="viewTypeV" src="@Urls.MobileImageUrl/480/btn_view_list.gif" alt="리스트"/></a></li>
+}
+else
+{
+	                            <li><a href="javascript:changeViewType('H');"><img id="viewTypeH" src="@Urls.MobileImageUrl/480/btn_view_img.gif" alt="이미지리스트"/></a></li>
+	                            <li><a href="javascript:changeViewType('V');"><img id="viewTypeV" src="@Urls.MobileImageUrl/480/btn_view_list_on.gif" alt="리스트"/></a></li>
+}
+	                        </ul>
+	                    </div>
+	                </div>
+					@if ("".Equals(Model.SellCustNo))
+	 {
+						<a href="#" class="detail slideToggleBtn" id="a_srp"><span>상세</span></a>
+	 }
+                </div>
+            </div>
+                        
+            <!-- 상세검색 LAYER 131029 소스위치 수정-->
+			<div class="cate_search slideToggleObj" style="display:none;">
+			<form id="sCategoryFrm" name="sCategoryFrm" method="get" action="/Search/Search">
+                <input type="hidden" name="keyword" value="@Model.Keyword" />
+                <input type="hidden" name="prevKeyword" value="@Model.PrevKeyword" />
+				<input type="hidden" name="lcId" value="@Model.LCode" />
+				<input type="hidden" name="mcId" value="@Model.MCode" />
+				<input type="hidden" name="scId" value="@Model.SCode" />
+				<input type="hidden" name="pageNo" value="@Model.PageNo" />
+				<input type="hidden" name="pageSize" value="@Model.PageSize" />
+				<input type="hidden" name="sortType" value="@Model.SortType" />
+				<input type="hidden" name="listType" value="@Model.ListType" />
+				<input type="hidden" name="sellCustNo" value="@EncodeUtil.custNoEncode(Model.SellCustNo)" />
+				<input type="hidden" name="categoryLevel" value="@Model.CategoryLevel" />
+				<ul>
+					<li class="row1">
+						<span class="tit">결과내 검색</span>
+						<span class="input_wrap"><input type="text" name="scKeyword" class="input100" /></span>
+					</li>
+					<li class="row2">
+						<span class="tit">가격대 검색</span>
+						<div class="input_wrap">
+							<span class="input_align">
+								<input type="tel" name="minPrice" class="price1" value="@Model.StartPrice" />
+                                <input type="tel" name="maxPrice" class="price2" value="@Model.EndPrice" />
+							</span>
+						</div>
+					</li>
+					<li class="row3">
+						<span class="tit2">상세조건 검색</span>
+						<div class="input_wrap">
+							<ul class="btn_tab_grp2">
+								<li id="tBtn1_con1" class="@("Y".Equals(Model.IsFeeFreeYN) ? "on" : "off")"><a href="#" onclick="toggle_button('tBtn1_con1');return false;">무료배송</a></li>
+                                <li id="tBtn1_con2" class="@("Y".Equals(Model.IsMileageYN) ? "on" : "off")"><a href="#" onclick="toggle_button('tBtn1_con2');return false;">마일리지</a></li>
+                                <li id="tBtn1_con3" class="@("Y".Equals(Model.IsDiscountYN) ? "on" : "off")"><a href="#" onclick="toggle_button('tBtn1_con3');return false;">상품할인</a></li>
+                                <li id="tBtn1_con4" class="@("Y".Equals(Model.IsStampYN) ? "on" : "off")"><a href="#" onclick="toggle_button('tBtn1_con4');return false;">스탬프</a></li>
+							</ul>
+							<input id="tBtn1_con1_val" type="hidden" name="isFeeFree" value="@Model.IsFeeFreeYN" />
+                            <input id="tBtn1_con2_val" type="hidden" name="isMileage" value="@Model.IsMileageYN" />
+                            <input id="tBtn1_con3_val" type="hidden" name="isDiscount" value="@Model.IsDiscountYN" />
+                            <input id="tBtn1_con4_val" type="hidden" name="isStamp" value="@Model.IsStampYN" />
+						</div>
+					</li>
+				</ul>
+				<div class="btnwrap">
+					<a href="#" class="btn_dsch btn_blue" onclick="cateogrySearch();"><span><img src="@Urls.MobileImageUrlV2/480/ico_zoom2.png" alt="" />상세 검색</span></a>
+					<a href="#" class="btn_init" onclick="actionInitDetail();return false;"><span><img src="@Urls.MobileImageUrlV2/480/icon_init.png" alt="" />초기화</span></a>
+					<a href="#" class="btn_cls slideToggleBtn"><span><img src="@Urls.MobileImageUrlV2/480/icon_cls.png" alt="" />닫기</span></a>
+				</div>
+			</form>
+			</div>
+			<script type="text/javascript">
+			    $(".g_category").layerSlideToggle2();
+			</script>
+
+		@if (SellImageUrl != "")
+  {
+			<div class="pp_bnr">
+				<span class="logo"><img src="@SellImageUrl" alt="" /></span>
+				<span class="rslt">G마켓 내 <em>@sellCustName</em> 상품 검색 결과입니다.</span>
+			</div>
+  }
+			<!--//131029-->
+
+@if (Model.TotalCount > 0)
+{
+           <div id="goodsList" class="@(("H".Equals(Model.ListType)) ? "horizontal_list" : "vertical_list")">
+                <ul>
+@{
+	// 성인여부 체크
+	// Login 시 Adult 체크
+	bool isAdult = false;
+	if (PageAttr.IsLogin)
+	{
+		@* 
+		2013-06-10 이윤호 
+		GMKTWebContext -> GMobileWebContext
+		*@
+		isAdult = BizUtil.IsAdultUser(GMobileWebContext.Current.UserProfile.CustNo);
+	}
+
+}
+
+@{
+	int i = 0;
+}
+@foreach (var item in Model.Items)
+{
+	string goodsImagePath = "";
+	// 2013-04-04 이윤호
+	// 모바일 구매 로그 작업
+	// parameter에 keyword_seq, keyword 추가
+	//string linkUrl = "http://item2.gmarket.co.kr/M/Goods/Goods.aspx?goodscode=" + item.GdNo
+	string linkUrl = Urls.MItemWebURL + "/Item?goodscode=" + item.GdNo
+									+ "&keyword_seq=" + Model.KeywordSeq + "&keyword=" + HttpUtility.UrlEncode(Model.Keyword, System.Text.Encoding.GetEncoding("EUC-KR"));
+	string onClickStr = "";
+	if (item.AdultYN)
+	{
+		if (PageAttr.IsAdultUse && PageAttr.IsLogin)
+		{
+			goodsImagePath = BizUtil.GetGoodsImagePath(item.GdNo.ToString(), "M3");
+		}
+		else if (PageAttr.IsLogin && !isAdult) // 미성년자
+		{
+			goodsImagePath = Model.ListType.Equals("H") ? Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty) : Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty);
+			onClickStr = "alert('죄송합니다.\\n성인만 구매 가능한 상품입니다.'); return false;";
+		}
+		else if (PageAttr.IsLogin && !PageAttr.IsAdultUse && isAdult)  // 성인이지만 성인인증 절차 필요
+		{
+			goodsImagePath = Model.ListType.Equals("H") ? Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty) : Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty);
+			//linkUrl = "/Common/AdultGoodsViewAgree?goodsNo=" + @item.GdNo;
+		}
+		else if (!PageAttr.IsLogin) // Login 필요
+		{
+			goodsImagePath = Model.ListType.Equals("H") ? Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty) : Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty);
+			linkUrl = ConstDef._GMW_LOGIN_AD_URL + "?rtnurl=" + HttpUtility.UrlEncode(linkUrl) + "&adultUseLoinCheck=Y";
+		}
+		else
+		{
+			goodsImagePath = BizUtil.GetGoodsImagePath(item.GdNo.ToString(), "M3");
+		}
+	}
+	else
+	{
+		goodsImagePath = BizUtil.GetGoodsImagePath(item.GdNo.ToString(), "M3");
+	}
+	
+                    <li>
+                        <a class="anchor" href="@linkUrl" onclick="@onClickStr">
+							<span class="thumbnail_wrap">
+                                <img class="thumbnail" src="@Urls.MobileImageUrlV2/lazy_200x200.gif"
+								data-original="@goodsImagePath"
+								alt="제품 이미지"  onError="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" />
+                            </span>
+                            <span class="goods_name">
+                        @if (Model.ADItmes.Contains(item.GdNo.ToString()) && i < Model.ADItmes.Length)
+						{
+							i++;
+                            <span class="plus" onclick="displayLayer_posit('plus_lyr',this);">PLUS</span>
+						}
+                            @item.Name</span>
+                            <span class="goods_info">
+@if (item.Discount.DiscountPrice > 0)
+{
+                            <span class="price">@CurrencyUtil.ToMoney(@item.SellPrice.ToString(), true)</span>
+		if ((@item.SellPrice - @item.Discount.DiscountPrice) < 10 )
+		{ 
+							<span class="sale_price">무료</span>
+		}
+		else { 
+							<span class="sale_price">@CurrencyUtil.ToMoney((@item.SellPrice - @item.Discount.DiscountPrice).ToString(), true)</span>
+		}
+}
+else
+{
+                            <span class="price" style="visibility:hidden">&nbsp;</span>
+		if (@item.SellPrice < 10)
+		{ 
+							<span class="sale_price">무료</span>
+		}
+		else
+		{ 
+							<span class="sale_price" style="margin-left:0;">@CurrencyUtil.ToMoney(@item.SellPrice.ToString(), true)</span>
+		}
+}
+
+@if (item.Delivery.DeliveryInfo.Equals("무료"))
+{
+														<span class="free">무료배송</span>
+}
+else if ("123456789".IndexOf(item.Delivery.DeliveryInfo.Substring(0, 1)) > -1)
+{
+														<span class="fee">배송비 @item.Delivery.DeliveryInfo</span>
+}
+else
+{
+														<span class="pay">@Html.Raw(@item.Delivery.DeliveryInfo.Replace("디지털쿠폰<br/>(방문사용)", "e쿠폰"))</span>
+}
+
+                            </span>
+                        </a>
+                    </li>
+}
+							</ul>
+@{
+string pageNaviParams = "keyword=" + HttpUtility.UrlDecode(Model.Keyword) +
+												"&prevKeyword=" + HttpUtility.UrlDecode(Model.PrevKeyword) +
+												"&minPrice=" + Model.StartPrice +
+												"&maxPrice=" + Model.EndPrice +
+												"&isFeeFree=" + Model.IsFeeFreeYN +
+												"&isMileage=" + Model.IsMileageYN +
+												"&isDiscount=" + Model.IsDiscountYN +
+												"&isStampYn=" + Model.IsStampYN +
+												"&lcId=" + Model.LCode +
+												"&mcId=" + Model.MCode +
+												"&scId=" + Model.SCode +
+												"&listType=" + Model.ListType +
+												"&sortType=" + Model.SortType +
+												"&sellCustNo=" + EncodeUtil.custNoEncode(Model.SellCustNo);
+}
+
+@GMobileHelper.PageNavi(Model.PageNo, Model.PageSize, Model.TotalCount, "/Search/Search", "pageNo", pageNaviParams, Model.Keyword)
+
+            </div>
+}
+else
+{
+		    <div class="msgW2 prod_no">
+                <div class="msg">
+                    <p class="txt2">
+                        <strong class="font_green">조건에 맞는 상품이 없습니다.</strong>
+                    </p>
+                </div>
+            </div>
+}
+
+		<!--smart click-->
+			<div class="smt_click" style="display:none">
+				<h4 class="smt_tit">스마트 클릭<span class="ad">광고</span></h4>
+				<!-- VERTICAL LIST -->
+				<div class="vertical_list">
+					<ul id="smt_click_items">
+						
+					</ul>
+				</div>
+				<!--// VERTICAL LIST -->
+			</div>
+			<!--//smart click-->
+
+        <!--layer 131029-->
+		<div class="com_layer" id="help_lyr">
+			<h3>G마켓 랭크순</h3>
+			<div class="help_cont">
+				<p class="guide_t">판매실적, 서비스 점수, 프로모션 활동 등을 산정한 점수와 검색 정확도 지수 (검색결과 페이지에만 적용)의 합산으로 정렬</p>
+				<ul class="list">
+					<li>판매실적 : 3일간 판매건수 및 금액</li>
+					<li>서비스 점수 : 배송점수+응대점수+후기점수등 서비스 점수</li>
+					<li>프로모션 활동 : 고객혜택 제공여부 및 광고구매 점수</li>
+					<li>검색정확도 지수 : 검색결과페이지 상품정렬시에만 적용되는 점수</li>
+				</ul>
+			</div>
+			<a href="#" class="b_close" onClick="displayLayer_posit('help_lyr'); return false;">닫기</a>
+		</div>
+		<!--layer-->
+
+        <!--layer 131029-->
+	    <div class="com_layer" id="plus_lyr">
+		    <h3>PLUS</h3>
+		    <div class="help_cont">
+			    <p class="guide_t">[PLUS]상품은 광고낙찰에 의한 전시상품입니다.</p>
+		    </div>
+		    <a href="#" class="b_close" onClick="displayLayer_posit('plus_lyr'); return false;">닫기</a>
+	    </div>
+	    <!--layer-->
+
+@if (Model.TotalCount > 0)
+{
+    <script type="text/javascript">
+
+        var list = '.@(("H".Equals(Model.ListType)) ? "horizontal_list" : "vertical_list")';
+
+        UL_layoutFix(list, true);
+
+        $(list + ' .anchor').on('click', function (e) {
+            $target_link = $(this).find('.plus').get(0);
+            if (e.target == $target_link) {
+                return false;
+            }
+        })
+    </script>
+}
+        </div>
+    </div>
+    <!--// CONTENTS -->
+
+
+

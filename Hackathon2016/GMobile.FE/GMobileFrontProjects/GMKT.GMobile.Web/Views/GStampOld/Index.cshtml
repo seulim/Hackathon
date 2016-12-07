@@ -1,0 +1,432 @@
+﻿@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Models;
+@using System.Text;
+
+@model GStampModel
+
+@{	
+	string[] strFoods = new string[Model.GStampFoods.Count];
+	StringBuilder sbFood = new StringBuilder();
+	string strFoodList = string.Empty;
+
+	int intFood = 0;
+	foreach (var eachGift in Model.GStampFoods)
+	{
+		sbFood.Append("<li>");
+		sbFood.Append("<img src='" + eachGift.ImageUrl + "' alt='" + eachGift.Title + "' />");
+		sbFood.Append("<span class='ent_grp'>");
+
+		if (!string.IsNullOrEmpty(Model.MesssageGStampBlacklist))
+		{
+			sbFood.Append("<a href='javascript:fnGStampBlacklist();') class='ent'>응모하기</a>");
+		}
+		else
+		{
+		sbFood.Append("<a href=" + Url.Action("CommonApplyEventPlatformGmarket", "GStamp") + "?str=" + eachGift.ApplyEidEncryptedString[0] + "&encStr=" + eachGift.ApplyEidEncryptedString[1] + " class='ent'>응모하기</a>");
+		}
+	sbFood.Append("<span class='txt'>G스탬프<span class='num n1'>-" + eachGift.ApplyCount + "장</span></span>");
+	sbFood.Append("</span>");
+	sbFood.Append("<span class='exch_grp'>");
+
+	if (eachGift.RemainCount > 0)
+	{
+		if (!string.IsNullOrEmpty(Model.MesssageGStampBlacklist))
+		{
+			sbFood.Append("<a href='javascript:fnGStampBlacklist();' class='exch'>교환하기</a>");
+		}else{
+		sbFood.Append("<a href=" + Url.Action("CommonApplyEventPlatformGmarket", "GStamp") + "?str=" + eachGift.ChangeEidEncryptedString[0] + "&encStr=" + eachGift.ChangeEidEncryptedString[1] + " class='exch'>교환하기</a>");
+		}
+		sbFood.Append("<span class='txt'>G스탬프<span class='num n2'>-" + eachGift.ChangeCount + "장</span></span>");
+		sbFood.Append("</span>");
+		sbFood.Append("</li>");
+	}
+	else
+	{
+		sbFood.Append(@"<a href='javascript:alert(""본 상품은 마감되었습니다."")' class='end'>마감</a>");
+		sbFood.Append("<span class='txt'>G스탬프<span class='num n2'>-" + eachGift.ChangeCount + "장</span></span>");
+		sbFood.Append("</span>");
+		sbFood.Append("</li>");
+	}
+
+	strFoods[intFood] = sbFood.ToString();
+	sbFood.Clear();
+	intFood++;
+	}
+
+	Random rnd = new Random();
+	int[] intCount = new int[Model.GStampFoods.Count];
+	bool overlapp_check = true;
+	int i = 0;
+
+	while (i != Model.GStampFoods.Count)
+	{
+		intCount[i] = rnd.Next(1, Model.GStampFoods.Count + 1);
+
+		overlapp_check = true;
+
+		for (int j = 0; j < i; j++)
+		{
+			if (intCount[i] == intCount[j])
+			{
+				overlapp_check = false;
+				break;
+			}
+		}
+
+		if (overlapp_check == true)
+		{
+			i++;
+		}
+	}
+
+	for (int k = 0; k < Model.GStampFoods.Count; k++)
+	{
+		if ((k + 1) % 2 == 1)
+		{
+			strFoodList += "<ul>";
+		}
+
+		strFoodList += strFoods[intCount[k] - 1];
+
+		if ((k + 1) % 2 == 0)
+		{
+			strFoodList += "</ul>";
+		}
+	}
+
+	}
+
+<!--link rel="stylesheet" type="text/css" href="@Urls.MobileWebUrl/css/480/@PageAttr.MainCss" media="screen, projection"/-->
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+	});
+
+	function fnGStampBlacklist() {
+		alert('@Model.MesssageGStampBlacklist');
+	}
+</script>
+
+
+<!-- CONTENT -->
+<div id="content" class="ctns">
+		
+	<div class="mkt">
+		<div class="stamp">
+
+			<!-- TAB -->
+			<div class="tab_stamp">
+				<ul>
+					<li class="on" id="tab_stamp0">
+						<a href="#" onclick="tabView2(2, 'tab_stamp', 0, 'ctns_stamp');return false;">스탬프 쿠폰교환</a>
+					</li>
+					<li class="off" id="tab_stamp1">
+						<a href="#" onclick="tabView2(2, 'tab_stamp', 1, 'ctns_stamp');return false;">스탬프 간식교환</a>
+					</li>
+				</ul>
+			</div>
+			<!-- //TAB -->
+
+			<div id="ctns_stamp0">
+				<p class="tit">모바일에서 간편하게!<span>G스탬프 쿠폰교환</span></p>
+
+@if (PageAttr.IsLogin == true)
+{
+				<div class="my_wrap">
+					<p class="my">나의 보유 <span>G스탬프</span>는?</p>
+					<p class="num">@Model.PossibleGStampCount<span>장</span>	</p>
+				</div>
+}
+else
+{
+				<a href="@Urls.MemberOnlyLoginUrl">
+					<div class="my_wrap">
+						<p class="my">나의 보유 <span>G스탬프</span>는?</p>
+						<p class="num">?<span>장</span>	</p>
+					</div>
+				</a>
+}
+					
+				<!-- G스탬프 쿠폰교환 -->
+				<div class="exch_wrap stm">
+					<p class="tit2"><span>G스탬프 <em>쿠폰교환</em></span></p>
+					<div class="cpn_wrap">
+						<ul>
+							<li>
+								<img src="@Urls.MobileImageUrlV2/640/img_rank_cpn11.gif" alt="1000원 할인쿠폰" />
+								<span class="txt1">G스탬프<span class="num">-7장</span></span>
+								<span class="txt2">(1만원이상 구매시)</span>
+								@if (!string.IsNullOrEmpty(Model.MesssageGStampBlacklist))
+				{<a href="javascript:fnGStampBlacklist();" class="exch">교환하기</a>}
+				else
+				{<a href="@Url.Action("ExchangeCoupon", "GStamp")/6" class="exch">교환하기</a>}
+							</li>
+							<li>
+								<img src="@Urls.MobileImageUrlV2/640/img_rank_cpn12.gif" alt="2000원 할인쿠폰" />
+								<span class="txt1">G스탬프<span class="num">-12장</span></span>
+								<span class="txt2">(2만원이상 구매시)</span>
+								@if (!string.IsNullOrEmpty(Model.MesssageGStampBlacklist))
+				{<a href="javascript:fnGStampBlacklist();" class="exch">교환하기</a>}
+				else
+				{<a href="@Url.Action("ExchangeCoupon", "GStamp")/7" class="exch">교환하기</a>}
+							</li>
+						</ul>
+					</div>
+					<div class="cpn_wrap">
+						<ul>
+							<li>
+								<img src="@Urls.MobileImageUrlV2/640/img_rank_cpn13.gif" alt="3000원 할인쿠폰" />
+								<span class="txt1">G스탬프<span class="num">-20장</span></span>
+								<span class="txt2">(3만원이상 구매시)</span>
+								@if (!string.IsNullOrEmpty(Model.MesssageGStampBlacklist))
+				{<a href="javascript:fnGStampBlacklist();" class="exch">교환하기</a>}
+				else
+				{<a href="@Url.Action("ExchangeCoupon", "GStamp")/8" class="exch">교환하기</a>}
+							</li>
+							<li>
+								<img src="@Urls.MobileImageUrlV2/640/img_rank_cpn14.gif" alt="5000원 할인쿠폰" />
+								<span class="txt1">G스탬프<span class="num">-25장</span></span>
+								<span class="txt2">(5만원이상 구매시)</span>
+								@if (!string.IsNullOrEmpty(Model.MesssageGStampBlacklist))
+				{<a href="javascript:fnGStampBlacklist();" class="exch">교환하기</a>}
+				else
+				{<a href="@Url.Action("ExchangeCoupon", "GStamp")/9" class="exch">교환하기</a>}
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!-- //G스탬프 쿠폰교환 -->
+
+				<!-- G스탬프 쿠폰응모 -->
+				<div class="ent_wrap stm">
+					<p class="tit2"><span>G스탬프 <em>쿠폰응모</em></span></p>
+					<div class="ent">
+						<div id="bnGrp" class="bn_grp">
+							<ul>
+							@if (!string.IsNullOrEmpty(Model.MesssageGStampBlacklist))
+			 {
+					<li><a href="javascript:fnGStampBlacklist();"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent1.gif" alt="1000원 할인쿠폰 G스탬프 1장 1만원이상 구매시 응모하기" /></a></li>
+								<li><a href="javascript:fnGStampBlacklist();"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent2.gif" alt="2000원 할인쿠폰 G스탬프 2장 2만원이상 구매시 응모하기" /></a></li>
+								<li><a href="javascript:fnGStampBlacklist();"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent3.gif" alt="3000원 할인쿠폰 G스탬프 3장 3만원이상 구매시 응모하기" /></a></li>
+								<li><a href="javascript:fnGStampBlacklist();"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent4.gif" alt="4000원 할인쿠폰 G스탬프 3장 4만원이상 구매시 응모하기" /></a></li>
+								<li><a href="javascript:fnGStampBlacklist();"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent5.gif" alt="5000원 할인쿠폰 G스탬프 3장 5만원이상 구매시 응모하기" /></a></li>
+								<li><a href="javascript:fnGStampBlacklist();"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent6.gif" alt="10000원 할인쿠폰 G스탬프 5장 6만원이상 구매시 응모하기" /></a></li>
+			 }
+			 else
+			 {
+			<li><a href="@Url.Action("ExchangeCoupon", "GStamp")/0"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent1.gif" alt="1000원 할인쿠폰 G스탬프 1장 1만원이상 구매시 응모하기" /></a></li>
+											<li><a href="@Url.Action("ExchangeCoupon", "GStamp")/1"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent2.gif" alt="2000원 할인쿠폰 G스탬프 2장 2만원이상 구매시 응모하기" /></a></li>
+											<li><a href="@Url.Action("ExchangeCoupon", "GStamp")/2"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent3.gif" alt="3000원 할인쿠폰 G스탬프 3장 3만원이상 구매시 응모하기" /></a></li>
+											<li><a href="@Url.Action("ExchangeCoupon", "GStamp")/3"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent4.gif" alt="4000원 할인쿠폰 G스탬프 3장 4만원이상 구매시 응모하기" /></a></li>
+											<li><a href="@Url.Action("ExchangeCoupon", "GStamp")/4"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent5.gif" alt="5000원 할인쿠폰 G스탬프 3장 5만원이상 구매시 응모하기" /></a></li>
+											<li><a href="@Url.Action("ExchangeCoupon", "GStamp")/5"><img src="@Urls.MobileImageUrlV2/640/img_stamp_ent6.gif" alt="10000원 할인쿠폰 G스탬프 5장 6만원이상 구매시 응모하기" /></a></li>				 
+			 }
+							</ul>
+						</div>
+						<div id="bnTurn" class="bn_turn">
+							<a href="#" id="prev1" class="prev" onclick="gallery1.prev();return false;"><span></span></a>
+							<a href="#" id="next1" class="next" onclick="gallery1.next();return false;"><span></span></a>
+						</div>
+						
+					</div>
+				</div>
+				<div id="bnIndex" class="bn_index">
+					<p class="selected"></p>
+					<p></p>
+					<p></p>
+					<p></p>
+					<p></p>
+					<p></p>
+				</div>
+
+				<!-- //G스탬프 쿠폰응모 -->
+			</div>
+
+			<div id="ctns_stamp1">
+				<p class="tit">모바일에서 간편하게!<span>G스탬프 간식교환</span></p>
+
+@if (PageAttr.IsLogin == true)
+{
+				<div class="my_wrap">
+					<p class="my">나의 보유 <span>G스탬프</span>는?</p>
+					<p class="num">@Model.PossibleGStampCount<span>장</span>	</p>
+				</div>
+}
+else
+{
+				<a href="@Urls.MemberOnlyLoginUrl">
+					<div class="my_wrap">
+						<p class="my">나의 보유 <span>G스탬프</span>는?</p>
+						<p class="num">?<span>장</span>	</p>
+					</div>
+				</a>
+}
+				<!-- G스탬프 간식교환 -->
+				<div class="snack_wrap stm">
+					<p class="tit2"><span>G스탬프 <em>간식교환</em></span></p>
+					<div class="snack">
+						<div id="bnGrp2" class="bn_grp">
+							@Html.Raw(@strFoodList)
+						</div>
+						<div id="bnTurn2" class="bn_turn">
+							<a href="#" id="prev2" class="prev" onclick="gallery2.prev();return false;"><span></span></a>
+							<a href="#" id="next2" class="next" onclick="gallery2.next();return false;"><span></span></a>
+						</div>
+					</div>
+				</div>
+				<!-- //G스탬프 간식교환 -->
+
+			</div>
+			
+		</div>
+
+		<!-- 이벤트/쿠폰/혜택 전체보기 (공통) -->
+		<div class="mkt_all_wrap">
+			<div class="mkt_all">
+				<p>이벤트/쿠폰/혜택 <span class="all1">전체보기</span></p>
+				<a href="@Url.Action("MyBenefitHome", "EventZone")" class="all2">모두보기</a>
+			</div>
+			<ul>
+				<li class="mkt_nav1"><a href="@Url.Action("Index", "Pluszone")">플러스존</a></li>
+				<li class="mkt_nav2"><a href="@Url.Action("MyBenefitCoupon", "EventZone")">전회원할인</a></li>
+				<li class="mkt_nav3"><a href="@Url.Action("MyBenefit", "EventZone")">등급혜택</a></li>
+				<li class="mkt_nav4"><a href="@Url.Action("MyBenefitVip", "EventZone")">VIP사은품</a></li>
+				<li class="mkt_nav5"><a href="#">G스탬프</a></li>
+			</ul>
+		</div>
+		<!-- //이벤트/쿠폰/혜택 전체보기 (공통) -->
+
+	</div>
+
+</div>
+<!-- //CONTENT -->
+
+@section scripts
+{
+<script type="text/javascript">
+@if (Model.CurrentTabNo == 1)
+{
+@:tabView2(2, 'tab_stamp', 1, 'ctns_stamp');
+}
+	
+	//<![CDATA[
+	var gallery1,
+			el,
+			i,
+			page,
+			dots1 = document.querySelectorAll('#bnIndex p');
+
+	/* HTML 파싱 */
+	var bnGrpList1 = $("#bnGrp li");
+	var bnGrpListAtag1 = [];
+
+	for (var j = 0; j < bnGrpList1.length; j++) {
+		bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+	}
+	var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+	/* //HTML 파싱 */
+
+	gallery1 = new SwipeView('#bnGrp', {
+		numberOfPages: bnGrpListAtag1.length,
+		hastyPageFlip: true,
+		flickTime: 0 // 0은 auto작동안함
+	});
+
+	// Load initial data
+	for (i = 0; i < 3; i++) {
+	    if (1 == bnGrpListAtag1.length) {
+	        page = i == 0 || 2 ? bnGrpListAtag1.length - 1 : i - 1;
+	    }
+	    else {
+	        page = i == 0 ? bnGrpListAtag1.length - 1 : i - 1;
+	    }
+
+		el = document.createElement('span');
+		el.innerHTML = bnGrpListAtag1[page];
+		gallery1.masterPages[i].appendChild(el)
+
+		el.width = bnGrpListAtag1[page].width;
+		el.height = bnGrpListAtag1[page].height;
+		el.onload = function () { this.className = ''; }
+	}
+
+	gallery1.onFlip(function () {
+		var el,
+				upcoming,
+				i;
+
+		for (i = 0; i < 3; i++) {
+			upcoming = gallery1.masterPages[i].dataset.upcomingPageIndex;
+
+			if (upcoming != gallery1.masterPages[i].dataset.pageIndex) {
+				el = gallery1.masterPages[i].querySelector('span');
+				el.innerHTML = bnGrpListAtag1[upcoming];
+			}
+		}
+
+		document.querySelector('#bnIndex .selected').className = '';
+		dots1[gallery1.pageIndex].className = 'selected';
+	});
+
+	flicking2("bnGrp");
+
+	var gallery2,
+			el,
+			i,
+			page,
+			dots2 = document.querySelectorAll('#bnIndex2 p');
+
+	var bnGrpList2 = $("#bnGrp2 ul");
+	var bnGrpListAtag2 = [];
+	for (var j = 0; j < bnGrpList2.length; j++) {
+		bnGrpListAtag2[j] = bnGrpList2[j].innerHTML;
+	}
+	var globalBnGrpListAtag2 = bnGrpListAtag2.join(",");
+
+	gallery2 = new SwipeView('#bnGrp2', {
+		numberOfPages: bnGrpListAtag2.length,
+		hastyPageFlip: true,
+		flickTime: 0 // 0은 작동안함
+	});
+
+	// Load initial data
+	for (i = 0; i < 3; i++) {
+	    if (1 == bnGrpListAtag2.length) {
+	        page = i == 0 || 2 ? bnGrpListAtag2.length - 1 : i - 1;
+	    }
+	    else {
+	        page = i == 0 ? bnGrpListAtag2.length - 1 : i - 1;
+	    }
+
+		el = document.createElement('ul');
+		el.innerHTML = bnGrpListAtag2[page];
+		gallery2.masterPages[i].appendChild(el)
+
+		el.width = bnGrpListAtag2[page].width;
+		el.height = bnGrpListAtag2[page].height;
+		el.onload = function () { this.className = ''; }
+	}
+
+	gallery2.onFlip(function () {
+		var el,
+				upcoming,
+				i;
+
+		for (i = 0; i < 3; i++) {
+			upcoming = gallery2.masterPages[i].dataset.upcomingPageIndex;
+
+			if (upcoming != gallery2.masterPages[i].dataset.pageIndex) {
+				el = gallery2.masterPages[i].querySelector('ul');
+				el.innerHTML = bnGrpListAtag2[upcoming];
+			}
+		}
+	});
+
+	flicking("bnGrp2");
+
+	//]]>
+</script>
+}

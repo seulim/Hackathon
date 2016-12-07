@@ -1,0 +1,1325 @@
+﻿@using GMKT.GMobile.Constant;
+@using GMobile.Data.Tiger;
+@using GMobile.Data.DisplayDB;
+@using GMobile.Data.Diver;
+@model GMKT.GMobile.Web.Models.HomeModel
+
+@{
+    PageAttr.IsMain = true;
+    string strPopupYn = "N";
+    string strNType = string.Empty;
+    string strNKind = string.Empty;
+    string strNContent = string.Empty;
+
+    if (PageAttr.IsIpad == true || PageAttr.IsIphone == true || PageAttr.IsIpod == true || PageAttr.IsIphoneF == true)
+    {
+        strNType = "I";
+    }
+    else if (PageAttr.IsAndroid == true)
+    {
+        strNType = "A";
+    }
+    else
+    {
+        strNType = "";
+    }
+
+    if (Model.PopupList.Count > 0)
+    {
+        for (int k = 0; k < Model.PopupList.Count; k++)
+        {
+            if (strNType == Model.PopupList[k].NType && Model.PopupList[k].NKind == "A")
+            {
+                strNContent = Model.PopupList[k].NContent;
+                strPopupYn = "Y";
+            }
+        }
+    }	
+}
+
+@section Css
+{
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrl/480/main_v2.css">    
+}
+
+  <hr />
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+			
+		<!-- 반응형웹 -->
+		<div class="rspn_wrap">
+
+		<!-- 반응형웹 (좌측컨탠츠) -->
+		<div class="rspn1">
+			<div class="rspn1_sub">
+
+@{
+    int intCount = 1;
+    string strCount = "";
+}
+@if (Model.AdBannerList.Count > 0)
+{
+			<!-- BANNER -->	
+			<div class="ban_wrap">
+				<div class="bn_grp ban" id="bnGrpBG">
+					<img src="@Urls.MobileImageUrlV2/lazy_640x240.gif" alt="loading..." />
+				</div>
+				<div class="bn_grp ban" id="bnGrp">
+					<ul style="display:none;">
+    @foreach (AdBannerT adBanner in Model.AdBannerList)
+    {
+        if (intCount >= 10)   // FCD 코드 집계 추가 App 인식 오류로 인한 변수 값 지정
+        {
+            strCount = "7032000" + intCount;   
+            <li><a onclick="AdBannerClick(@intCount)" href="http://sna.gmarket.co.kr/?fcd=@strCount&url=@TextUtil.SafeString(adBanner.BnLinkUrl, "")" >
+						<img class="lazyImage" src="@Urls.MobileImageUrlV2/lazy_640x240.gif" data-original="@Const.GMW_WEB_IMG_URL@TextUtil.SafeString(adBanner.BnImgPath, "")@adBanner.BnImgNm" alt="배너이미지1" style="height:auto;" /></a></li>
+        }
+        else
+        {
+            strCount = "70320000" + intCount; 
+            <li><a  onclick="AdBannerClick(@intCount)"  href="http://sna.gmarket.co.kr/?fcd=@strCount&url=@TextUtil.SafeString(adBanner.BnLinkUrl, "")">
+						<img class="lazyImage" src="@Urls.MobileImageUrlV2/lazy_640x240.gif" data-original="@Const.GMW_WEB_IMG_URL@TextUtil.SafeString(adBanner.BnImgPath, "")@adBanner.BnImgNm" alt="배너이미지1" style="height:auto;" /></a></li>
+        }
+
+        intCount++;
+    }
+					</ul>
+				</div>
+				<div id="bnTurn" class="bn_turn" style="display:none;">
+		     		<button type="button" id="prev" class="prev" onclick="gallery1PREV();gallery1.prev();return false;"><span></span></button>
+					<button type="button" id="next" class="next" onclick="gallery1NEXT();gallery1.next();return false;"><span></span></button>
+				</div>
+			</div>			
+			<!-- //BANNER -->
+}
+
+@{
+    intCount = 13;
+    strCount = "";
+}
+@if (Model.MobileHomeIconList.Count > 0)
+{			
+			<!-- MAIN BENEFIT -->
+			<div class="mjr_bnf_wrap">
+				<div class="mjr_bnf">
+					<ul>
+    @foreach (MobileHomeIconT homeIcon in Model.MobileHomeIconList)
+    {
+        strCount = "7032000" + intCount;   // FCD 코드 집계 추가 App 인식 오류로 인한 변수 값 지정
+            <li>
+            @if (strCount.Equals("703200013"))
+            {
+                <a onclick="SnaUrl(@strCount);" href="@homeIcon.IconLnkUrl"><span class="bnf"><img src="@homeIcon.IconImageUrl"/></span></a>
+            }
+            else if (strCount.Equals("703200014"))
+            {
+                <a onclick="SnaUrl(@strCount);" href="@homeIcon.IconLnkUrl"><span class="bnf"><img src="@homeIcon.IconImageUrl"/></span></a>
+            }
+            else if (strCount.Equals("703200015"))
+            {
+                <a onclick="SnaUrl(@strCount);" href="@homeIcon.IconLnkUrl"><span class="bnf"><img src="@homeIcon.IconImageUrl"/></span></a>
+            }
+            else if (strCount.Equals("703200016"))
+            {
+                <a onclick="SnaUrl(@strCount);" href="@homeIcon.IconLnkUrl"><span class="bnf"><img src="@homeIcon.IconImageUrl"/></span></a>
+            }
+            @if (homeIcon.IsIconNew == true)
+            {
+				<span class="new"></span>
+            }
+		</li>
+       
+
+            intCount++;
+
+    }
+					</ul>
+				</div>
+			</div>
+			<!-- //MAIN SERVICE -->
+}
+
+
+@if (Model.SpecialVisible == true)
+{
+			<!-- MOBILE SPECIAL --> <!-- 20130417 -->
+			<div class="mbl_sp_wrap">
+
+
+                <div class="mbl_sp">
+					<p class="msp1">
+                        <img src="@Urls.MobileImageUrlV2/640/txt_ms.png" alt="모바일 스페셜" class="tit" />
+                    
+						
+					<p class="msp2">
+                     <img src="@Urls.MobileImageUrlV2/640/icon_hot.png" alt="HOT" class="hot" /><a href="http://sna.gmarket.co.kr/?fcd=703200017&url=@Model.SpecialLink" class="txt">@Html.Raw(Model.SpecialText)</a><a href="http://sna.gmarket.co.kr/?fcd=703200017&url=@Model.SpecialLink" class="txt"><img src="@Urls.MobileImageUrlV2/640/icon_play.png" alt="" class="play" /></a>
+@*
+2013-05-03 이윤호
+프로모션바 GAdmin으로 등록할 수 있기 전까지 사용할 모델
+반영시간에 따라 자동으로 문구와 URL 변경할 수 있도록 함
+
+@if (Model.LinkText == string.Empty)
+{
+						<img src="@Urls.MobileImageUrlV2/640/icon_hot.png" alt="HOT" class="hot" /><a href="@Urls.MWebUrl/Event/2013/04/0419_supermileage/m_supermile.asp" class="txt">모바일 구매하면 무조건 <span>더블마일리지!</span></a><img src="@Urls.MobileImageUrlV2/640/icon_play.png" alt="" class="play" />	
+}
+else
+{
+						<img src="@Urls.MobileImageUrlV2/640/icon_hot.png" alt="HOT" class="hot" /><a href="@Model.LinkURL" class="txt">@Html.Raw(Model.LinkText)</a><img src="@Urls.MobileImageUrlV2/640/icon_play.png" alt="" class="play" />
+}
+*@
+					
+                    </p>
+				</div>
+    
+			</div>
+			<!-- //MOBILE SPECIAL --> <!-- //20130417 -->
+}
+@{
+    string SnaDisplayToday = "703300001";  // FCD 코드 집계 추가 App 인식 오류로 인한 변수 값 지정
+}
+
+			<!-- GOOD SERIES -->
+			<div class="gd_srs sctn_tit">
+
+				<div class="tit_grp">
+					<h3><strong id="changeTit"></strong><span id="time_limit" style="display:none"></span></h3>
+					<!--h3><strong id="changeTit">오늘만특가</strong><span id="time_limit"></span></h3-->
+					<!--h3><strong id="changeTit">GOOD 시리즈</strong></h3-->
+					<a onclick="SnaUrl(@SnaDisplayToday);" href="@Urls.MobileWebUrl/Display/Today" class="more"><span>더보기</span></a>
+				</div>
+
+				<div class="bn_grp" id="bnGrp2">
+					<ul>
+@*
+2013-05-09 이윤호
+배너 클릭 시 'VIP로 이동'을 '오특,굿시리즈 랜딩페이지로 이동'으로 수정
+*@
+@{
+    intCount = 2;
+}
+@foreach (var item in Model.TodaySpecial)
+{
+    if (intCount < 10)    // FCD 코드 집계 추가 App 인식 오류로 인한 변수 값 지정
+    {
+        strCount = "70330000" + intCount;
+    }
+    else
+    {
+        strCount = "7033000" + intCount;
+    }                                                                      
+          <li><a onclick="AdTodayGoodClick(@strCount)" href="@Url.Action("Today", "Display")"><img class="lazyImage" src="@Urls.MobileImageUrlV2/lazy_640x240.gif" data-original="@item.MobileMainBannerUrl" alt="@item.SpecialTitle" style="height:auto;" /></a></li>
+    intCount++;
+}
+@{
+    intCount = 14;
+}
+@foreach (var item in Model.GoodSeries)
+{
+    strCount = "7033000" + intCount;   
+	<li><a onclick="AdTodayGoodClick(@strCount)"  href="@Url.Action("Today", "Display", new { id = 1 })"><img class="lazyImage" src="@Urls.MobileImageUrlV2/lazy_640x240.gif" data-original="@item.MobileBannerUrl" alt="@item.Title" style="height:auto;" /></a></li>
+    intCount++;
+}
+					</ul>
+				</div>
+				<div id="bnTurn2" class="bn_turn" style="display:none;">
+					<button type="button" id="prev2" class="prev2"  onclick="gallery2PREV();gallery2.prev();return false;"><span></span></button>
+					<button type="button" id="next2" class="next2" onclick="gallery2NEXT();gallery2.next();return false;"><span></span></button>
+				</div>
+			</div>
+            <input id="hidTodaySpecialCnt" name="hidTodaySpecialCnt" type="hidden" value="@Model.TodaySpecial.Count" />
+			<!-- //GOOD SERIES -->
+@{
+    int i = 1;
+    intCount = 2;
+    string SnaBestSellList = "703400001";  
+}
+@if (Model.BestSellerList.Count > 0)
+{
+			<!-- GMARKET BEST -->
+			<div class="gmk_best sctn_tit">
+
+				<div class="tit_grp">
+					<h3>G마켓 베스트</h3>
+                     <a  onclick="SnaUrl(@SnaBestSellList);" href="@Urls.MobileWebUrl/Display/BestSellerList" class="more"><span>더보기</span></a>
+                </div>
+
+				<div class="bn_grp" id="bnGrp3">
+    @foreach (SearchGoods bestSeller in Model.BestSellerList)
+    {
+        strCount = "70340000" + intCount;   // FCD 코드 집계 추가 App 인식 오류로 인한 변수 값 지정
+        if (i % 6 == 1)
+        {
+				    @:<ol>
+        }
+						<li>
+							<a href="http://sna.gmarket.co.kr/?fcd=@strCount&url=@HttpUtility.UrlEncode(ConstDef._GMW_OLD_MOBILEWEB_GOOD_URL + bestSeller.gd_no)">
+								<span class="num">@i</span>
+								<span class="tit">@bestSeller.gd_nm</span>
+								<img class="lazyImage" src="@Urls.MobileImageUrlV2/lazy_200x200.gif" data-original="@BizUtil.GetGoodsImagePath(bestSeller.gd_no, "M2")" alt="" />
+								<span class="prc">@CurrencyUtil.ToMoney(bestSeller.sell_price - bestSeller.disc_price, false)<span>원</span></span>
+							</a>
+						</li>
+        if (i % 6 == 0)
+        {
+				    @:</ol>
+        }
+
+        i++;
+        intCount++;
+    }
+				</div>
+				<div id="bnIndex3" class="bn_index">
+@{
+    int totalPageCnt = 1;
+    totalPageCnt = @Model.BestSellerList.Count / 6;
+}
+    @if (@Model.BestSellerList.Count % 6 > 0)
+    {
+        totalPageCnt++;
+    }
+					<p class="selected"></p>
+    @for (int page = 1; page < totalPageCnt; page++)
+    {
+					<p></p>
+    }
+				</div>
+			</div>
+			<!-- //GMARKET BEST -->
+}
+		
+			</div>
+		</div>
+		<!-- //반응형웹 (좌측컨탠츠) -->
+		
+		<!-- 반응형웹 (우측컨탠츠) -->
+		<div class="rspn2">
+
+@{
+    int j = 1;
+    intCount = 2;
+    string SnaShopList = "703500001";  
+}
+@if (Model.PopularPlanList.Count > 0)
+{
+			<!-- MOBILE PLAN -->
+			<div class="mbl_plan sctn_tit">
+
+				<div class="tit_grp">
+					<h3>모바일 기획전</h3>
+					<a onclick="SnaUrl(@SnaShopList);" href="@Urls.MobileWebUrl/Display/SpecialShoppingList"   class="more"><span>더보기</span></a>
+				</div>
+
+				<div class="bn_grp" id="bnGrp4">
+    @foreach (MobileShopPlanT popularPlan in Model.PopularPlanList)
+    {
+        if (intCount < 10)   // FCD 코드 집계 추가 App 인식 오류로 인한 변수 값 지정
+        {
+            strCount = "70350000" + intCount;
+        }
+        else
+        {
+            strCount = "7035000" + intCount;
+        }
+
+
+        if (j % 3 == 1)
+        {
+					@:<ul class="bn_sub4"> <!-- class설정 다른페이지의 소스와 구별필요 -->
+        }
+						<li>
+					<a href="http://sna.gmarket.co.kr/?fcd=@strCount&url=@Urls.MobileWebUrl/Display/SpecialShopping?lcId=@popularPlan.GdlcCd&sid=@popularPlan.Sid">
+                    <span class="tit">@popularPlan.Title</span>
+				    <img class="lazyImage" src="@Urls.MobileImageUrlV2/lazy_320x220.gif" data-original="@popularPlan.MobileThumbImageUrl" alt="" />
+				    <span class="desc">@popularPlan.MobilePromoteText</span></a>
+         
+						</li>
+        if (j % 3 == 0)
+        {
+					@:</ul>
+        }
+
+        if (j == 15)
+        {
+            break;
+        }
+
+        j++;
+        intCount++;
+    }
+
+				</div>
+				<div id="bnIndex4" class="bn_index2">
+@{
+    int totalPageCnt = 1;
+    totalPageCnt = j / 3;
+}
+    @if (j % 3 > 0)
+    {
+        totalPageCnt++;
+    }
+					<p class="selected"></p>
+    @for (int page = 1; page < totalPageCnt; page++)
+    {
+					<p></p>
+    }
+				</div>
+			</div>
+			<!-- //MOBILE PLAN -->
+}
+@{
+    string svc1 = "703600001";    // FCD 코드 집계 추가 App 인식 오류로 인한 변수 값 지정
+    string svc2 = "703600002";
+}
+
+			<!-- SERVICE GO -->
+			<div class="svc_go_wrap">
+				<p>서비스 바로가기</p>
+				<div class="svc_go">
+					<ul>
+						<li><a onclick="SnaUrl(@svc1);" href="@Urls.MobileWebUrl/Display/Today" class="svc1">오늘만특가</a></li>
+						<li><a onclick="SnaUrl(@svc2);" href="@Urls.MobileWebUrl/Pluszone" class="svc2">플러스존</a></li>
+						<li><a href="http://sna.gmarket.co.kr/?fcd=703600003&url=@Urls.MobileWebUrl/Vertical/Shop?shopSeq=1" class="svc3">브랜드온</a></li>
+						<li><a href="http://sna.gmarket.co.kr/?fcd=703600004&url=@Urls.MobileWebUrl/Vertical/Shop?shopSeq=2" class="svc4">롯데백화점</a></li>
+					</ul>
+					<ul>
+						<li><a href="http://sna.gmarket.co.kr/?fcd=703600005&url=http://mobile.gmarket.co.kr/Vertical/Shop?shopSeq=6" class="svc5">패션소호</a></li>
+						<li><a href="http://sna.gmarket.co.kr/?fcd=703600006&url=@Urls.MobileWebUrl/Vertical/Shop?shopSeq=4" class="svc6">장보기전G마켓</a></li>
+						<li><a href="http://sna.gmarket.co.kr/?fcd=703600007&url=@Urls.MobileWebUrl/Vertical/Shop?shopSeq=5" class="svc7">G맘클럽</a></li>
+					    <li><a href="http://sna.gmarket.co.kr/?fcd=703600008&url=@Urls.MobileWebUrl/Vertical/Shop?shopSeq=3" class="svc8">글로벌쇼핑</a></li>
+					</ul>
+				</div>
+			</div>
+			<!-- //SERVICE GO -->
+		
+		</div>
+		<!-- //반응형웹 (우측컨탠츠) -->
+
+		</div>
+		<!-- //반응형웹 -->
+
+		<div class="lyr" id="lyr" style="display:none" >
+
+			<!-- 레이어(컨텐츠) -->
+			
+			@Html.Raw(strNContent)
+
+			<!-- //레이어(컨텐츠) -->
+
+			<!-- 닫기버튼 -->
+			<div class="cls_wrap">
+				<a href="#" class="no_see" onclick="fnAll();popBlockUI('lyr');return false;"><img src="@Urls.MobileImageUrlV2/640/btn_bg2.png" alt="" /><span>다시보지 않기</span></a><a href="#" class="cls" onclick="fnToday();popBlockUI('lyr');return false;"><img src="@Urls.MobileImageUrlV2/640/btn_bg2.png" alt="" /><span>닫기</span></a>
+				<img src="@Urls.MobileImageUrlV2/640/bg_lyr_bot2.png" alt="" class="bot" />
+			</div>
+			<!-- //닫기버튼 -->
+
+		</div>
+
+	</div>
+	<!-- //CONTENT -->
+
+	<div id="mask" style="display:none"></div>
+
+	<hr />
+
+   <input type="hidden" id="navigallery1" name="navigallery1" />
+   <input type="hidden" id="navigallery2" name="navigallery2" />
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		var bannerWidth = $('#bnGrp').width();
+		var bannerHeight = 125;
+
+		if ($(window).width() > 800) bannerWidth = parseInt($(window).width() - $('#bnGrp4').width());
+		bannerHeight = parseInt(bannerWidth*300/800);
+	
+		$('#bnGrpBG').css({"height":bannerHeight, 'background-color': '#f7f7f7'});
+		$('#bnGrp').css({"height":bannerHeight, 'background-color': '#f7f7f7'});
+		$("#bnGrpBG").remove();
+		$("#bnTurn").show();
+		$("#bnTurn2").show();
+
+		$('#bnGrp2').css({"height":bannerHeight, 'background-color': '#f7f7f7'});
+	});
+
+	$(window).bind("resize", function () {
+		
+		if (( $(window).width() > 800 && $("#bnGrp4").data("position") == "V")
+			|| ($(window).width() <= 800 && $("#bnGrp4").data("position") == "H") )
+		{
+			if ($("#bnGrp4").data("position") == "V") $("#bnGrp4").data("position", "H");
+			else $("#bnGrp4").data("position", "V");
+
+			$("img.lazyImage").lazyload({
+				event: "lazyevent"
+			});
+			$("img.lazyImage").trigger("lazyevent");
+		}
+	});
+
+	window.onload = function () {
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+			window.scrollTo(0, 1);
+		}, 100);
+
+		Timer();
+
+		titleChange(0);
+
+		var PopupYn = "@strPopupYn";
+		var varPCID = appGetCookie();
+		var AppChk = "Y";
+
+		if (varPCID != "" && (varPCID.substring(0, 1) == "3" || varPCID.substring(0, 1) == "4")) {
+			AppChk = "N";
+		}
+
+		if (AppChk == 'Y') {
+			if (PopupYn == "Y") {
+				if (getCookie("PopupT") != "N") {
+					displayLayers('lyr', 'mask', '');
+					popBlockUI2('lyr');
+				}
+			}
+		}
+
+		$("img.lazyImage").lazyload({
+			event: "lazyevent"
+		});
+		$("img.lazyImage").trigger("lazyevent");
+
+	}
+
+	function Timer() {
+		var today = new Date();
+		var TYear = today.getFullYear().toString();
+		var TDay = today.getDate().toString();
+
+		//	var d_day = new Date("July " + (eval(TDay) + 1) + " " + TYear + " 00:00:00");
+        var d_day = new Date("July " + (eval(TDay)) + " " + TYear + " 00:00:00");
+        d_day.setDate( d_day.getDate() + 1 );
+
+		var days = (d_day - today) / 1000 / 60 / 60 / 24;
+		var daysRound = Math.floor(days);
+		var hours = (d_day - today) / 1000 / 60 / 60 - (24 * daysRound);
+		var hoursRound = Math.floor(hours);
+		var minutes = (d_day - today) / 1000 / 60 - (24 * 60 * daysRound) - (60 * hoursRound);
+		var minutesRound = Math.floor(minutes);
+
+		var seconds = (d_day - today) / 1000 - (24 * 60 * 60 * daysRound) - (60 * 60 * hoursRound) - (60 * minutesRound);
+		var secondsRound = Math.round(seconds);
+
+		secondsRound = "0" + secondsRound.toString();
+		minutesRound = "0" + minutesRound.toString();
+		hoursRound = "0" + hoursRound.toString();
+
+		var secondsRoundLength = secondsRound.length;
+		var minutesRoundLength = minutesRound.length;
+		var hoursRoundLength = hoursRound.length;
+
+		var rightH = hoursRound.substring(hoursRoundLength - 2, hoursRoundLength);
+		var rightM = minutesRound.substring(minutesRoundLength - 2, minutesRoundLength);
+		var rightS = secondsRound.substring(secondsRoundLength - 2, secondsRoundLength);
+
+		if (rightM == "60") rightM = "00";
+		if (rightS == "60") rightS = "00";
+
+		var timelimit = rightH + ":" + rightM + ":" + rightS;
+
+		$("#time_limit").text(timelimit);
+
+		var newtime = window.setTimeout("Timer();", 1000);
+	} 
+
+	//<![CDATA[
+  var gallery1,
+		el,
+		i,
+		page,
+		dots1 = document.querySelectorAll('#bnIndex button');
+
+  /* HTML 파싱 */
+  var bnGrpList1 = $("#bnGrp li");
+  var bnGrpListAtag1 = [];
+  // 시작포인트 랜덤
+  var index1 = 0;
+  randomPage1 = Math.floor(Math.random() * (bnGrpList1.length));
+  for (var j = randomPage1; j < bnGrpList1.length; j++, index1++) {
+      bnGrpListAtag1[index1] = bnGrpList1[j].innerHTML;
+  }
+  if (randomPage1 > 0) {
+      for (var j = 0; j < randomPage1; j++, index1++) {
+          bnGrpListAtag1[index1] = bnGrpList1[j].innerHTML;
+      }
+  }
+
+  $("#navigallery1").val(randomPage1);  //임프레션 집계 추가
+  AdBanner(randomPage1);  //임프레션 집계 추가
+
+  var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+  /* //HTML 파싱 */
+
+  gallery1 = new SwipeView('#bnGrp', {
+      numberOfPages: bnGrpListAtag1.length,
+      hastyPageFlip: true,
+      flickTime: 1000 // 4초후 
+  });
+
+  // Load initial data
+  for (i = 0; i < 3; i++) {
+      if (1 == bnGrpListAtag1.length) {
+          page = i == 0 || 2 ? bnGrpListAtag1.length - 1 : i - 1;
+      }
+      else {
+          page = i == 0 ? bnGrpListAtag1.length - 1 : i - 1;
+      }
+
+      el = document.createElement('span');
+      el.innerHTML = bnGrpListAtag1[page];
+      gallery1.masterPages[i].appendChild(el)
+
+      el.width = bnGrpListAtag1[page].width;
+      el.height = bnGrpListAtag1[page].height;
+      el.onload = function () { this.className = ''; }
+  }
+
+  gallery1.onFlip(function () {
+      var el,
+			upcoming,
+			i;
+
+      for (i = 0; i < 3; i++) {
+          upcoming = gallery1.masterPages[i].dataset.upcomingPageIndex;
+
+          if (upcoming != gallery1.masterPages[i].dataset.pageIndex) {
+              el = gallery1.masterPages[i].querySelector('span');
+              el.innerHTML = bnGrpListAtag1[upcoming];
+
+			  	$("img.lazyImage").lazyload({
+					event: "lazyevent"
+				});
+				$("img.lazyImage").trigger("lazyevent");
+          }
+      }
+  });
+
+  flicking("bnGrp", "prev", "next");
+
+  var gallery2,
+		el,
+		i,
+		page,
+		dots2 = document.querySelectorAll('#bnIndex2 button');
+
+  /* HTML 파싱 */
+  var bnGrpList2 = $("#bnGrp2 li");
+  var bnGrpListAtag2 = [];
+  // 시작포인트 랜덤
+  var index2 = 0;
+  randomPage2 = Math.floor(Math.random() * (bnGrpList2.length));
+  //alert("random1:" + randomPage2);
+  for (var j = randomPage2; j < bnGrpList2.length; j++, index2++) {
+      bnGrpListAtag2[index2] = bnGrpList2[j].innerHTML;
+  }
+  if (randomPage2 > 0) {
+      for (var j = 0; j < randomPage2; j++, index2++) {
+          bnGrpListAtag2[index2] = bnGrpList2[j].innerHTML;
+      }
+  }
+
+  $("#navigallery2").val(randomPage2);  //임프레션 집계 추가
+  AdTodayGood(randomPage2);  //임프레션 집계 추가
+
+  var globalBnGrpListAtag2 = bnGrpListAtag2.join(",");
+  /* //HTML 파싱 */
+
+  gallery2 = new SwipeView('#bnGrp2', {
+      numberOfPages: bnGrpListAtag2.length,
+      hastyPageFlip: true,
+      flickTime: 2000, // 5초후
+      titleChangeValue: true,  // 섹션의 타이틀을 변경할경우 비교변수(변경할것이면 true, 변경하지 않으면 false)로 설정
+      titleChangeNm: 'titleChange'	// 섹션의 타이틀을 변경할 함수명 설정 
+  });
+
+  // Load initial data
+  for (i = 0; i < 3; i++) {
+      if (1 == bnGrpListAtag2.length) {
+          page = i == 0 || 2 ? bnGrpListAtag2.length - 1 : i - 1;
+      }
+      else {
+          page = i == 0 ? bnGrpListAtag2.length - 1 : i - 1;
+      }
+
+      el = document.createElement('span');
+      el.innerHTML = bnGrpListAtag2[page];
+      gallery2.masterPages[i].appendChild(el)
+
+      el.width = bnGrpListAtag2[page].width;
+      el.height = bnGrpListAtag2[page].height;
+      el.onload = function () { this.className = ''; }
+  }
+
+  gallery2.onFlip(function () {
+      var el,
+			upcoming,
+			i;
+
+      for (i = 0; i < 3; i++) {
+          upcoming = gallery2.masterPages[i].dataset.upcomingPageIndex;
+
+          if (upcoming != gallery2.masterPages[i].dataset.pageIndex) {
+              el = gallery2.masterPages[i].querySelector('span');
+              el.innerHTML = bnGrpListAtag2[upcoming];
+
+				$("img.lazyImage").lazyload({
+					event: "lazyevent"
+				});
+				$("img.lazyImage").trigger("lazyevent");
+          }
+      }
+  });
+
+  flicking("bnGrp2", "prev2", "next2");
+
+  var gallery3,
+		el,
+		i,
+		page,
+		dots3 = document.querySelectorAll('#bnIndex3 p');
+
+  /* HTML 파싱 */
+  var bnGrpList3 = $("#bnGrp3 ol");
+  var bnGrpListAtag3 = [];
+  for (var j = 0; j < bnGrpList3.length; j++) {
+      bnGrpListAtag3[j] = bnGrpList3[j].innerHTML;
+  }
+  var globalBnGrpListAtag3 = bnGrpListAtag3.join(",");
+  /* //HTML 파싱 */
+
+  gallery3 = new SwipeView('#bnGrp3', {
+      numberOfPages: bnGrpListAtag3.length,
+      hastyPageFlip: true,
+      flickTime: 0 // 0은 작동안함
+  });
+
+  // Load initial data
+  for (i = 0; i < 3; i++) {
+      if (1 == bnGrpListAtag3.length) {
+          page = i == 0 || 2 ? bnGrpListAtag3.length - 1 : i - 1;
+      }
+      else {
+          page = i == 0 ? bnGrpListAtag3.length - 1 : i - 1;
+      }
+
+      el = document.createElement('ol');
+      el.innerHTML = bnGrpListAtag3[page];
+      gallery3.masterPages[i].appendChild(el)
+
+      el.width = bnGrpListAtag3[page].width;
+      el.height = bnGrpListAtag3[page].height;
+      el.onload = function () { this.className = ''; }
+  }
+
+  gallery3.onFlip(function () {
+      var el,
+			upcoming,
+			i;
+
+      for (i = 0; i < 3; i++) {
+          upcoming = gallery3.masterPages[i].dataset.upcomingPageIndex;
+
+          if (upcoming != gallery3.masterPages[i].dataset.pageIndex) {
+              el = gallery3.masterPages[i].querySelector('ol');
+              el.innerHTML = bnGrpListAtag3[upcoming];
+
+				$("img.lazyImage").lazyload({
+					event: "lazyevent"
+				});
+				$("img.lazyImage").trigger("lazyevent");
+          }
+      }
+
+      document.querySelector('#bnIndex3 .selected').className = '';
+      dots3[gallery3.pageIndex].className = 'selected';
+  });
+
+  flicking("bnGrp3");
+
+  var gallery4,
+		el,
+		i,
+		page,
+		dots4 = document.querySelectorAll('#bnIndex4 p');
+
+  var bnGrpList4 = $("#bnGrp4 ul");
+  var bnGrpListAtag4 = [];
+  for (var j = 0; j < bnGrpList4.length; j++) {
+      bnGrpListAtag4[j] = bnGrpList4[j].innerHTML;
+  }
+  var globalBnGrpListAtag4 = bnGrpListAtag4.join(",");
+
+  gallery4 = new SwipeView('#bnGrp4', {
+      numberOfPages: bnGrpListAtag4.length,
+      hastyPageFlip: true,
+      flickTime: 0 // 0은 작동안함
+  });
+
+  // Load initial data
+  for (i = 0; i < 3; i++) {
+      if (1 == bnGrpListAtag4.length) {
+          page = i == 0 || 2 ? bnGrpListAtag4.length - 1 : i - 1;
+      }
+      else {
+          page = i == 0 ? bnGrpListAtag4.length - 1 : i - 1;
+      }
+
+      el = document.createElement('ul');
+      el.innerHTML = bnGrpListAtag4[page];
+      gallery4.masterPages[i].appendChild(el)
+
+      el.width = bnGrpListAtag4[page].width;
+      el.height = bnGrpListAtag4[page].height;
+      el.onload = function () { this.className = ''; }
+
+		if ($(window).width() >= 800)
+			$("#bnGrp4").data("position", "H");
+		else
+			$("#bnGrp4").data("position", "V");
+  }
+
+  gallery4.onFlip(function () {
+      var el,
+			upcoming,
+			i;
+
+      for (i = 0; i < 3; i++) {
+          upcoming = gallery4.masterPages[i].dataset.upcomingPageIndex;
+
+          if (upcoming != gallery4.masterPages[i].dataset.pageIndex) {
+              el = gallery4.masterPages[i].querySelector('ul');
+              el.innerHTML = bnGrpListAtag4[upcoming];
+          }
+      }
+
+      document.querySelector('#bnIndex4 .selected').className = '';
+      dots4[gallery4.pageIndex].className = 'selected';
+  });
+
+  flicking("bnGrp4");
+
+  responseWeb(); //반응형웹 호출
+
+//]]>
+
+	  //배너타이틀변경함수
+	  //<![CDATA[
+	  //인덱스번호 0 ~ 5(각각의 인덱스에 어떤 이미지(good시리즈, 오늘만특가)가 들어있는지 알수있음)
+	  //인덱스로 비교하여 어떤 이미지(good시리즈, 오늘만특가)인지 확인하시고 설정하면됩니다.
+	  function titleChange(pIndex) { //인덱스의 번호별로 설정(함수내의 세부적인 내용은 바꿔서 사용하시면 됩니다.)
+          //alert("random2:" + randomPage2);
+          //alert(pIndex);
+          var pageIndex = randomPage2 + pIndex;
+
+          if (pageIndex > (@Model.TodaySpecial.Count + @Model.GoodSeries.Count))
+              pageIndex = pageIndex - (@Model.TodaySpecial.Count + @Model.GoodSeries.Count);
+
+          // 시작포인트 랜덤 기능 추가하면서 
+	      if (pageIndex < @Model.TodaySpecial.Count) { //오늘만특가
+	          $("#changeTit").text("오늘만특가");
+              $("#time_limit").attr("style", "display:inline");
+	      } else if (pageIndex < (@Model.TodaySpecial.Count + @Model.GoodSeries.Count)) { //GOOD 시리즈
+	          $("#changeTit").text("GOOD 시리즈");                
+	          $("#time_limit").attr("style", "display:none");
+	      } else {
+	          $("#changeTit").text("오늘만특가");
+              $("#time_limit").attr("style", "display:inline");
+          }
+	  }
+	  //]]>
+
+	var todayDate = new Date();
+
+
+	function fnToday(){		
+		todayDate = new Date(todayDate.getTime() + 1 * 24 * 60 * 60 * 1000);
+		document.cookie = "PopupT=N; path=/;domain=gmarket.co.kr; expires=" + todayDate.toGMTString() + ';'
+	}
+
+	function fnAll(){
+		todayDate = new Date(todayDate.getTime() + 365 * 24 * 60 * 60 * 1000);
+		document.cookie = "PopupT=N; path=/;domain=gmarket.co.kr; expires=" + todayDate.toGMTString() + ';'
+	}
+		
+	function getCookie(name){ 
+		var nameOfCookie = name + "="; 
+		var x = 0; 
+		while ( x != document.cookie.length ) 
+		{ 
+				var y = (x+nameOfCookie.length); 
+				if ( document.cookie.substring( x, y ) == nameOfCookie ) { 
+						if ( (endOfCookie=document.cookie.indexOf( ";", y )) == -1 ) 
+								endOfCookie = document.cookie.length; 
+						return unescape( document.cookie.substring( y, endOfCookie ) ); 
+				} 
+				x = document.cookie.indexOf( " ", x ) + 1; 
+				if ( x == 0 ) 
+						break; 
+		} 
+		return ""; 
+	}
+
+	var c_name = "pcid";
+	var appYn = "N";
+
+    function appGetCookie() {
+        if (document.cookie.length > 0) {
+            c_start = document.cookie.indexOf(c_name + "=");
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1;
+                c_end = document.cookie.indexOf(";", c_start);
+                if (c_end == -1) c_end = document.cookie.length;
+
+
+                return unescape(document.cookie.substring(c_start, c_end));
+                /*if (unescape(document.cookie.substring(c_start, c_end)) == "") {
+                    appYn = "N";
+                } else {
+                    appYn = "Y";
+                }*/
+
+            }
+        }
+        return "";// appYn;
+    }
+
+//임프레션 start
+
+  function  gallery1PREV(){
+   var prevpoint =  $("#navigallery1").val();
+   prevpoint = parseInt(prevpoint) - 1;
+   if(prevpoint <= -1){
+    prevpoint = parseInt(bnGrpList1.length) -1;
+      $("#navigallery1").val(prevpoint);
+   }
+   else{
+      $("#navigallery1").val(prevpoint);
+   } 
+
+    AdBanner(prevpoint); 
+  }
+
+  function gallery1NEXT(){
+   var prevpoint =  $("#navigallery1").val();
+   prevpoint = parseInt(prevpoint) + 1;
+   if(bnGrpList1.length <= prevpoint){
+      $("#navigallery1").val(0);
+      prevpoint = 0;
+   }
+   else{
+      $("#navigallery1").val(prevpoint);
+   }
+
+   AdBanner(prevpoint);  
+  }
+
+ function  gallery2PREV(){
+   var prevpoint =  $("#navigallery2").val();
+   prevpoint = parseInt(prevpoint) - 1;
+   if(prevpoint <= -1){
+    prevpoint = parseInt(bnGrpList2.length) -1;
+      $("#navigallery2").val(prevpoint);
+   }
+   else{
+      $("#navigallery2").val(prevpoint);
+   } 
+    AdTodayGood(prevpoint); 
+  }
+
+  function gallery2NEXT(){  
+   var prevpoint =  $("#navigallery2").val();
+   prevpoint = parseInt(prevpoint) + 1;
+   if(bnGrpList2.length <= prevpoint){
+      $("#navigallery2").val(0);
+      prevpoint = 0;
+   }
+   else{
+      $("#navigallery2").val(prevpoint);
+   }
+     AdTodayGood(prevpoint); 
+  }
+
+function  AdBanner(code){
+var bancode = "";
+switch(code)
+    {
+    case 0 :
+    bancode = "1_1";
+    break;
+    case 1 :
+    bancode = "1_2";
+    break;
+    case 2 :
+    bancode = "1_3";
+    break;
+    case 3 :
+    bancode = "1_4";
+    break;
+    case 4 :
+    bancode = "1_5";
+    break;
+    case 5 :
+    bancode = "1_6";
+    break;
+    case 6 :
+    bancode = "1_7";
+    break;
+    case 7 :
+    bancode = "1_8";
+    break;
+    case 8 :
+    bancode = "1_9";
+    break;
+    case 9 :
+    bancode = "1_10";
+    break;
+    case 10 :
+    bancode = "1_11";
+    break;
+    case 11 :
+    bancode = "1_12";
+    break;
+    case 12 :
+    bancode = "1_13";
+    break;
+    case 13 :
+    bancode = "1_14";
+    break;
+    case 14 :
+    bancode = "1_15";
+    break;
+    }
+
+     $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?main_banimp=" + bancode );
+   
+}
+
+function  AdTodayGood(code){
+
+        switch(code)
+        {
+             case 0 :
+             if (hidTodaySpecialCnt.value > code){
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_1");
+             break;
+            }else{
+             var banimp =  code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+              break;
+            }     
+            case 1 :
+             if (hidTodaySpecialCnt.value > code){
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_2");
+             break;
+            }else{
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 2 :
+             if (hidTodaySpecialCnt.value > code){
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_3");
+             break;
+            }else{
+             var banimp =  code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 3 :
+             if (hidTodaySpecialCnt.value > code){
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_4");
+             break;
+            }else{
+             var banimp =  code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 4 :
+             if (hidTodaySpecialCnt.value > code){
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_5");
+             break;
+            }else{
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 5 :
+             if (hidTodaySpecialCnt.value > code){
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_6");
+             break;
+            }else{
+             var banimp =  code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 6 :
+             if (hidTodaySpecialCnt.value > code){
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_7");
+             break;
+            }else{
+             var banimp =  code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 7 :
+            if (hidTodaySpecialCnt.value > code){
+            $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_8");
+             break;
+            }else{
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 8 :
+            if (hidTodaySpecialCnt.value > code){
+            $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_9");
+             break;
+            }else{
+             var banimp =  code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 9 :
+            if (hidTodaySpecialCnt.value > code){
+            $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_10");
+             break;
+            }else{
+            var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 10 :
+            if (hidTodaySpecialCnt.value > code){
+            $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_11");
+             break;
+            }else{
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 11 :
+            if (hidTodaySpecialCnt.value > code){
+            $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banimp=1_12");
+             break;
+            }else{
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            }
+            case 12 :
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            case 13 :
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+             break;
+            case 14 :
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+            break;
+            case 15 :
+             var banimp = code - hidTodaySpecialCnt.value;
+             banimp = banimp +1;
+             $.post("http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banimp=1_" + banimp);
+            break;
+        }
+}
+
+function  AdBannerClick(code){
+
+var bancode = "";
+switch(code)
+{
+case 1 :
+bancode = "1_1";
+break;
+case 2 :
+bancode = "1_2";
+break;
+case 3 :
+bancode = "1_3";
+break;
+case 4 :
+bancode = "1_4";
+break;
+case 5 :
+bancode = "1_5";
+break;
+case 6 :
+bancode = "1_6";
+break;
+case 7 :
+bancode = "1_7";
+break;
+case 8 :
+bancode = "1_8";
+break;
+case 9 :
+bancode = "1_9";
+break;
+case 10 :
+bancode = "1_10";
+break;
+case 11 :
+bancode = "1_11";
+break;
+case 12 :
+bancode = "1_12";
+break;
+case 13 :
+bancode = "1_13";
+break;
+case 14 :
+bancode = "1_14";
+break;
+case 15 :
+bancode = "1_15";
+break;
+}
+
+    var MobileForm = $("#MainWiseLogForm");
+      MobileForm.attr("target", "ifrMainWiseLogForm");
+      MobileForm.attr("action", "http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?main_banclick=" + bancode);
+      MobileForm.submit();
+}
+
+function  AdTodayGoodClick(fcd){
+
+    switch(fcd)
+    {
+        case 703300002:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300002&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_1" );
+        MobileForm.submit();
+        break;
+        case 703300003:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300003&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_2" );
+        MobileForm.submit();
+        break;
+        case 703300004:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300004&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_3" );
+        MobileForm.submit();
+        break;
+        case 703300005:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300005&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_4"  );
+        MobileForm.submit();
+        break;
+        case 703300006:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300006&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_5"  );
+        MobileForm.submit();
+        case 703300007:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300007&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_6"  );
+        MobileForm.submit();
+        break;
+        case 703300008:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300008&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_7"  );
+        MobileForm.submit();
+        break;
+        case 703300009:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300009&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_8" );
+        MobileForm.submit();
+        break;
+        case 703300010:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300010&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_9"  );
+        MobileForm.submit();
+        break;
+        case 703300011:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300011&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_10"  );
+        MobileForm.submit();
+        break;
+        case 703300012:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300012&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_11"  );
+        MobileForm.submit();
+        break;
+        case 703300013:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300013&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?sale_banclick=1_12"  );
+        MobileForm.submit();
+        break;
+        case 703300014:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300014&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banclick=1_1"  );
+        MobileForm.submit();
+        break;   
+        case 703300015:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300015&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banclick=1_2"  );
+        MobileForm.submit();
+        break;
+        case 703300016:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300016&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banclick=1_3"  );
+        MobileForm.submit();
+        break;
+        case 703300017:
+        var MobileForm = $("#MainWiseLogForm");
+        MobileForm.attr("target", "ifrMainWiseLogForm");
+        MobileForm.attr("action", "http://sna.gmarket.co.kr/?fcd=703300017&url=http://m.gmarket.co.kr/Event/plan_display_wiselog.asp?good_banclick=1_4"  );
+        MobileForm.submit();
+        break;
+    }
+}
+
+function SnaUrl(fcd){ 
+   $.post("http://sna.gmarket.co.kr/?fcd=" + fcd);
+}
+
+//임프레션 end
+
+</script>
+
+<form id="MainWiseLogForm" name="MainWiseLogForm" method="post" >
+<iframe id="ifrMainWiseLogForm" name="ifrMainWiseLogForm" src="about:blank"  height="0" width="0" style="display:none;"></iframe>
+</form>

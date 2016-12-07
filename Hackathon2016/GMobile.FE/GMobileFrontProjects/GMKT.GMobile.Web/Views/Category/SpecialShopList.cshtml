@@ -1,0 +1,110 @@
+﻿@using GMKT.GMobile.Data.Search;
+
+@model SpecialShopModel
+@{
+    ViewBag.Title = "SpecialShopList";
+}
+
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/cpplpsrp.js"></script>
+<script type="text/javascript">
+
+	var pageNo = @Model.pageNo;
+	var lcId = @Model.lcId;
+	var pageSize = @Model.pageSize;
+
+	jQuery(document).ready(function () {
+
+		try
+		{
+			loadSpecialShopList();
+		}
+		catch( ex )
+		{
+			alert( ex.message );
+		}
+
+	});
+
+	function loadSpecialShopList() {
+
+		var params = { lcId: lcId, pageNo: pageNo, pageSize : pageSize };
+
+		if (pageNo == 1)
+			$('.plan_lst').empty();
+
+		jQuery.ajax({
+			type: "POST",
+			url: "@Urls.MobileWebUrl/Category/SpecialShopListJson",
+			dataType: "json",
+			data: params,
+			success: function (data) {
+
+				if (data == null || typeof data === 'undefined') return;
+
+				var totalCount = data.totalCount;
+				var pageSize = data.pageSize;
+
+				if ( pageNo == 1 && totalCount == 0 )
+					$('.mw_none').show();
+				else
+					$('.mw_none').hide();
+
+				if ( data.Items.length < 1 ) return;
+
+				for ( i = 0; i < data.Items.length; i++ )
+				{
+					$('.plan_lst').append('<li><a href="' + data.Items[i].LandingURL + '">' +
+						'<img src="' + data.Items[i].sSpecialImage + '" alt="' + data.Items[i].sSpecialTitle + '">' + 
+						'</a></li>');
+				}
+
+				if (pageNo < data.pageCount)
+					$('.btn_box').show();
+				else
+					$('.btn_box').hide();
+			},
+			error: function (jqXHR, textStatus, errorThrown) {
+				
+			}
+		});
+
+	}
+
+	function more() {
+		pageNo++;
+		loadSpecialShopList();
+	}
+
+</script>
+
+	<div id="content" class="ctns">
+		<div class="mw_wrap">
+			<ul class="mw_tab">
+			<li><a href="@(Urls.MobileWebUrl + "/Category/Category?lcId=" + Model.lcId)" class="in_tab">카테고리</a></li>
+			<li><a href="@(Urls.MobileWebUrl + "/Category/GmarketBest?lcid=" + Model.lcId)" class="in_tab">카테고리 베스트</a></li>
+			<li class="selected">
+				<a href="@(Urls.MobileWebUrl + "/Category/SpecialShopList?lcId=" + Model.lcId)" class="in_tab">기획전</a>
+			</li>
+			</ul>
+			<!-- [D] 탭 선택 시 타이틀 변경 -->
+			<h3 class="blind">기획전</h3>
+			<div class="mw_contbx">
+				
+				<div class="mw_none" style="display:none">
+					<h4>진행중인 기획전이 없습니다.</h4>
+					<p>다양한 기획전을 준비중입니다.</p>
+					<span class="sp_mw">Gmarket</span>
+				</div>
+				<div class="kind_artwrap">
+					<ul class="plan_lst">
+					</ul>
+					<div class="btn_box" style="display:none">
+						<button type="button" class="btn_more2" onclick="more();">목록 더보기</button>
+					</div>
+				</div>
+			</div>
+			<div class="mw_contbx">
+				
+			</div>
+		</div>
+	</div>

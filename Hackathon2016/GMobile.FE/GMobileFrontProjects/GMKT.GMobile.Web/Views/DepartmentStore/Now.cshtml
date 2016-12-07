@@ -1,0 +1,124 @@
+﻿@using GMKT.Web.Membership
+@{
+	const string categoryFcd = "715300004";
+}
+
+@model GMKT.GMobile.Web.Models.DepartmentStoreNowModel
+
+@if (PageAttr.Exid != ExIdAppEnum.None)
+{
+<style type="text/css">
+	#head.head_simple
+	{
+		display: none;
+	}
+</style>
+}
+@section scripts{
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileAppUtil.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/MobileSnsUtil.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/kakao.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+    <script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll4.js"></script>
+	<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/PdsLogSender.js"></script>
+
+	<script type="text/javascript">
+		$(function () {
+			$('.sp_sdeal.btn_zzim').click(function (e) {
+
+				e.preventDefault();
+				if ($(this).attr("isSoldOut") != "True") {
+					var el = this;
+
+					var parameter = "itemNos=" + $(el).attr("goodscode");
+					$.getJSON("/Common/AddFavoriteItems?" + parameter,
+				function (data) {
+					var result = data.result;
+					if (result == 0) {
+						if (!$(el).hasClass('btn_zzim_on')) {
+							$(el).addClass("btn_zzim_on");
+							superInter();
+						} else {
+							//	$(el).parent(".u_area.ly_inter").remove();
+							$(el).removeClass("btn_zzim_on");
+						}
+					} else {
+						alert(data.msg);
+						if (result == -100) {
+							location.href = "@Urls.MobileWebUrl/Login/Login?type=old&rtnurl=" + encodeURIComponent(document.location.href);
+						}
+					}
+				}
+			);
+				}
+			});
+		});
+	</script>
+}
+<div id="content" class="dept">
+	@{Html.RenderPartial("_DepartmentStoreSubHeader");}
+	
+		<!-- .super_deal -->
+		<div class="super_deal">
+			<div class="sdeal_cate_wrap">
+				<div class="sdeal_cate" style="overflow: hidden;">
+					<ul class="lst_cate">
+					@foreach (var shopCategory in Model.ShopCategory)
+					{
+						string selected = "";
+						if (ViewBag.Category == shopCategory.CategoryNo.ToString())
+						{
+							selected = "class=selected";
+						}
+						<li @selected><a href="@shopCategory.LandingUrl">@shopCategory.CategoryName</a></li>
+					}
+					</ul>
+				</div>
+			</div>						<div class="bx_sdeal">
+					<ul class="lst_prd" id="list_superdeal">
+					@{ var i = 0;  }
+						@foreach (GMKT.GMobile.Data.HomeMainItem item in Model.Item)
+						{
+								if (i < 20)
+								{
+									@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, false, Urls.MobileImageUrlV2, "716000055", false, "716000057","716000058","716000056");
+								}
+								else
+								{
+									@GlobalFunction.GetSuperDealItem(item, PageAttr.IsMain, true, Urls.MobileImageUrlV2, "716000055", false, "716000057", "716000058", "716000056");
+								}
+				
+								i++;
+						}
+					</ul>
+			</div>
+		</div>
+
+		@if(!PageAttr.IsApp)
+		{
+		<a href="javascript:;" class="btn_top_bar">Top으로 이동</a>
+		}
+		
+		<script type="text/javascript">
+			var isApp = "@PageAttr.IsApp".toLowerCase() == "true";
+			$(document).ready(function () {
+				$(".superdeal_lazy").lazyload({
+					effect: "fadeIn",
+					threshold: 400
+				});
+
+				$("body").addClass("department_body");
+				if (isApp) {
+					$("body").addClass("body_app");
+				}
+
+			});
+		</script>
+		<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/lpsrp.js?v=1"></script>
+		<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/swiper.min.js?v=1"></script>
+		
+
+</div>
+

@@ -1,0 +1,821 @@
+﻿@{
+    ViewBag.Title = "Gmarket BizOn Guide";
+}
+<hr />
+<!-- CONTENT -->
+<div id="content">
+	<div class="biz_cont">
+		<div class="choice">
+			<a id="find_tab0" class="on" onclick="tabView(2,'find_tab',0,'find_cnt');"><span class="buyer">BIZ ON 구매안내</span></a>
+			<a id="find_tab1" class="off" onclick="tabView(2,'find_tab',1,'find_cnt');"><span class="seller">BIZ ON 판매안내</span></a>
+		</div>
+		<div id="find_cnt0" class="cont_bx" style="display: block;">
+			<div class="desc_bx">
+				<h3 class="sub_tit">BIZON 소개</h3>
+				<p class="desc">비즈온은 G마켓 사업자 회원님만을 위한 특별한 서비스와 혜택을 제공하는 사업자구매 전문몰입니다.</p>
+			</div>
+			<div class="banner_wrap">
+				<div id="bnGrp" class="bnGrp">
+					<ul class="img_area">
+					<li>
+						<img src="@Urls.MobileImagePics/mobile/bizon/buy_info.jpg" alt="복지시설 - 보행차, 자세교정기, 재활치료기 등. 병원 - 청전기, 휠체어, 의약품 등. 학교 - 출석부, 학교게시판, 학용품 등. 레저시설 - 보드, 캠핑용품, 타격연습기 등">
+					</li>
+					<li>
+						<img src="@Urls.MobileImagePics/mobile/bizon/buy_info2.jpg?ver=20151106" alt="사업자 회원전용 할인쿠폰 + G캐시 제공. 복수구매하면 추가할인 제공. 0.3% Smile Point 추가 적립혜택 제공.">
+					</li>
+					<li>
+						<img src="@Urls.MobileImagePics/mobile/bizon/buy_info3.jpg" alt="견적서 출력가능. 카드전표 발행. 장기간 저장서비스. 현금영수증 발급. 클릭한번으로!! 일부기능은 pc버전에서만 가능합니다.">
+					</li>
+					</ul>
+				</div>
+				<div id="bnTurn" class="biz_bnTurn type">
+					<button type="button" id="prev" class="btn_prev" onclick="gallery1.prev();return false;"><span>이전</span></button>
+					<button type="button" id="next" class="btn_next" onclick="gallery1.next();return false;"><span>다음</span></button>
+				</div>
+			</div>
+			<div class="desc_bx type">
+				<h3 class="sub_tit">BIZON TALK</h3>
+				<p class="desc">비즈온은 G마켓 사업자 회원님만을 위한 특별한 서비스와 혜택을 제공하는 사업자구매 전문몰입니다.</p>
+			</div>
+			<div class="banner_wrap">
+				<div id="bnGrp2" class="bnGrp">
+					<ul class="img_area">
+					<li><img src="@Urls.MobileImagePics/mobile/bizon/buy_talk.jpg" alt=""></li>
+					<li><img src="@Urls.MobileImagePics/mobile/bizon/buy_talk2.jpg" alt=""></li>
+					<li><img src="@Urls.MobileImagePics/mobile/bizon/buy_talk3.jpg" alt=""></li>
+					</ul>
+				</div>
+				<div id="bnTurn2" class="biz_bnTurn type">
+					<button type="button" id="prev2" class="btn_prev" onclick="gallery2.prev();return false;"><span>이전</span></button>
+					<button type="button" id="next2" class="btn_next" onclick="gallery2.next();return false;"><span>다음</span></button>
+				</div>
+			</div>
+			<div class="desc_bx type2">
+				<h3 class="sub_tit">BIZON FAQ</h3>
+				<p class="desc">G마켓 비즈온은 어렵지 않아요. 여러분의 궁금증을 풀어드립니다.</p>
+			</div>
+			<!-- FAQ -->
+			<div class="choice type">
+				<a href="#" id="fnq_tab0" class="on" onclick="tabView(3,'fnq_tab',0,'fnq_cnt');return false;">가입</a>
+				<a href="#" id="fnq_tab1" class="off" onclick="tabView(3,'fnq_tab',1,'fnq_cnt');return false;">상품구매</a>
+				<a href="#" id="fnq_tab2" class="off" onclick="tabView(3,'fnq_tab',2,'fnq_cnt');return false;">결제 / 증빙</a>
+			</div>
+			<div id="fnq_cnt0" class="cont_bx" style="display: block;">
+				<div class="fnq_wrap">
+					<ul class="fnq_lst">
+					<li>
+						<div class="question">
+							<p><span>Q.</span>사업자회원 가입은 어떻게 하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>G마켓 회원가입 페이지에서 개인회원의 주민등록번호 대신 사업자등록번호를 입력하여 '사업자회원'으로 간단히 가입하실 수 있습니다.<br>
+								<a href="https://mobile.gmarket.co.kr/SignUp">사업자회원 가입하러가기<span></span></a>
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>법인사업자만 사업자회원으로 가입할 수 있나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>아닙니다.<br>비즈온은 사업자등록증을 소지하고 계신 사업자라면 개인사업자와 법인사업자 구분 없이 누구나 이용 가능합니다.</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>사업자로 회원가입 시 오류가 나는데 어떻게 하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>사업자 회원가입 시 오류가 발생하는 경우 아래의 표를 참고하여 주시기 바랍니다.<br>
+								<a href="#">사업자회원 가입 시 오류 및 해결방안 보러가기<span></span></a>
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					</ul>
+				</div>
+			</div>
+			<div id="fnq_cnt1" class="cont_bx" style="display: none;">
+				<div class="fnq_wrap">
+					<ul class="fnq_lst">
+					<li>
+						<div class="question">
+							<p><span>Q.</span>사업자 회원은 BIZ ON에서만 구매할 수 있나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>아닙니다.<br>사업자회원은 G마켓의 모든 상품을 구매하실 수 있습니다. 다만, BIZ ON의 일부 상품 구매 시 Smile Point를 추가 적립 받으실 수 있습니다. </p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>BIZ ON 상품 중 어떤 상품이 Smile Point를 추가로 적립해 주는 상품인가요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>
+								BIZ ON 상품 중 0.3% Smile Point를 추가로 적립해드리는 상품은 다음과 같이 확인 가능합니다.<br><br>
+								1) BIZ ON 홈페이지 메인에서 Smile Point +0.3% 코너를 확인하세요.<br>
+								2) BIZ ON 카테고리 상품 리스트 또는 검색 결과 리스트에서 사업자 +0.3% 태그를 확인하세요.<br>
+								3) 상품구매페이지의 구매혜택란에서 사업자 +0.3% 태그를 확인하세요.</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>0.3% Smile Point 추가 혜택은 어떻게 계산하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>사업자회원님께서 상품을 구매하여 최종 결제 하신 금액의 0.3%를 추가 Smile Point로 적립해 드립니다.<br><br>EX) 1개당 1만원인 상품에 1천원 쿠폰을 적용해서 구매 시 : (10,000원 - 1,000원) X 0.3% = 27원</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>적립한 Smile Point는 어떻게 사용하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>10,000포인트 이상 적립했을 경우 Smile Cash로 전환하여 결제시 현금처럼 사용하실 수 있습니다.</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>복수구매 할인은 어떻게 적용되나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>복수 구매 할인 조건을 넘는 수량을 구매하게 되면 전체 금액에서 금액이 할인되는 것이 아니라 상품 1개당 금액이 할인되게 됩니다.<br><br> EX) 1개당 1만원인 상품을 3개 이상 구매 시 1,000원 할인인 경우 : (10,000원 - 1,000원) X 3 = 27,000원  </p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>하나의 사업자회원 ID를 여러 부서, 혹은 여러 구매 담당자가 사용 할 수 있나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>네. 그렇습니다.<br>동일 ID를 공유하여 사용 가능합니다. 장바구니 메모 기능을 활용하여 담당 부서, 혹은 담당자를 표기해두시면 더욱 편리하게 이용하실 수 있습니다.</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					</ul>
+				</div>
+			</div>
+			<div id="fnq_cnt2" class="cont_bx" style="display: none;">
+				<div class="fnq_wrap">
+					<ul class="fnq_lst">
+					<li>
+						<div class="question">
+							<p><span>Q.</span>견적서 출력은 어떻게 하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>장바구니에서 견적이 필요한 상품에 대해서 체크하신 후 견적서 출력 버튼을 클릭하시면 견적서가 출력됩니다.</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>견적서에 명기된 가격은 변경될 수 있나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>네. 변경될 수 있습니다.<br>견적서는 출력시점에 적용되어진 각종 고객 혜택 (쿠폰, Smile Point 차감 등) 만을 반영하며 출력시점 이후 고객 혜택은 상황에 따라 변경 될 수 있습니다.</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>사업자로 회원 가입 시 오류가 나는데 어떻게 하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>네. 그렇습니다<br>개인 회원님과 동일하게 사업자회원님도 개인카드 및 법인 카드로 결제가 가능하며, 현금 결제도 가능합니다.</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>증빙을 위한 현금영수증, 카드 전표가 제공되나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p><span>A.</span>네. 그렇습니다.<br>[나의쇼핑정보 > 주문/배송 조회] 에서 최근 2년간의 구매 내역을 확인하실 수 있으며 언제든지 카드전표, 현금영수증 출력이 가능합니다.</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="find_cnt1" class="cont_bx" style="display:block">
+			<div class="desc_bx">
+				<h3 class="sub_tit">BIZON Smile Point +0.3% 추가 혜택 상품 등록 방법</h3>
+			</div>
+			<div class="banner_wrap">
+				<div id="bnGrp3" class="bnGrp">
+					<ul class="img_area">
+					<li>
+						<img src="@Urls.MobileImagePics/mobile/bizon/sell_info.jpg?ver=20151106" alt="STEP1. 가입자격을 확인합니다. 비즈온 e딜러의 자격은 ESM PLUS에서 확인할 수 있습니다.">
+					</li>
+					<li>
+						<img src="@Urls.MobileImagePics/mobile/bizon/sell_info2.jpg?ver=20151106" alt="STEP2. 복수 구매 할인을 설정합니다. 복수구매할인 설정 중 구매수량에 따른 복수 구매할인 설정 시에만 등록이 가능합니다.">
+					</li>
+					<li>
+						<img src="@Urls.MobileImagePics/mobile/bizon/sell_info3.jpg?ver=20151106" alt="STEP3. 비즈온 서비스 여부에 체크합니다. 사업자가 구매 시 Smile Point 0.3%를 추가 제공함에 동의합니다.">
+					</li>
+					</ul>
+				</div>
+				<div id="bnTurn3" class="biz_bnTurn type">
+					<button type="button" id="prev3" class="btn_prev" onclick="gallery3.prev();return false;"><span>이전</span></button>
+					<button type="button" id="next3" class="btn_next" onclick="gallery3.next();return false;" ><span>다음</span></button>
+				</div>
+					
+			</div>
+			<div class="desc_bx type2">
+				<h3 class="sub_tit">BIZON FAQ</h3>
+				<p class="desc">G마켓 비즈온은 어렵지 않아요. 여러분의 궁금증을 풀어드립니다.</p>
+			</div>
+			<div class="choice type">
+				<a href="#" id="fnq2_tab0" class="on" onclick="tabView(3,'fnq2_tab',0,'fnq2_cnt');return false;">가입 / 자격</a>
+				<a href="#" id="fnq2_tab1" class="off" onclick="tabView(3,'fnq2_tab',1,'fnq2_cnt');return false;">상품구매</a>
+				<a href="#" id="fnq2_tab2" class="off" onclick="tabView(3,'fnq2_tab',2,'fnq2_cnt');return false;">판매 / 정산</a>
+			</div>
+			<div id="fnq2_cnt0" class="cont_bx" style="display: block;">
+				<div class="fnq_wrap">
+					<ul class="fnq_lst">
+					<li>
+						<div class="question">
+							<p><span>Q.</span>비즈온 판매 권한은 어떻게 받을 수 있나요? 별도의 증빙 서류가 필요한가요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>비즈온 판매는 누구나 가능하며, 별도의 증빙 서류는 없습니다. 다만, Smile Point 추가 적립 상품 등록 시에는 별도의 조건이 있는 판매자만 상품 등록이 가능합니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>Smile Point +0.3% 추가 혜택 상품의 판매하고 싶습니다. 판매 권한은 어떻게 받을 수 있나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>G마켓 판매 회원 중 3가지 자격요건을 충족한 판매자에게 자동으로 자격이 부여 됩니다.<br><br>
+									1) '일반과세자' 로 등록된 판매회원<br>
+									2) 전월 판매등급이 '파워딜러'인 판매회원<br>
+									3) 전월 고객만족우수 등급인 판매회원<br>
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>Smile Point +0.3% 추가 혜택 상품의 판매 권한은 어디서 확인 할 수 있나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>[ESM+ 계정(ID)관리 -> G마켓 판매자 계정(ID) 관리] 의 판매자 정보 관리(나의정보) 중 'BIZ ON 판매자 권한 여부'에서 확인하실 수 있습니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>Smile Point +0.3% 추가 혜택 상품 판매 권한을 잃게 되면 상품 노출이 중지되나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>판매자 권한을 잃게 되면 +0.3% Smile Point 동의 체크가 철회되며, +0.3% Smile Point 상품에 대한 노출은 중지됩니다. 다만, 일반 상품으로의 노출은 지속됩니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>판매 권한을 다시 부여 받게 되면 Smile Point +0.3% 추가 혜택 상품으로 다시 자동 노출 되나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>권한을 다시 가지게 되더라도 [ESM+ 전문관관리 → BIZ ON 관리]에서 0.3% 동의를 다시 체크해주어야 합니다. 자동 복구되지는 않습니다.<br>
+								<a href="#">사업자회원 가입하러가기<span></span></a>
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					</ul>
+				</div>
+			</div>
+			<div id="fnq2_cnt1" class="cont_bx" style="display: none;">
+				<div class="fnq_wrap">
+					<ul class="fnq_lst">
+					<li>
+						<div class="question">
+							<p><span>Q.</span>비즈온 상품 등록은 어떻게 하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>BIZ ON 적용 카테고리 상품의 등록된 모든 상품은 BIZ ON의 자동으로 동시 등록 됩니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>상품 등록 및 판매에 비용이 발생하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>일반 상품 등록 시 자동으로 상품이 등록되며, 상품 등록은 일반 상품 등록과 동일하게 무료 입니다. <br>판매 시에도 역시 동일한 수수료가 발생합니다. <br>다만, 사업자회원(사업자구매회원, 사업자판매회원) 이 +0.3% Smile Point 추가 혜택 상품을 구매할 경우 결제 금액의 0.3%만큼 Smile Point가 추가 제공되며, 추가 제공은 판매자가 부담하게 됩니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>일반 상품으로 등록 하지 않고 비즈온 상품으로만 등록이 가능한가요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>비즈온 상품은 일반 상품 등록 시 자동으로 등록되며, <br>+0.3% Smile Point 추가 혜택 상품 역시 일반 상품 등록 후 추가 설정을해야 하므로 비즈온 상품으로 등록 하려면 반드시 일반 상품 등록을하셔야 합니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>모든 카테고리 또는 상품이 비즈온 상품으로 등록 되나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>아닙니다. <br>BIZ ON 적용 카테고리가 따로 존재하며, 해당 카테고리 상품만 비즈온의 등록 됩니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>Smile Point +0.3% 추가 혜택 상품 등록은 어떻게 하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>[ESM+ 상품등록/변경 -> 상품등록 3단계]에서 아래의 2가지를 진행하시면 등록됩니다.<br><br>
+									1) 해당 상품 복수 구매 할인 적용<br>
+									2) 사업자구매고객 +0.3% Smile Point 추가 적립 동의
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>상품에 기존 Smile Point가 설정되어 있는 경우 '추가 Smile Point 제공 동의'를 또 해야 하나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>네. 그렇습니다.<br>기존 설정된 Smile Point와는 별개로 G마켓 사업자회원이 해당 상품을 구매하는 경우 결제 금액의 0.3%를 기존 설정된 Smile Point에 추가로 적립해주는 것에 동의하는 것입니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>Smile Point +0.3% 추가 혜택 상품은 어디에 노출되나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>BIZ ON 홈페이지의 해당 코너와 카테고리 상품 리스트, 검색 후상품 리스트의 해당 코너의 자동 노출 됩니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>Smile Point +0.3% 추가 혜택 상품은 모든 카테고리 상품에 대해 등록 가능한가요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>아닙니다. <br>BIZ ON 적용 카테고리가 따로 존재하며, 해당 카테고리 상품만 등록 가능합니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					</ul>
+				</div>
+			</div>
+			<div id="fnq2_cnt2" class="cont_bx" style="display: none;">
+				<div class="fnq_wrap">
+					<ul class="fnq_lst">
+					<li>
+						<div class="question">
+							<p><span>Q.</span>비즈온 상품을 개인 회원이 구매한 경우와 사업자 회원이 구매한 경우차이가 있나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>아닙니다. <br>개인 회원과 사업자 회원의 차이는 없습니다. <br>다만 +0.3% Smile Point 추가 혜택 상품을 사업자 회원이 구매 시 결제 금액의 0.3%를 Smile Point로 추가 제공하며, 개인 회원이 구매 시에는 제공되지 않습니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>비즈온 상품(Smile Point +0.3% 혜택 상품 제외)을 개인 회원에게 판매한 경우와 사업자 회원에게 판매한 경우 상품의 수수료율은 다르게 적용되나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>아닙니다. <br>수수료율은 모두 동일하게 적용됩니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					<li>
+						<div class="question">
+							<p><span>Q.</span>Smile Point +0.3% 혜택 상품을 개인 회원에게 판매한 경우와 사업자 회원에게 판매한 경우 상품의 수수료율은 다르게 적용되나요?</p>
+							<a href="#" class="btn_open"><span>답변 열기</span></a>
+						</div>
+						<div class="answer">
+							<p>
+								<span>A.</span>아닙니다. <br>수수료율은 모두 동일하게 적용됩니다. <br>다만, 정산 시 +0.3 Smile Point 금액은 판매자부담금으로 정산금액에서 +0.3% Smile Point 추가 적립 금액을 제외한 금액이 정산됩니다.
+							</p>
+							<a href="#" class="btn_cls"><span>답변 닫기</span></a>
+						</div>
+					</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="desc_bx">
+			<h3 class="sub_tit">BIZON 혜택구경</h3>
+			<p class="desc">G마켓 비즈온은 어렵지 않아요. 여러분의 궁금증을 풀어드립니다.</p>
+		</div>
+		<div class="link_bx_wrap">
+			<ul class="link_bx">
+				<li>
+				<a href="@Urls.MobileWebUrl/BizOn">
+					<span class="bg"></span>
+					<p class="tx">BIZON 바로가기</p>
+				</a>
+			</li>
+			<li>
+				<a href="@Urls.MobileWebUrl/Display/SpecialShopping?lcId=&sid=116682">
+					<span class="bg"></span>
+					<p class="tx">가입 &amp; 구매 혜택</p>
+				</a>
+			</li>
+			<li>
+				<a href="@Urls.MobileWebUrlSecure/SignUp">
+					<span class="bg"></span>
+					<p class="tx">사업자회원 가입하기</p>
+				</a>
+			</li>
+			</ul>
+		</div>
+		<div class="center_wrap">
+			<div class="tx_num">
+				<h4 class="tit">BIZON 전용 고객 센터</h4>
+				<p class="tx">1588-2194</p>
+			</div>
+			<div class="tx_lst">
+				<ul class="lst_type">
+				<li>상담 가능 시간 : 오전 9시 ~ 오후 6시<br>(점심 시간 12시 ~ 오후 1시, 토요일 및 공휴일 휴무)</li>
+				<li>FAX : 02-589-8842</li>
+				<li>E-mail : bizon@corp.gmarket.co.kr</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- //CONTENT -->
+<hr />
+@section Css{	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/main.css" />
+	<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/bizon.css" />
+}
+<script type="text/javascript">
+	var layer_banner_all = {}
+	layer_banner_all.items = [];
+	$(window).load(function () {
+		var $box_list_bnr = $('#layer_bnr_all')
+		var $list_bnr = $('#layer_bnr_all .biz_list_bnr');
+		var $list_bnr_close = $box_list_bnr.find('.close');
+		var box_list_items = '';
+		$('.biz_bnr_all > a').on('click', function () {
+			$box_list_bnr.show();
+
+			$("<div id='mask' selected='true'></div>").appendTo("#wrap");
+			for (var i = 0; i < layer_banner_all.items.length; i++) {
+				box_list_items += '<li>' + layer_banner_all.items[i] + '</li>';
+			}
+			$list_bnr.html(box_list_items);
+			setTimeout(function () {
+				$('#wrap #mask').on('click', function (e) {//131206 body--> #mask 수정
+					if (e.target.getAttribute('id') == 'mask') {
+
+						$('#wrap #mask').off(); //131206 body--> #mask 수정
+						layer_banner_all.items = [];
+						$box_list_bnr.hide();
+						$("#wrap #mask").remove();
+					}
+				});
+			}, 100);
+		});
+		$list_bnr_close.on('click', function () {
+			$('#wrap #mask').off(); //131206 body--> #mask 수정
+			layer_banner_all.items = [];
+
+			setTimeout(function () {
+				$box_list_bnr.hide();
+				$("#wrap #mask").remove();
+			}, 300)
+			return false;
+		});
+	});
+</script>
+<script type="text/javascript">
+//<![CDATA[
+	var gallery1,
+		el,
+		i,
+		page,
+		dots1 = document.querySelectorAll('#bnIndex button');
+	dots12 = document.querySelectorAll('#bnIndex1 a');
+
+	/* HTML 파싱 */
+	var bnGrpList1 = $("#bnGrp li");
+
+	if (1 < bnGrpList1.length) {
+
+		var bnGrpListAtag1 = [];
+
+		var bnGrpListAtag1_planned = [];
+
+		for (var j = 0; j < bnGrpList1.length; j++) {
+			bnGrpListAtag1_planned[j] = bnGrpList1[j].innerHTML;
+			bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+		}
+		layer_banner_all.items = bnGrpListAtag1_planned;
+
+		var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+		/* //HTML 파싱 */
+
+		gallery1 = new SwipeView('#bnGrp', {
+			numberOfPages: bnGrpListAtag1.length,
+			hastyPageFlip: true,
+			flickTime: 1000 // 4초후 
+		});
+
+		// Load initial data
+		for (i = 0; i < 3; i++) {
+
+			if (1 == bnGrpListAtag1.length) {
+				page = i == 0 || 2 ? bnGrpListAtag1.length - 1 : i - 1;
+			}
+			else {
+				page = i == 0 ? bnGrpListAtag1.length - 1 : i - 1;
+			}
+
+			el = document.createElement('span');
+			el.innerHTML = bnGrpListAtag1[page];
+			gallery1.masterPages[i].appendChild(el)
+
+			el.width = bnGrpListAtag1[page].width;
+			el.height = bnGrpListAtag1[page].height;
+			el.onload = function () { this.className = ''; }
+		}
+
+		gallery1.onFlip(function () {
+			var el,
+				upcoming,
+				i;
+
+			for (i = 0; i < 3; i++) {
+				upcoming = gallery1.masterPages[i].dataset.upcomingPageIndex;
+
+				if (upcoming != gallery1.masterPages[i].dataset.pageIndex) {
+					el = gallery1.masterPages[i].querySelector('span');
+					el.innerHTML = bnGrpListAtag1[upcoming];
+				}
+			}
+		});
+
+		flicking("bnGrp", "prev", "next");
+
+	} else if (1 == bnGrpList1.length) {
+
+		var bnGrpListAtag1 = [];
+
+		for (var j = 0; j < bnGrpList1.length; j++) {
+			bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+		}
+		var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+		$("#bnGrp").append(globalBnGrpListAtag1);
+		flicking("bnGrp", "prev", "next");
+
+	} 
+</script>
+<script type="text/javascript">
+//<![CDATA[
+	var gallery2,
+		el,
+		i,
+		page,
+		dots1 = document.querySelectorAll('#bnIndex button');
+	dots12 = document.querySelectorAll('#bnIndex1 a');
+
+	/* HTML 파싱 */
+	var bnGrpList1 = $("#bnGrp2 li");
+
+	if (1 < bnGrpList1.length) {
+
+		var bnGrpListAtag1 = [];
+
+		var bnGrpListAtag1_planned = [];
+
+		for (var j = 0; j < bnGrpList1.length; j++) {
+			bnGrpListAtag1_planned[j] = bnGrpList1[j].innerHTML;
+			bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+		}
+		layer_banner_all.items = bnGrpListAtag1_planned;
+
+		var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+		/* //HTML 파싱 */
+
+		gallery2 = new SwipeView('#bnGrp2', {
+			numberOfPages: bnGrpListAtag1.length,
+			hastyPageFlip: true,
+			flickTime: 1000 // 4초후 
+		});
+
+		// Load initial data
+		for (i = 0; i < 3; i++) {
+
+			if (1 == bnGrpListAtag1.length) {
+				page = i == 0 || 2 ? bnGrpListAtag1.length - 1 : i - 1;
+			}
+			else {
+				page = i == 0 ? bnGrpListAtag1.length - 1 : i - 1;
+			}
+
+			el = document.createElement('span');
+			el.innerHTML = bnGrpListAtag1[page];
+			gallery2.masterPages[i].appendChild(el)
+
+			el.width = bnGrpListAtag1[page].width;
+			el.height = bnGrpListAtag1[page].height;
+			el.onload = function () { this.className = ''; }
+		}
+
+		gallery2.onFlip(function () {
+			var el,
+				upcoming,
+				i;
+
+			for (i = 0; i < 3; i++) {
+				upcoming = gallery2.masterPages[i].dataset.upcomingPageIndex;
+
+				if (upcoming != gallery2.masterPages[i].dataset.pageIndex) {
+					el = gallery2.masterPages[i].querySelector('span');
+					el.innerHTML = bnGrpListAtag1[upcoming];
+				}
+			}
+		});
+
+		flicking("bnGrp2", "prev2", "next2");
+
+	} else if (1 == bnGrpList1.length) {
+
+		var bnGrpListAtag1 = [];
+
+		for (var j = 0; j < bnGrpList1.length; j++) {
+			bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+		}
+		var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+		$("#bnGrp2").append(globalBnGrpListAtag1);
+		flicking("bnGrp2", "prev2", "next2");
+
+	} 
+		
+</script>
+<script type="text/javascript">
+//<![CDATA[
+	var gallery3,
+		el,
+		i,
+		page,
+		dots1 = document.querySelectorAll('#bnIndex button');
+	dots12 = document.querySelectorAll('#bnIndex1 a');
+
+	/* HTML 파싱 */
+	var bnGrpList1 = $("#bnGrp3 li");
+
+	if (1 < bnGrpList1.length) {
+
+		var bnGrpListAtag1 = [];
+
+		var bnGrpListAtag1_planned = [];
+
+		for (var j = 0; j < bnGrpList1.length; j++) {
+			bnGrpListAtag1_planned[j] = bnGrpList1[j].innerHTML;
+			bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+		}
+		layer_banner_all.items = bnGrpListAtag1_planned;
+
+		var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+		/* //HTML 파싱 */
+
+		gallery3 = new SwipeView('#bnGrp3', {
+			numberOfPages: bnGrpListAtag1.length,
+			hastyPageFlip: true,
+			flickTime: 1000 // 4초후 
+		});
+
+		// Load initial data
+		for (i = 0; i < 3; i++) {
+
+			if (1 == bnGrpListAtag1.length) {
+				page = i == 0 || 2 ? bnGrpListAtag1.length - 1 : i - 1;
+			}
+			else {
+				page = i == 0 ? bnGrpListAtag1.length - 1 : i - 1;
+			}
+
+			el = document.createElement('span');
+			el.innerHTML = bnGrpListAtag1[page];
+			gallery3.masterPages[i].appendChild(el)
+
+			el.width = bnGrpListAtag1[page].width;
+			el.height = bnGrpListAtag1[page].height;
+			el.onload = function () { this.className = ''; }
+		}
+
+		gallery3.onFlip(function () {
+			var el,
+				upcoming,
+				i;
+
+			for (i = 0; i < 3; i++) {
+				upcoming = gallery3.masterPages[i].dataset.upcomingPageIndex;
+
+				if (upcoming != gallery3.masterPages[i].dataset.pageIndex) {
+					el = gallery3.masterPages[i].querySelector('span');
+					el.innerHTML = bnGrpListAtag1[upcoming];
+				}
+			}
+		});
+
+		flicking("bnGrp3", "prev3", "next3");
+
+	} else if (1 == bnGrpList1.length) {
+
+		var bnGrpListAtag1 = [];
+
+		for (var j = 0; j < bnGrpList1.length; j++) {
+			bnGrpListAtag1[j] = bnGrpList1[j].innerHTML;
+		}
+		var globalBnGrpListAtag1 = bnGrpListAtag1.join(",");
+		$("#bnGrp3").append(globalBnGrpListAtag1);
+		flicking("bnGrp3", "prev3", "next3");
+
+	} 
+		
+</script><script type="text/javascript">
+	$(document).ready(function () {
+		$(".btn_prev").click(function (e) {
+			e.preventDefault();
+		});
+		setTimeout(function () {
+			$("#find_cnt1").css({ display: 'none' })
+			if ("@ViewBag.Type" == "sell") {
+				tabView(2, 'find_tab', 1, 'find_cnt');
+			} else {
+				tabView(2, 'find_tab', 0, 'find_cnt');
+			}
+		}, 300);
+	});
+	$(document).on("touchstart", function () { });
+</script>

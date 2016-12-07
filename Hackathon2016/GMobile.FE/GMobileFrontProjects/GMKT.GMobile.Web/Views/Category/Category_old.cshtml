@@ -1,0 +1,382 @@
+﻿@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Models;
+@using Arche.Data.Voyager;
+@using GMKT.Web.Context;
+@model CategorySearchModel
+@{
+    //ViewData["Title"] = "Category";
+    // 성인여부 체크
+    // Login 시 Adult 체크
+    bool isAdult = false;
+    if (PageAttr.IsLogin)
+    {
+        isAdult = BizUtil.IsAdultUser(GMobileWebContext.Current.UserProfile.CustNo);
+    }
+	string best100Url = "";
+	if (ViewBag.UseSearchApi)
+	{
+		best100Url = String.Format("/Best/BestSellerList?type=L&code={0}&listView=H", Model.LCode);
+	}
+	else
+	{
+		best100Url = String.Format("/Display/BestSellerList?pageKind=L&ecp_gdlc={0}&listView=H", Model.LCode);
+	}
+}
+
+<script type="text/javascript" src="@Urls.MobileWebUrl/js/common/front.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+
+<script type="text/javascript">
+	window.onload = function () {
+
+		setTimeout(function () {
+			displayLayer("progress_icon", "none");
+		}, 100);
+
+	}
+
+	jQuery(document).ready(function () {
+		$("img.thumbnail").lazyload();
+	});
+
+</script>
+<script type="text/javascript">
+    function actionInitDetail() {
+        var objBtn = null;
+        var btnId = null;
+        var form = document.sCategoryFrm;
+
+        form.scKeyword.value = '';
+        form.minPrice.value = '';
+        form.maxPrice.value = '';
+
+        for (var i = 1; i < 5; i++) {
+            btnId = 'tBtn1_con' + i;
+            objBtn = document.getElementById(btnId);
+            objBtn.className = objBtn.className.replace('on', 'off');
+            setValueByElementId(btnId + '_val', 'N');
+        }
+    }
+    function cateogrySearch() {
+        var form = document.sCategoryFrm;
+
+        if (form.scKeyword.value.replace(/(^\s*)|(\s*$)/gi, "") == "") {
+            alert('검색어를 입력해주세요.');
+            form.scKeyword.focus();
+            return false;
+        }
+
+        if (!checkNumberForInputObject(form.minPrice)) {
+            return false;
+        }
+
+        if (!checkNumberForInputObject(form.maxPrice)) {
+            return false;
+        }
+
+        form.submit();
+    }
+    function checkNumberForInputObject(objName) {
+        var obj = eval(objName);
+        if (isNaN(obj.value.replace(',', ''))) {
+            alert('숫자만 입력 하실 수 있습니다.');
+            obj.focus();
+            return false;
+        }
+        return true;
+    }
+</script>
+
+<form id="categoryList" name="categoryForm" action="/Category/List" method="get">
+	<input type="hidden" name="lcId" value="@Model.LCode" />
+	<input type="hidden" name="mcId" value="@Model.MCode" />
+	<input type="hidden" name="scId" value="@Model.SCode" />
+</form>
+
+    <!-- CONTENTS -->
+    <div id="contents" class="cts">
+
+        <!-- CATEGORY -->
+        <div class="category">
+
+			<div class="cg_mtt3">
+				<div class="cg_mtt3_1">
+	                <h3 class="left0right1">@CategoryUtil.GetCategoryName(Model.LCode.ToString())</h3>
+	                <p><a href="@best100Url" class="btn_cg2">G마켓베스트</a></p>
+	                <p><a href="#" id="a_srp" class="btn_cg3 slideToggleBtn">상세검색</a></p>
+
+
+					<!-- 상세검색 LAYER -->
+					<div class="cate_search slideToggleObj" style="display:none;">
+	                <form id="sCategoryFrm" name="sCategoryFrm" method="post" action="/Search/Search">
+	                    <input type="hidden" name="lcId" value="@Model.LCode" />
+	                    <ul>
+	                        <li class="row1">
+	                            <span class="tit">결과내 검색</span>
+	                            <span class="input_wrap"><input type="text" name="scKeyword" class="input100" /></span>
+	                        </li>
+	                        <li class="row2">
+	                            <span class="tit">가격대 검색</span>
+	                            <div class="input_wrap">
+	                                <span class="input_align">
+	                                    <input type="tel" name="minPrice" class="price1" />
+	                                    <input type="tel" name="maxPrice" class="price2" />
+	                                </span>
+	                            </div>
+	                        </li>
+	                        <li class="row3">
+	                            <span class="tit2">상세조건 검색</span>
+	                            <div class="input_wrap">
+	                                <ul class="btn_tab_grp2">
+	                                    <li id="tBtn1_con1" class="off"><a href="#" onclick="toggle_button('tBtn1_con1');return false;">무료배송</a></li>
+	                                    <li id="tBtn1_con2" class="off"><a href="#" onclick="toggle_button('tBtn1_con2');return false;">마일리지</a></li>
+	                                    <li id="tBtn1_con3" class="off"><a href="#" onclick="toggle_button('tBtn1_con3');return false;">상품할인</a></li>
+	                                    <li id="tBtn1_con4" class="off"><a href="#" onclick="toggle_button('tBtn1_con4');return false;">스탬프</a></li>
+	                                </ul>
+	                                <input id="tBtn1_con1_val" type="hidden" name="isFeeFree" />
+	                                <input id="tBtn1_con2_val" type="hidden" name="isMileage" />
+	                                <input id="tBtn1_con3_val" type="hidden" name="isDiscount" />
+	                                <input id="tBtn1_con4_val" type="hidden" name="isStamp" />
+	                            </div>
+	                        </li>
+	                    </ul>
+						<div class="btnwrap">
+							<a href="#" class="btn_dsch btn_blue" onclick="cateogrySearch();"><span><img src="@Urls.MobileImageUrlV2/480/ico_zoom2.png" alt="" />상세 검색</span></a>
+							<a href="#" class="btn_init" onclick="actionInitDetail();return false;"><span><img src="@Urls.MobileImageUrlV2/480/icon_init.png" alt="" />초기화</span></a>
+							<a href="#" class="btn_cls slideToggleBtn"><span><img src="@Urls.MobileImageUrlV2/480/icon_cls.png" alt="" />닫기</span></a>
+						</div>
+	                </form>
+					</div>
+					<script type="text/javascript">
+					    $(".cg_mtt3").layerSlideToggle2();
+					</script>
+				</div>
+			</div>
+
+            <!-- CATE_LIST -->
+            <div class="cate_listW" id="cate_listW">
+@if (Model.CategoryGroups.Count > 0 && Model.CategoryLevel < 3)
+{
+                <ul class="cate_list">
+@{
+	SortedDictionary<string, HistogramEntry>.Enumerator en = Model.sortedCategoryGroups.GetEnumerator();
+}
+
+@while( en.MoveNext() )
+{
+	HistogramEntry entry=en.Current.Value;
+
+    if (Model.CategoryLevel == 0)
+    {
+									<li><a href="javascript:goCategory('@entry.Value','','');">@CategoryUtil.GetCategoryName(entry.Value.ToString())</a></li>
+    }
+    else if (Model.CategoryLevel == 1)
+    {
+									<li><a href="javascript:goCategory('@Model.LCode','@entry.Value','');">@CategoryUtil.GetCategoryName(entry.Value.ToString())</a></li>	
+    }
+    else
+    {
+        if ((entry.Value.Equals("200000117") || BizUtil.isAdultCategory(entry.Value.ToString())) && !PageAttr.IsLogin) 
+		{
+									<li><a href="@Urls.LoginUrl">@CategoryUtil.GetCategoryName(entry.Value.ToString()) (<strong class="point">@entry.Count</strong>개)</a></li>	
+        }
+        else
+        {
+									<li><a href="javascript:goCategory('@Model.LCode','@Model.MCode', '@entry.Value');">@CategoryUtil.GetCategoryName(entry.Value.ToString()) (<strong class="point">@entry.Count</strong>개)</a></li>	
+        }
+    }
+
+
+}
+                </ul>
+
+if (Model.CategoryGroups.Count > 5)
+{
+                <a href="#" class="btn_more"><span>더보기</span></a>
+                <a href="#" class="btn_close"><span>닫기</span></a>
+}
+                <script type="text/javascript">
+                    $("#cate_listW").moreCategory2(".btn_more", 5);
+                    function goCategory(lc, mc, sc) {
+                    	var form = document.categoryForm;
+                    	form.lcId.value = lc;
+                    	form.mcId.value = mc;
+                    	form.scId.value = sc;
+
+                        var timestamp = new Date().getTime();
+                        form.action = "/Category/List?tValue=" + timestamp;
+
+                        form.submit();
+                    }
+                </script>
+}
+            </div>
+
+
+@{
+    if (Model.Plans.Count > 0)
+    {
+            <div class="ct_hgroup">
+                <h4>@CategoryUtil.GetCategoryName(Model.LCode.ToString()) 기획전</h4>
+            </div>
+
+            <!-- PLAN -->
+            <div class="plan" id="plWrap">
+                <div id="planListWrap" class="planListWrap">
+                    <ul id="planList">
+        @foreach (var plan in Model.Plans)
+        {
+                        <li>
+                            <a href="@Urls.MobileWebUrl/Display/SpecialShopping?lcId=@Model.LCode&sid=@plan.sSpecialID">
+                                <span class="p_pic"><img src="@plan.sSpecialImage" width="198" height="83" alt="인기기획전" onError="this.src='<%=Const.NONE_IMAGE_201x85%>';" /></span>
+                                <span class="p_txt">
+                                    <span class="title">@plan.sSpecialGdlcNm</span>
+                                    <strong>@plan.sSpecialTitle</strong>
+                                </span>
+                            </a>
+                        </li>
+        }
+                    </ul>
+                </div>
+                <a href="#" id="plprev" class="btnpre" ></a>
+                <a href="#" id="plNext" class="btnnext"></a>
+            </div>
+            <!--// PLAN -->
+            <script type="text/javascript">
+			/*
+                //<![CDATA[
+                var objRotationAll = new ImageRotation();
+                objRotationAll.objName = 'objRotationAll';
+                objRotationAll.scrollDirection = 'direction';
+                objRotationAll.setScrollType('horizontal');
+                objRotationAll.autoScroll = "auto";
+                objRotationAll.scrollGap = 3000;
+                objRotationAll.listNum = 1;
+                objRotationAll.wrapId = "planListWrap";
+                objRotationAll.listId = "planList";
+                objRotationAll.btnNext = "plNext";
+                objRotationAll.btnPrev = "plprev";
+                objRotationAll.mg = 0;
+                objRotationAll.initialize();
+                //]]>
+			*/
+            </script>
+    }
+}
+
+            <div class="ct_hgroup">
+                <h4>@CategoryUtil.GetCategoryName(Model.LCode.ToString()) BEST</h4>
+@{
+    if (Model.TotalCount > 0)
+    {
+                <p class="rbtn_more"><a href="@best100Url" class="more">더보기</a></p>
+    }
+}
+            </div>
+@{
+    int i = 1;
+
+    if (Model.TotalCount > 0)
+    {
+            <div class="horizontal_list">
+                <ul>
+        @foreach (var item in Model.Items)
+        {
+            string goodsImagePath = "";
+            string linkUrl = Urls.MItemWebURL + "/Item?goodscode=" + item.GdNo;  
+            //string linkUrl = "http://item2.gmarket.co.kr/M/Goods/Goods.aspx?goodscode=" + item.GdNo;  
+            string onClickStr = "";
+            if (item.AdultYN)
+            {
+                if (PageAttr.IsAdultUse && PageAttr.IsLogin)
+                {
+                    goodsImagePath = BizUtil.GetGoodsImagePath(item.GdNo.ToString(), "M3");
+                }
+                else if (PageAttr.IsLogin && !isAdult) // 미성년자
+                {
+                    goodsImagePath = Model.ListType.Equals("H") ? Const.ADULT_IMAGE_210 : Const.ADULT_IMAGE_210;
+                    onClickStr = "alert('죄송합니다.\\n성인만 구매 가능한 상품입니다.'); return false;";
+                }
+                else if (PageAttr.IsLogin && !PageAttr.IsAdultUse && isAdult)  // 성인이지만 성인인증 절차 필요
+                {
+                    goodsImagePath = Model.ListType.Equals("H") ? Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty) : Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty);
+                    //goodsImagePath = Model.ListType.Equals("H") ? Const.ADULT_IMAGE_210 : Const.ADULT_IMAGE_210;
+                    //linkUrl = "/Common/AdultGoodsViewAgree?goodsNo=" + @item.GdNo;
+                }
+                else if (!PageAttr.IsLogin) // Login 필요
+                {
+                    goodsImagePath = Model.ListType.Equals("H") ? "http://image.gmarket.co.kr/Gmarket_Mobile_v2" + Const.ADULT_IMAGE_210.Replace("images/", string.Empty) : "http://image.gmarket.co.kr/Gmarket_Mobile_v2" + Const.ADULT_IMAGE_210.Replace("images/", string.Empty);
+                    linkUrl = ConstDef._GMW_LOGIN_AD_URL + "?rtnurl=" + HttpUtility.UrlEncode(linkUrl) + "&adultUseLoinCheck=Y";
+                }
+                else
+                {
+                    goodsImagePath = BizUtil.GetGoodsImagePath(item.GdNo.ToString(), "M3");
+                }
+            }
+            else
+            {
+                goodsImagePath = BizUtil.GetGoodsImagePath(item.GdNo.ToString(), "M3");
+            }
+                    <li>
+                        <a class="anchor" href="@linkUrl" onclick="@onClickStr">
+                            <span class="thumbnail_wrap">
+                                <img class="thumbnail" src="@Urls.MobileImageUrlV2/lazy_200x200.gif"
+								data-original="@goodsImagePath"
+								alt="제품 이미지" onError="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" />
+                                <span class="flag_sky">@i</span>
+                            </span>
+                            <span class="goods_name">@item.Name</span>
+                            <span class="goods_info">
+            @if (item.Discount.DiscountPrice > 0)
+            {
+                                <span class="price">@CurrencyUtil.ToMoney(@item.SellPrice.ToString(), true)</span>
+                                <span class="sale_price">@CurrencyUtil.ToMoney((@item.SellPrice - @item.Discount.DiscountPrice).ToString(), true)</span>
+            }
+            else
+            {
+                                <span class="price" style="visibility:hidden;">&nbsp;</span>
+                                <span class="sale_price" style="margin-left:0;">@CurrencyUtil.ToMoney(@item.SellPrice.ToString(), true)</span>
+            }
+
+            @if (item.Delivery.DeliveryInfo.Equals("무료"))
+            {
+                                <span class="free">무료배송</span>
+            }
+            else if ("123456789".IndexOf(item.Delivery.DeliveryInfo.Substring(0, 1)) > -1)
+            {
+                                <span class="fee">배송비 @item.Delivery.DeliveryInfo</span>
+            }
+            else
+            {
+                	            <span class="pay">@Html.Raw(@item.Delivery.DeliveryInfo.Replace("디지털쿠폰<br/>(방문사용)", "e쿠폰"))</span>
+            }
+                            </span>
+                        </a>
+                    </li>
+            i++;
+        }
+                 </ul>
+            </div>
+
+            <!--// CATE_TYPE1 -->
+            <script type="text/javascript">
+                UL_layoutFix(".horizontal_list", true);
+            </script>
+    }
+    else
+    {
+            <div class="msgW2 prod_no">
+                <div class="msg">
+                    <p class="txt2">
+                        <strong class="font_green">조건에 맞는 상품이 없습니다.</strong>
+                    </p>
+                </div>
+            </div>    
+    }
+}
+        </div>
+        <!--// CATEGORY -->
+
+    </div>
+    <!--// CONTENTS -->

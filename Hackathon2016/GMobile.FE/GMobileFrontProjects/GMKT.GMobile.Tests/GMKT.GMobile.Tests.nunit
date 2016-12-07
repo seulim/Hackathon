@@ -1,0 +1,9 @@
+﻿<NUnitProject>
+	<Settings activeconfig="Debug" />
+	<Config name="Debug" binpathtype="Auto" runtimeFramework="any">
+		<assembly path="bin\Debug\GMKT.GMobile.Tests.dll" />
+	</Config>
+	<Config name="Release" binpathtype="Auto">
+		<assembly path="bin\Release\GMKT.GMobile.Tests.dll" />
+	</Config>
+</NUnitProject>

@@ -1,0 +1,64 @@
+﻿@{
+    ViewBag.Title = "KakaoTalkPinNumber";
+    Layout = "~/Views/Shared/_KakaoTalkLayout.cshtml";
+}
+
+@model GMKT.GMobile.Web.Models.KakaoTalkApplyUserM
+
+<script type="text/javascript">
+    var KakaoTalkApplyUser = @Html.Raw(Json.Encode(Model));
+</script>
+<script type="text/javascript" src="@Url.Content("~/Scripts/KakaoTalk/KakaoTalkPinNumber.js?dummy=20130131132400")"></script>
+
+<!-- WRAPPER -->
+<div id="wrapper">
+
+	<!-- CONTENTS -->
+	<div id="contents" class="cts">
+
+		<!-- MAYPAGE -->
+		<div class="mypage">
+
+			<div class="mhgroup">
+				<h3 class="tit_left">카카오톡 맞춤정보<span>(사용자 인증)</span></h3>
+			</div>
+
+			<div class="kakao">
+				<h4>G마켓 회원 인증</h4>
+				<p class="tt2">카카오톡으로 받으신 인증번호를 인력하신 후 확인을 눌러주세요.</p>
+				
+				<div class="agr_wrap">
+					<form action="#" method="post" id="frmPinNumSubmit">
+						<fieldset>
+						<legend>전화번호 입력</legend>
+							<div class="tele">
+								<span>인증번호</span><input type="text" value="" class="ip_num2" id="txtInputCode"/>
+							</div>
+							<div class="agr">
+								<ul>
+									<li>인증번호를 입력한 다음 확인을 누르시면 카카오톡 맞춤정보 서비스 신청이 완료됩니다.</li>
+									<li>인증을 완료하실 경우 G마켓이 카카오톡 플러스 친구로 자동 추가됩니다.</li>
+								</ul>
+							</div>
+@*                            @Html.HiddenFor(m => m.UseAgree)
+                            @Html.HiddenFor(m => m.AccessChannel)
+                            @Html.HiddenFor(m => m.UserHPNoArr)*@
+							<div class="btn2_grp">
+								<ul>
+									<li><a href="#" class="btn_blue" id="btnPinNumSubmit"><span>확인</span></a></li>
+									<li><a href="#" class="btn_white" id="btnPinNumAgain"><span>인증번호 재전송</span></a></li>
+								</ul>
+							</div>
+						</fieldset>
+					</form>
+				</div>				
+			</div>			
+
+		</div>
+		<!--// MAYPAGE -->
+			
+	</div>
+	<!--// CONTENTS -->
+
+</div>
+<!--// WRAPPER -->

@@ -1,0 +1,1594 @@
+﻿@using GMKT.GMobile.Data;
+@using GMKT.GMobile.Data.Search;
+@using GMKT.GMobile.Constant;
+
+@model GMKT.GMobile.Web.Controllers.CategoryController.LandingBannerModel
+
+<script id="branddirect-template" type="text/x-handlebars-template">
+<div class="go_store_banner">
+	<a href="javascript:;" onclick="javascript:sendPDSLogFromEliment(this, true)" data-pdslog="{{PdsLogJson}}" data-link="{{LinkUrl}}"><img src="{{BannerUrl}}" alt="{{Title}}"></a>
+</div>
+{{#if Items}}
+<div class="pro_silde_wrap">
+	<!-- 제품 리스트 스와이프 -->
+	<div class="swiper-container">
+		<ul class="pro_lst swiper-wrapper">
+			{{#each Items}}			
+				<li class="swiper-slide">
+					<a href="{{getLinkUrl LinkURL IsPlusAD}}" onclick="javascript:sendPDSLogFromEliment(this)" data-pdslog="{{PdsLogJson}}">
+						<div class="img_bx"><img src="{{ImageURL}}" alt="{{GoodsName}}"></div>
+						<span class="txt_box">
+							<strong class="prd_tit">{{GoodsName}}</strong>
+							<span class="price_box">
+								<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}<span class="unit">원</span></strong>
+							</span>
+						</span>
+					</a>
+				</li>				
+			{{/each}}
+		</ul>
+	</div>
+</div>
+{{/if}}
+</script>
+
+<script id="smartbox-template" type="text/x-handlebars-template">
+{{#if TabEntities}}
+	<div id="divNavFinder" class="nav_finder">
+		<div class="nav_swiper" id="divSmartBoxTab">
+			{{#each TabEntities}}
+			<a href="{{getNavFinderATagName Name}}" onclick="javascript:sendPDSLogFromEliment(this)" data-pdslog="{{TabClickPdsLogJson}}">{{Name}}</a>
+			{{/each}}
+		</div>
+		@Html.Partial( "~/Views/Search/_SortArea.cshtml", 
+			Model, 
+			new ViewDataDictionary { 
+				{ "isDepartmentStore", ViewBag.isDepartmentStore },
+				{ "menuName", ViewBag.menuName }, 
+				{ "keyword", String.IsNullOrEmpty(ViewBag.primeKeyword) ? String.Empty : ViewBag.primeKeyword }, 
+				{ "categoryCode", String.IsNullOrEmpty(ViewBag.scId) ? (String.IsNullOrEmpty(ViewBag.mcId) ? String.Empty : ViewBag.mcId) :  ViewBag.scId}
+			})
+	</div>
+	<div id="divSmartBoxTileContainer" class="section_finder_container">
+		<div class="swiper-container" id="divSmartBoxTile">
+			<div class="swiper-wrapper">
+				{{#each TabEntities}}	
+				<div class="swiper-slide">
+					<ul class="lst_smart">
+					{{#each TileEntities}}		
+						<li class="{{#if Selected}}selected{{/if}}" id="li_tile_{{Type}}_{{Code}}" etype={{Type}}>
+							<a href="javascript:;" onclick='javascript:sendPDSLogFromEliment(this); selectTile("{{Type}}", "{{Code}}", "{{Name}}", this);' data-pdslog="{{PdsLogJson}}">
+								{{#if Image}}
+								<img src="{{Image}}" width="85" height="23" alt="">
+								{{else}}
+									{{#if Name}}
+									{{Name}}
+									{{/if}}
+								{{/if}}
+							</a>
+							{{#ifDisplayCategoryMore ../GroupType}}
+							<button type="button" href="#cate" class="btn_sort detail side_call" onclick='javascript:sendPDSLogFromEliment(this);detailTileManager.displaySmartBoxDetailLayer("{{Code}}");' data-pdslog="{{MoreClickPdsLogJson}}" style={{#if Selected}}"display:block"{{else}}"display:none"{{/if}}>더보기</button>
+							{{/ifDisplayCategoryMore}}
+						</li>
+					{{/each}}
+					</ul>
+					{{#ifDisplayCategoryMore GroupType}}
+						<a id="aDetail" href="#cate" onclick="javascript:sendPDSLogFromEliment(this);detailTileManager.displaySmartBoxDetailLayer();" data-pdslog="{{MoreClickPdsLogJson}}" class="btn_more side_call">더보기</a>
+					{{else}}
+						{{#ifNotEmptyArray TileMore}}
+						<a href="#brand" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog="{{MoreClickPdsLogJson}}" class="btn_more side_call">더보기</a>
+						{{/ifNotEmptyArray}}
+					{{/ifDisplayCategoryMore}}
+				</div>
+				{{/each}}
+			</div>
+		</div>
+		<div class="recom_artbx" id="divTileHistory" style="display:none">
+			<div id="scroll_in2" class="scroll_inner">
+				<ul class="recom_lst tail">
+				</ul>
+			</div>
+		</div>
+	</div>
+{{/if}}
+</script>
+
+
+<script id="bizonitem-template" type="text/x-handlebars-template">
+<ul class="{{printItemCSSStyle}}">
+{{#each BizOnItem}}
+	<li seq='{{@@index}}' moreImageCnt='{{LargeImageList.length}}' class='{{printPlusItemCSSStyle IsPlusAD AnotherTypeStart}}'>
+
+		<div class="best_tit">
+			<h3 class="mbest_stit">Smile Point + 0.3%</h3>
+		</div>
+
+		<a href="{{getLinkUrl LinkURL IsPlusAD}}">
+			<span class="img_box">
+				<img id="itemImage" data-original="{{printImage this @@index}}" 
+					src="@Urls.MobileImageUrlV2/640/img_none.jpg"  
+					onError="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" 
+					alt="" class="thumbnail">
+			</span>
+			<span class="txt_box">
+			                
+				{{#ifDisplayPlusIcon IsPlusAD}}
+				<strong class="prd_tit align_l">
+				<span class="sp_mw ico_plus">PLUS</span>
+				{{else}}
+				<strong class="prd_tit">
+				{{/ifDisplayPlusIcon}}		
+									
+				{{GoodsName}}</strong>
+				<span class="price_box">
+
+					{{#ifNotZero DiscountRate}}
+
+					<strong class="per_price"><span class="blind">할인율</span>{{DiscountRate}}<span class="per">%</span></strong>
+					<span class="origin_price"><span class="blind">정가</span>{{OriginalPrice}}</span>
+					<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>
+					
+					{{else}}
+					
+					<span class="origin_price" ></span>
+					<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>						
+					
+					{{/ifNotZero}}
+
+				</span>
+				<span class="option_bx">
+					{{printSellerInfo this}}
+				{{#if Delivery.ShowDeliveryInfo}}
+					{{printDeliveryInfo this}}
+				{{/if}}
+				</span>
+			</span>
+		</a>
+
+		{{#ifOverOne LargeImageList.length}} {{! View Style 이 Image 뷰 스타일일 때만 해당되는 큰 이미지 페이징}}
+
+		<div class="page_area" style="{{printLargeImageVisibility}}">
+			<a href="javascript:showPreviousImage('{{@@index}}');" class="btn_prev" style="display:none">
+				<span class="sp_mw">이전 이미지</span>
+			</a>
+			<a href="javascript:showNextImage('{{@@index}}')" class="btn_next">
+				<span class="sp_mw">다음 이미지</span>
+			</a>
+			<div class="sp_mw page_box">
+				<span class="pag" id="moreImageIndex">1</span> / <span class="pag2">{{LargeImageList.length}}</span>
+			</div>
+		</div>
+
+		{{/ifOverOne}}
+	</li>
+{{/each}}
+</ul>
+</script>
+
+<!-- 
+	검색 결과 리스트 아이템 template (갤러리뷰, 리스트뷰, 이미지뷰 공통으로 사용)
+-->
+<script id="item-template" type="text/x-handlebars-template">
+{{#each Item}}
+	{{> partialItemGroupTitle}}
+	{{#ifPrintItemUL 'start' this ../Item.length @@index}}
+	<ul class="{{printItemCSSStyle}}">
+	{{/ifPrintItemUL}}	
+		<li seq='{{@@index}}' moreImageCnt='{{LargeImageList.length}}'>
+			<a href="{{getLinkUrl LinkURL IsPlusAD}}" class="card" onclick="javascript:sendPDSLogFromEliment(this);sendClickLog('{{PdsClickUrl}}');" data-pdslog="{{PdsLogJson}}">
+				<span class="img_box">
+					<img id="itemImage" data-original="{{printImage this @@index}}" 
+						src="@Urls.MobileImageUrlV2/640/img_none.jpg"  
+						onError="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';" 
+						alt="" class="thumbnail">
+				</span>
+				<span class="info_box">
+					<strong class="tit_pd">{{GoodsName}}</strong>
+					{{#ifDisplayBrandName BrandName}}
+					<span class="brand">{{BrandName}}</span>
+					{{/ifDisplayBrandName}}
+					<span class="pr_info">
+						{{#ifNotZero DiscountRate}}
+							<span class="sale">{{DiscountRate}}<span class="unit">%</span></span>
+							<strong class="pd_price">
+								<em class="cp">{{SalePrice}}</em><span class="unit">원</span>
+								<span class="ori_price">{{OriginalPrice}}<em class="unit">원</em></span>
+							</strong>
+						{{else}}
+							<strong class="pd_price">
+								<em class="cp">{{SalePrice}}</em>{{#if IsDisplayWon}}<span class="unit">원</span>{{/if}}
+							</strong>
+						{{/ifNotZero}}
+						{{#if BuyCount}}
+							<span class="qnum">구매 <em>{{BuyCount}}</em></span>
+						{{/if}}
+					</span>
+						<span class="btns_rt">
+							<button class="btn_zzim" data-click-state="0" onclick="javascript:sendPDSLogFromItemButton(this, 'zzim', {{ListingItemGroup}});AddFavoriteItem('{{GoodsCode}}', this);">찜하기</button>
+							{{#if IsCartVisible}}
+								<button class="btn_addcart" data-click-state="0" onclick="javascript:sendPDSLogFromItemButton(this, 'addcart', {{ListingItemGroup}});addCartBaro('{{GoodsCode}}', this, '{{CartDirectAdgateUrl}}');">장바구니넣기</button>
+							{{/if}}
+							{{#if IsPurchasedSeller}}
+							<span class="buy_store">구매매장</span>							
+							{{/if}}
+						</span>
+				</span>
+				{{printDeliveryInfoNew this}}
+			</a>
+		</li>
+	{{#ifPrintItemUL 'end' this ../Item.length @@index}}
+	</ul>
+	{{#ifItemGroup 'smart' ListingItemGroup}}
+	<div class="pdlist_more smd card">
+		<a href="{{getSmartDeliveryLandingUrl}}" onclick="javascript:sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000040" : "200000103")', 'Utility');"><span class="bt_more">스마트배송 더보기<span class="sp_lpsrp">+</span></span></a>
+	</div>
+	{{/ifItemGroup}}
+	{{/ifPrintItemUL}}	
+{{/each}}
+
+{{printPaging this}}
+
+</script>
+
+<!-- 
+	아이템 group title partial template
+-->
+<script id="partial-itemgrouptitle-template" type="text/x-handlebars-template">
+{{#ifDisplayGroupTitle @@index AnotherTypeStart}}
+	{{#ifItemGroup 'smart' ListingItemGroup}}
+		<div class="linebn_smartdelivery card">
+			<a href="{{getSmartDeliveryLandingUrl}}" onclick="javascript:sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000040" : "200000103")', 'Utility');"><span class="sp_lpsrp">스마트배송</span>골라 담자! 3만원 이상 무료배송<span class="bt_more">더보기<span class="sp_lpsrp">+</span></span></a>
+		</div>
+	{{else}}
+	<div class="{{printItemGroupStyle 'div'}}">
+		<h3 class="{{printItemGroupStyle 'h3'}}">
+		{{printItemGroupTitle ListingItemGroup}}
+		</h3>
+		{{#ifDisplayAdIcon ListingItemGroup}}
+		<span class="ad_area">
+			<button type="button" class="btn_ad" onclick="sendPDSLogItemAdArea({{ListingItemGroup}}, true);">광고<span class="sp_lpsrp"></span></button>
+			<span class="ad_layer"><strong>{{printItemGroupTitle ListingItemGroup}}이란?</strong>{{printItemGroupDescription ListingItemGroup}}<button class="btn_close sp_lpsrp" href="javascript:;" onclick="sendPDSLogItemAdArea({{ListingItemGroup}}, false);">닫기</button></span>
+		</span>
+		{{/ifDisplayAdIcon}}
+	</div>
+	{{/ifItemGroup}}
+{{/ifDisplayGroupTitle}}
+</script>
+
+<!--
+	G9 아이템 template
+-->
+<script id="g9-item-template" type="text/x-handlebars-template">
+	<ul class="section_pd_g9">
+		<li>
+			<span href="#" class="card">
+				<a href="{{TitleLandingUrl}}" onclick="javascript:sendPDSLogFromEliment(this)" class="tit_section" target="_blank" data-pdslog="{{TitlePdsLogJson}}">
+					<em class="sp_lpsrp">g9</em>쇼핑에 상식을 채우다
+				</a>
+				{{#if IsDisplayRemainTime}}
+				<span class="time" id="remainTime"><em class="sp_lpsrp">시간</em>11:03:03</span>
+				{{else}}
+				<span class="time">{{OpenTimeText}}</span>
+				{{/if}}
+				<a href="{{LandingUrl}}" onclick="javascript:sendPDSLogFromEliment(this);" target="_blank" data-pdslog="{{LandingPdsLogJson}}">
+					<img class="img" src="{{ImageUrl}}" alt="">
+					<span class="pd_info">
+						<strong class="tit">{{BrandName}} {{GoodsName}}</strong>
+						<strong class="price">{{SalePrice}}<em class="unit">원</em></strong>
+						<span class="tags">
+						{{#if IsShowPromotionTag}}
+							<img src="{{PromotionTagUrl}}" alt="{{PromotionTagName}}">
+						{{/if}}
+						{{#if IsFreeDelivery}}
+							<img src="@Urls.MobileImagePics/mobile/lpsrp/ic_delvfree.gif" alt="무료배송">
+						{{/if}}
+						</span>
+						<span class="qnum"><em>{{SoldQty}}</em>구매</span>
+					</span>
+				</a>
+			</span>
+		</li>
+	</ul>
+</script>
+
+<!-- 
+	파워 클릭 결과 아이템 template
+-->
+<script id="cpcblock-item-template" type="text/x-handlebars-template">
+	{{#if CPCBlockAdList}}
+	<h3 class="best_stit">파워 클릭</h3>
+	<span class="ad_area">
+        <button type="button" class="btn_ad">광고<span class="sp_lpsrp"></span></button>
+        <span class="ad_layer"><strong>파워클릭이란?</strong>파워클릭 광고를 구매한 상품으로 입찰가순으로 전시됩니다.<button class="btn_close sp_lpsrp" href="javascript:;">닫기</button></span>
+    </span>
+	<ul class="best_lst type_list">
+		{{#each CPCBlockAdList}}
+		<li>
+			<a href="{{getSmartClickLinkUrl LinkURL IsPlusAD}}" class="card" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog="{{PdsLogJson}}">	
+				<span class="img_box">
+					<img src="{{ImageURL}}" alt="">
+				</span>
+				<span class="info_box">
+					<strong class="tit_pd">{{GoodsName}}</strong>
+					{{#ifDisplayBrandName BrandName}}
+					<span class="brand">{{BrandName}}</span>
+					{{/ifDisplayBrandName}}
+					<span class="pr_info">
+						{{#ifNotZero DiscountRate}}
+						<span class="sale">{{DiscountRate}}<span class="unit">%</span></span>
+						<strong class="pd_price">
+							<em class="cp">{{SalePrice}}</em><span class="unit">원</span>
+							<span class="ori_price">{{OriginalPrice}}<em class="unit">원</em></span>
+						</strong>
+						{{else}}
+						<strong class="pd_price">
+							<em class="cp">{{SalePrice}}</em>{{#if IsDisplayWon}}<span class="unit">원</span>{{/if}}
+						</strong>						
+						{{/ifNotZero}}
+						{{#if BuyCount}}
+							<span class="qnum">구매 <em>{{BuyCount}}</em></span>
+						{{/if}}
+					</span>
+						<span class="btns_rt">
+							<button class="btn_zzim" data-click-state="0" onclick="javascript:sendPDSLogFromItemButton(this, 'zzim', {{ListingItemGroup}}, true); AddFavoriteItem('{{GoodsCode}}', this);">찜하기</button>
+							{{#if IsCartVisible}}
+								<button class="btn_addcart" data-click-state="0" onclick="javascript:sendPDSLogFromItemButton(this, 'addcart', {{ListingItemGroup}}, true); addCartBaro('{{GoodsCode}}', this, '{{CartDirectAdgateUrl}}');">장바구니넣기</button>
+							{{/if}}
+							{{#if IsPurchasedSeller}}
+							<span class="buy_store">구매매장</span>							
+							{{/if}}
+						</span>
+				</span>
+				{{printDeliveryInfoNew this}}
+			</a>
+		</li>
+		{{/each}}
+	</ul>
+	{{/if}}
+</script>
+
+<!-- 
+	카테고리 레이어의 아이템 template
+-->
+<script id="category-template" type="text/x-handlebars-template">
+<div class="cate_cont">
+	<ul class="cate_lst_lp">
+
+		{{printParentCategories this}}
+
+		{{#ifOverOne Category.length}}
+
+		{{#each Category}}
+		<li>
+			<a href="javascript:sendCategoryLayerPdsLog('{{CategoryId}}');selectCategory('{{CategoryLevel}}', '{{CategoryId}}', '{{CategoryNm}}');search(false);">
+				{{CategoryNm}}<span class="pnum">{{addCommas CategoryCount}}</span>
+			</a>
+		</li>
+		{{/each}}
+
+		{{/ifOverOne}}
+
+	</ul>
+</div>
+</script>
+
+<!-- 
+	스마트박스 카테고리 리스트 아이템 template
+-->
+<script id="smartbox-lcategory-template" type="text/x-handlebars-template">
+	<ul class="cate_lst">
+		{{#each TileMore}}
+		<li class="{{#if Selected}}selected{{/if}}" id="li_tile_detail_{{Type}}_{{Code}}">
+			<span>
+				<a href="javascript:;" onclick="javascript:detailTileManager.sendPdsLog('{{Code}}', false);detailTileManager.selectCategoryLTile({{Code}}, true, this);">{{Name}}</a>
+				<button type="button" onclick="javascript:detailTileManager.sendPdsLog('{{Code}}', true);detailTileManager.selectCategoryLTileButton({{Code}}, this);">더보기</button>
+			</span>
+			<ul class="dep2">
+				{{#if DetailTile}}
+					{{#if DetailTile.Mtile}}
+					<li class="selected" id="li_tile_detail_{{Type}}_{{DetailTile.Mtile.Code}}" what="aa">
+						<a href="javascript:;" onclick="javascript:detailTileManager.selectCategoryMTile({{DetailTile.Mtile.Code}}, this);">{{DetailTile.Mtile.Name}}</a>
+						<ul class="dep3">
+						{{#if DetailTile.Stile}}
+							<li id="li_tile_detail_{{Type}}_{{DetailTile.Stile.Code}}">
+								<a href="javascript:;" onclick="javascript:detailTileManager.selectCategorySTile({{DetailTile.Stile.Code}}, this);">{{DetailTile.Stile.Name}}</a>
+							</li>
+						{{/if}}
+						</ul>
+					</li>
+					{{/if}}
+				{{/if}}
+			</ul>
+		</li>
+		{{/each}}
+	</ul>
+</script>
+
+<script id="smartbox-mcategory-template" type="text/x-handlebars-template">
+	{{#each this}}
+	<li id="li_tile_detail_{{Type}}_{{DetailTile.Mtile.Code}}">
+		<a href="javascript:;" onclick="javascript:detailTileManager.selectCategoryMTile({{DetailTile.Mtile.Code}}, this);">{{DetailTile.Mtile.Name}}</a>
+		<ul class="dep3">
+		</ul>
+	</li>
+	{{/each}}
+</script>
+
+<script id="smartbox-scategory-template" type="text/x-handlebars-template">
+		{{#each this}}
+		<li id="li_tile_detail_{{Type}}_{{DetailTile.Stile.Code}}">
+			<a href="javascript:;" onclick="javascript:detailTileManager.selectCategorySTile({{DetailTile.Stile.Code}}, this);">{{DetailTile.Stile.Name}}</a>
+		</li>
+		{{/each}}
+</script>
+<!-- 
+	브랜드 리스트 아이템 template
+-->
+<script id="brand-template" type="text/x-handlebars-template">
+	
+	<ul class="slide_lst brand">
+		{{#each BrandFinderList}}
+		<li brandNo="{{BrandNo}}">
+			<div class="img_box">
+				<img src="{{BrandonSubImg}}" width="40" height="15" alt="{{BrandName}}" />
+			</div>
+			<div class="inp_box">
+				<input type="checkbox" id="chk_{{BrandNo}}" class="inp_chk" />
+				<label for="chk_{{BrandNo}}" class="tit">{{BrandName}}<span>{{addCommas BrandCount}}</span></label>
+			</div>
+		</li>
+		{{/each}}
+	</ul>
+
+</script>
+
+<!-- 
+	상단 PP 아이템 template
+-->
+<script id="pp-item-template" type="text/x-handlebars-template">
+	<span id='pp_all' class="total selected" onclick="javascript:sendFcdCode('PP',-1);">
+		<a href="javascript:sendPDSLogFromPPAll();selectPPAll();search(true);">
+			<span class="mall_box">전체</span>
+			<span class="num" id='TotalGoodsCount'>{{addCommas TotalGoodsCount}}</span>
+		</a>
+	</span>
+	<div id="wrapper5" class="cl">
+		{{#ifNotEmptyArray SPPLists}}
+		<div class="scroll_box">
+		{{else}}
+		<div class="scroll_box" style="display:none">
+		{{/ifNotEmptyArray}}
+			<ul class="mw_tab" id="ppList">
+				{{#ifNotEmptyArray SPPLists}}
+				<li class="intotal">
+					<a href="javascript:closePPLayer();setCategoryParams('','','');search(false);">전체상품</a>
+				</li>
+				{{/ifNotEmptyArray}}
+				{{#each SPPLists}}
+				<li id='pp_{{@@index}}'>
+					<a href="javascript:search(true);" onclick="javascript:sendPDSLogFromEliment(this);selectPP('{{SellerNo}}', {{@@index}}); sendFcdCode('PP', {{@@index}});" data-pdslog="{{PdsLogJson}}">
+						{{#if IsForSale}}
+						<span class="sp_lpsrp">SALE</span>
+						{{/if}}
+						<span class="mall_box">
+							<img src="{{PppOffImageUrl}}" alt="{{PartnerNm}}" />
+						</span>
+					</a>
+				</li>
+				{{/each}}
+			</ul>	
+		</div>
+	</div>
+
+	{{#hasMorePP SPPLists}}
+
+	<div class="mw_tab_info">
+		<button type="button" class="btn_more" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000026" : "200000089")', 'Utility');togglePPLayer();sendFcdCode('PP',3);"><span class="sp_lpsrp">쇼핑몰더보기</span></button>
+	</div>
+	<div class="bts_bottom"><a href="javascript:;" class="bt_close" onclick="javascript:sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000027" : "200000090")', 'Utility');togglePPLayer();">닫기</a></div>
+	{{/hasMorePP}}
+
+</script>
+
+<script id="smart-finder-option-value-template" type="text/x-handlebars-template">
+	{{#each OptionValues}}
+		<li>
+			<div class="inp_box">
+				<input type="checkbox" id="tchk1" class="inp_chk" value="{{ValueId}}"><label for="tchk1" class="tit">{{OptionValueName}}</label>
+			</div>
+		</li>
+	{{/each}}
+</script>
+
+<script id="departmetstore-item-template" type="text/x-handlebars-template">
+<section class="sec_dept">
+	<div class="prd_dept">
+		<ul>
+		{{#each Item}}
+		<li>
+			<div class="box">
+				<a class="{{DepartmentStoreCssName}}" href="{{DepartmentStoreLandingUrl}}" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog='{"Parameter":{"classname":"{{DepartmentStoreCssName}}","url":"{{DepartmentStoreLandingUrl}}"},"AreaType":"Link","AreaCode":"200000305"}'></a>
+				<a href="{{LinkURL}}" onclick="javascript:sendPDSLogFromEliment(this);" data-pdslog="{{PdsLogJson}}">
+					<img data-original="{{printImage this @@index}}" 
+						src="@Urls.MobileImageUrlV2/640/img_none.jpg"  
+						onError="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';"  alt="{{GoodsName}}" class="thumbnail">
+					<div class="info">
+						<p class="tit">{{#if BrandNameTag}}{{BrandNameTag}}{{/if}}</br>{{GoodsName}}</p>
+						<p class="price">
+							{{#ifNotZero DiscountRate}}
+							<span><span class="blind">정가</span>{{OriginalPrice}}</span>
+							<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>
+							{{else}}
+							<span><span class="blind">정가</span></span>
+							<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>
+							{{/ifNotZero}}
+						</p>
+					</div>
+				</a>
+			</div>
+		</li>
+		{{/each}}
+		</ul>			
+	</div>
+</section>
+
+{{printPaging this}}
+</script>
+
+<script id="best-item-template" type="text/x-handlebars-template">
+<div class="mbest_wrap">
+	<div class="mbest_intit">
+		<p class="more_txt">이런 상품은 어떠세요?</p>
+		<h3 class="mbest_tit">모바일 베스트</h3>
+		<a href="@Urls.MobileWebUrl/Best" class="btn_more">더보기</a>
+	</div>
+	<ul class="mbest_lst">
+	{{#each this}}
+		<li>
+			<a href="{{LinkURL}}">
+				<span class="rank">{{inc @@index}}</span>
+				<div class="img_bx">
+					<img src="{{printImage this @@index}}" alt="">
+				</div>
+				<div class="info_bx {{#unless DiscountPrice}}no_sale{{/unless}}">
+					<strong class="tit">{{#if BrandNameTag}}{{BrandNameTag}}{{/if}}</br>{{GoodsName}}</strong>
+					<div class="price_box">
+						{{#if DiscountPrice}}
+						<span class="per_price"><span class="blind">정가</span>{{addCommas SellPrice}}</span>
+						{{/if}}
+						<strong class="price"><span class="blind">할인가</span>{{addCommas DispPrice}}</strong>
+					</div>
+					{{#isFreeShipping this}}
+					<span class="ico_del">무료배송</span>
+					{{/isFreeShipping}}
+					{{#if this.IsTpl}}
+					<span class="ico_smart">스마트배송</span>
+					{{/if}}
+				</div>
+			</a>
+		</li>
+	{{/each}}
+	</ul>
+	<div class="btn_box"><a href="@Urls.MobileWebUrl/Best" class="btn_more2">모바일 베스트 더보기</a></div>
+</div>
+</script>
+
+<script id="departmetstore-best-item-template" type="text/x-handlebars-template">
+<section class="sec_dept">
+	<div class="prd_dept">
+		<ul>
+		{{#each Item}}
+		<li>
+			<div class="box">
+				<a class="{{DepartmentStoreCssName}}" href="{{DepartmentStoreLandingUrl}}"></a>
+				<a href="{{LinkURL}}">
+					<span class="order">{{inc @@index}}</span>
+					<span class="imgbx">
+						<img data-original="{{printImage this @@index}}" 
+							src="@Urls.MobileImageUrlV2/640/img_none.jpg"  
+							onError="this.src='@Urls.MobileImageUrlV2/480/no_img_208.png';"  alt="{{GoodsName}}" class="thumbnail">
+					</span>
+					<div class="info">
+						<p class="tit">{{#if BrandNameTag}}{{BrandNameTag}}{{/if}}</br>{{GoodsName}}</p>
+						<p class="price">
+							<span><span class="blind">정가</span>{{Price}}</span>
+							<strong class="sale_price"><span class="blind">할인가</span>{{DiscountPrice}}</strong>
+						</p>
+					</div>
+				</a>
+			</div>
+		</li>
+		{{/each}}
+		</ul>			
+	</div>
+</section>
+</script>
+
+<script id="brand-tpl-view-template" type="text/x-handlebars-template">
+	{{#if IsShowSmartDeliveryFilter}}
+	<li id="li_smart_delivery">
+		<input type="checkbox" id="smart_delivery" class="inp_chk" onclick="javascript:sendPDSLogBasic('200000071', 'Utility');selectSmartDeliveryFilter(this);"><label for="smart_delivery">스마트배송상품</label>
+	</li>
+	{{/if}}
+	{{#if IsShowBrandOnlyFilter}}
+	<li id="li_brand_goods"> 
+		<input type="checkbox" id="brand_goods" class="inp_chk" onclick="javascript:sendPDSLogBasic('200000072', 'Utility');selectBrandGoodsFilter(this);"><label for="brand_goods">브랜드상품</label>
+	</li>
+	{{/if}}
+</script>
+
+<script id="sponsor-link-view-template" type="text/x-handlebars-template">
+    <h3>스폰서링크</h3>
+    <span class="ad_area">
+        <button type="button" class="btn_ad" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000061" : "200000124")', 'Utility');">광고<span class="sp_lpsrp"></span></button>
+        <span class="ad_layer"><strong>스폰서링크란?</strong> 제휴사의 광고가 전시되는 영역입니다.<button class="btn_close sp_lpsrp" onclick="sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000062" : "200000125")', 'Utility');" href="javascript:;">닫기</button></span>
+    </span>
+    <ul class="lst_spon card">
+        {{#each Items}}
+        <li>
+            <a href="{{cUrl}}" target="_blank" onclick='javascript:sendPDSLogFromEliment(this);SnaUrlFooter("@ViewBag.SpnosorLinkChannelCode");' data-pdslog="{{PdsLogJson}}">
+                <span class="num">{{getCount @@index}}</span>
+                <p class="tit">{{Title}}</p>
+                <p class="link">{{vUrl}}</p>
+                <p class="txt">{{Desc}}</p>
+            </a>
+        </li>
+        {{/each}}
+    </ul>
+</script>
+
+<script id="footer-da-view-template" type="text/x-handlebars-template">
+    <a href="{{LinkUrl}}" onclick="javascript:sendPDSLogFromEliment(this, false);sendClickLogForFooterDa(event, '{{ClickUrl}}', '{{LinkUrl}}', this);" data-pdslog="{{PdsLogJson}}"><img src="{{ImageUrl}}" alt="" ad="{{ImpUrl}}" impId=""/></a>
+</script>
+
+
+
+<script type="text/javascript">
+	var LpSrpAjaxHistory = function () {
+		var _$wrapper = $('#wrap');
+		var _wrapperHeight = 0;
+		var _reqParams = null;
+		var _smartBoxResult = { initial: null, current: null };
+		var _smartBoxDetails = { mTiles: [], sTiles: [] };
+		var _smartBoxGroupType = '';
+		var _ppData = { list: null, pp: '', index: -1 };
+		var _searchJsonResult = null;
+		var _currentViewStyle = '';
+		var _categoryData = { LcId: '', LcIdName: '', McId: '', McIdName: '', ScId: '', ScIdName: '', Category: [] };
+
+		(function () {
+			var loadedState = history.state;
+			if (loadedState && loadedState.id) {
+				_wrapperHeight = loadedState.wrapperHeight || 0;
+				_reqParams = loadedState.reqParams;
+				_smartBoxResult = loadedState.smartBoxResult || _smartBoxResult;
+				_smartBoxDetails = loadedState.smartBoxDetails || _smartBoxDetails;
+				_ppData = loadedState.ppData || _ppData;
+				_searchJsonResult = loadedState.searchJsonResult;
+				_currentViewStyle = loadedState.currentViewStyle || '';
+				_categoryData = loadedState.categoryData || _categoryData;
+			}
+			
+			//console.log('load', loadedState);
+
+			if (_wrapperHeight > 0) {
+				//console.log('height', _wrapperHeight);
+				_$wrapper.height(_wrapperHeight);
+			}
+		})();
+
+		this.getReqParams = function () {
+			return _reqParams;
+		};
+
+		this.getSmartBoxResult = function () {
+			return _smartBoxResult;
+		};
+
+		this.setSmartBoxGroupType = function (type) {
+			_smartBoxGroupType = type;
+		};
+
+		this.setInitialSmartBoxResult = function (result) {
+			_smartBoxResult.initial = jQuery.extend(true, {}, result);
+		};
+
+		this.setCurrentSmartBoxResult = function (result) {
+			_smartBoxResult.current = jQuery.extend(true, {}, result);
+		};
+
+		this.addSmartBoxDetailTiles = function (parentCategoryType, lCode, mCode, data) {
+			//console.log('addDetails', parentCategoryType, lCode, mCode, data);
+			if (parentCategoryType == "L") {
+				_smartBoxDetails.mTiles.push({ categoryType: parentCategoryType, lCode: lCode, mCode: mCode, data: data });
+			} else if (parentCategoryType == "M") {
+				_smartBoxDetails.sTiles.push({ categoryType: parentCategoryType, lCode: lCode, mCode: mCode, data: data })
+			}
+		};
+
+		this.getSmartBoxDetailTiles = function (parentCategoryType) {
+			if (parentCategoryType == "L") {
+				return _smartBoxDetails.mTiles;
+			} else if (parentCategoryType == "M") {
+				return _smartBoxDetails.sTiles;
+			}
+		};
+
+		this.setPPList = function (ppList) {
+			_ppData.list = jQuery.extend(true, [], ppList);
+		};
+
+		this.setSelectedPP = function (pp, ppIndex) {
+			_ppData.pp = pp;
+			_ppData.index = ppIndex;
+		};
+
+		this.getPPData = function () {
+			return _ppData;
+		};
+
+		this.setSearchJsonResult = function (result) {
+			_searchJsonResult = jQuery.extend(true, {}, result);
+		};
+
+		this.getSearchJsonResult = function () {
+			return _searchJsonResult;
+		};
+
+		this.setCurrentViewStyle = function (viewStyle) {
+			_currentViewStyle = viewStyle;
+		};
+
+		this.getCurrentViewStyle = function () {
+			return _currentViewStyle;
+		};
+
+		this.setCategoryData = function (returnData) {
+			_categoryData.LcId = returnData.LcId;
+			_categoryData.LcIdName = returnData.LcIdName;
+			_categoryData.McId = returnData.McId;
+			_categoryData.McIdName = returnData.McIdName;
+			_categoryData.ScId = returnData.ScId;
+			_categoryData.ScIdName = returnData.ScIdName;
+			_categoryData.Category = jQuery.extend(true, [], returnData.Category);
+		};
+
+		this.getCategoryData = function () {
+			return _categoryData;
+		};
+
+		this.saveState = function () {
+			var pageState = {};
+			_$wrapper.height("");
+			pageState.wrapperHeight = _$wrapper.height();
+			pageState.id = Date.now();
+			pageState.reqParams = jQuery.extend(true, [], reqParams);
+			pageState.reqParams.smartBoxGroupType = _smartBoxGroupType;
+			pageState.smartBoxResult = _smartBoxResult;
+			pageState.smartBoxDetails = _smartBoxDetails;
+			pageState.ppData = _ppData;
+			pageState.searchJsonResult = _searchJsonResult;
+			pageState.currentViewStyle = _currentViewStyle;
+			pageState.categoryData = _categoryData;
+
+			history.replaceState(pageState, null, location.href);
+
+			//console.log('save', pageState);
+		};
+	}
+
+	var ajaxHistory = new LpSrpAjaxHistory();
+</script>
+
+<script type="text/javascript">
+	var searchEx = {
+		isDepartmentStore: @(ViewBag.isDepartmentStore != null ? ViewBag.isDepartmentStore.ToString().ToLower() : "false")
+		, isSmartDeliveryShop: @(ViewBag.isSmartDeliveryShop != null ? ViewBag.isSmartDeliveryShop.ToString().ToLower() : "false")
+		, groupCode : '@ViewBag.departmentGroupCode'
+		, selectedCategoryGroupName: '@ViewBag.selectedCategoryGroupName'
+	}
+
+	// 최초 로딩시 req param 정보들.(리셋할때 필요함)
+	var defaultReqParams = { menuName:"@ViewBag.menuName", primeKeyword: '@ViewBag.primeKeyword', moreKeyword: '@ViewBag.moreKeyword', keywordSeqNo: 0,
+		lcId: '@ViewBag.lcId', mcId: '@ViewBag.mcId', scId: '@ViewBag.scId', sortType: '@ViewBag.SortType',
+		minPrice : @ViewBag.minPrice, maxPrice : @ViewBag.maxPrice, pageNo :@ViewBag.pageNo, pageSize:@ViewBag.pageSize,
+		brandList : '@ViewBag.brandList', sellCustNo : '@ViewBag.sellCustNo', 
+		isShippingFree : 'N', isMileage : 'N', isDiscount : 'N', isStamp : 'N', isSmartDelivery : 'N',
+		mClassSeq : '@ViewBag.mClassSeq', sClassSeq : '@ViewBag.sClassSeq', valueId : '@ViewBag.valueId', valueIdName : '@ViewBag.valueIdName'
+		, isBizOn : '@ViewBag.isBizOn', isRecommendKeyword : '@ViewBag.isRecommendKeyword', keywordList: '@ViewBag.keywordList', tiles: [], smartBoxGroupType:''
+		, isBrand : 'N', searchEx: searchEx
+	};
+
+	// 중간중간 검색 조건들을 변경할때, 변경 req param 정보를 유지하기 위함 값.
+//	var reqParams = { menuName:"@ViewBag.menuName", primeKeyword: '@ViewBag.primeKeyword', moreKeyword: '@ViewBag.moreKeyword', keywordSeqNo: 0,
+//		lcId: '@ViewBag.lcId', mcId: '@ViewBag.mcId', scId: '@ViewBag.scId', sortType: '@ViewBag.SortType',
+//		minPrice : @ViewBag.minPrice, maxPrice : @ViewBag.maxPrice, pageNo :@ViewBag.pageNo, pageSize:@ViewBag.pageSize,
+//		brandList : '@ViewBag.brandList', sellCustNo : '@ViewBag.sellCustNo', 
+//		isShippingFree : 'N', isMileage : 'N', isDiscount : 'N', isStamp : 'N', isSmartDelivery : 'N',
+//		mClassSeq : '@ViewBag.mClassSeq', sClassSeq : '@ViewBag.sClassSeq', valueId : '@ViewBag.valueId', valueIdName : '@ViewBag.valueIdName'
+//		, isBizOn : '@ViewBag.isBizOn', isRecommendKeyword : '@ViewBag.isRecommendKeyword', keywordList: '@ViewBag.keywordList', tiles: [], smartBoxGroupType:''
+//		, isBrand : 'N', searchEx: searchEx
+//	};
+
+	var reqParams = (ajaxHistory.getReqParams()) ? jQuery.extend(true, {}, ajaxHistory.getReqParams()): jQuery.extend(true, {}, defaultReqParams);
+
+	// req param 를 초기 정보로 리셋
+//	function initReqParams()
+//	{
+//		// clone
+//		reqParams = jQuery.extend(true, {}, defaultReqParams);
+//	}
+
+	var menuName = "@ViewBag.menuName";
+	// 응답 데이터를 갖고 있는 전역변수
+	var returnData = null;
+
+	// 현재 뷰 스타일 저장(Gallery,List,Image)
+	var currentViewStyle = ajaxHistory.getCurrentViewStyle();
+
+	var bPPUpdate = true;
+
+	var defaultImage = '@Urls.MobileImageUrlV2/640/img_none.jpg';
+
+	var adultDefaultImage = '@(Urls.MobileImageUrlV2 + Const.ADULT_IMAGE_210.Replace("images/", string.Empty))';
+
+	var bFirstLoading = true;
+	// 카테고리 필터링, 브랜드 필터링, 정렬 변경, 상세검색 필터링 이후 top으로 보내기
+	var bForceTopMove = false;
+
+	var loginUrl = "@(Urls.LoginUrl)" + "?URL=" + encodeURIComponent(location.href);
+	var isLogin = "@PageAttr.IsLogin".toLowerCase() == "true" ? true : false;
+	var isApp = "@PageAttr.IsApp".toLowerCase() == "true";
+	//첫페이지 첫 아이템 그룹코드 저장 (모든 상품이 일반상품일때 타이틀 노출 제거 관련)
+	var veryFirstItemGroup = 0;
+	//G9 상품 남은 시간 표시 타이머
+	var g9BoxTimer = null;
+	var mobileG9Url = '@(Urls.MobileG9Url)';
+
+	jQuery(document).ready(function () {
+        /* landing Banner */
+        var em = eModule
+            , apps = em.apps
+            , landing = apps.landing;
+
+        landing.init({
+            pageName: 'SRP',
+            landingType: '@Model.LandingBanner.Type',
+            imageUrl: '@Model.LandingBanner.ImageUrl',
+            description: '@Model.LandingBanner.Description',
+            campaign: '@Model.Campaign.Name',
+            medium: '@Model.Campaign.Medium',
+            mediumSource: '@Model.Campaign.MediumSource',
+	        mediumContent: '@Model.Campaign.MediumContent',
+            term: '@Model.Campaign.Keyword'
+        });
+
+        $("#lay_notice").on('click', '#goToApp', function (e) {
+            e.preventDefault();
+            landing.installApp();
+        }).on('click', '#landingClose', function (e) {
+            e.preventDefault();
+            landing.close();
+        });
+        /* landing Banner */
+
+		// 출력할 함수들을 등록한다.
+		registerHelpers();
+
+		// reqParam 으로 ajax 요청
+		if(reqParams.menuName === "SRP"){
+			$('#searchOptionDiv').remove();
+			if(!searchEx.isDepartmentStore){
+				displayRecommendKeyword();
+			}
+			displaySmartBoxAtPageLoad();
+		}
+		else if(reqParams.menuName === "LP"){
+			$("body").addClass("lp_body");
+			if(searchEx.isDepartmentStore){
+				$('#searchOptionDiv').remove();
+				$('h2.kind_tit.kind_tit2').remove();
+				displaySmartBoxAtPageLoad();
+			} else {
+				$('[data-layer-ctrl=true]').off('click');
+				openLayer();
+				bindAdLayerEvent('.sort_layer');
+			}
+		}
+		//console.log(reqParams);
+
+		var ppData = ajaxHistory.getPPData();
+		if(ppData.list != null && ppData.list.length > 0) {
+			var oriTotalGoodsCount = 0;
+			var sr = ajaxHistory.getSearchJsonResult();
+			if (sr && sr != null && sr.OriginalTotalGoodsCount) {
+				oriTotalGoodsCount = sr.OriginalTotalGoodsCount;
+			}
+			displayPPList({TotalGoodsCount: oriTotalGoodsCount, SPPLists: ppData.list});
+		}
+		if(ppData.index > -1) {	
+			selectPP(ppData.pp, ppData.index);
+		}
+
+		renderSelectSortOption(reqParams.sortType);
+		
+		var categoryData = ajaxHistory.getCategoryData();
+		if(categoryData) {
+			displayCategory(categoryData);
+		}
+
+		var searchResult = ajaxHistory.getSearchJsonResult();
+		if(searchResult) {
+			returnData = searchResult;
+			displaySearchResult();
+		} else {
+			searchJson(true);
+		}		
+
+		// 상단 헤더에 검색 키워드 출력
+		if (typeof gmHeader != "undefined" && gmHeader) {
+			gmHeader.setCurrentKeyword( reqParams.primeKeyword.replace(/&amp;/gi,"&"));
+		}
+
+		if(searchEx.isDepartmentStore){
+			$('#scroll_in2').hide();
+			$('div.sort_box').hide();
+			$('#SELL_POINT_INFO').remove();
+			$('#liInfo_lst_sell_point').remove();
+			$('#ulInfo_lst_plus_focus').remove();
+			$("body").addClass("department_body");
+			if (isApp) {
+				$("body").addClass("body_app");
+			}
+			//TODO by sue : ^^
+			displaySmartBoxHistory();
+		}
+	});
+
+	function displaySlideOrderInfo() {
+		var sType = reqParams.sortType;
+		if (sType != undefined) {
+			if (sType == '' || sType == 'ACCURACY_LQS' || sType == 'SELL_POINT_INFO' || sType == 'PREMIUM_RANK_LQS') {
+				$(".tab_slide .btn_info").show();
+                if(sType == 'PREMIUM_RANK_LQS' || sType == ''){
+                    $("#PREMIUM_RANK_LQS .ad_layer").removeClass("on");
+                }
+                else{
+                    $("#PREMIUM_RANK_LQS .ad_layer").removeClass("on");
+                }
+			} else {
+				$(".tab_slide .btn_info").hide();
+                $("#PREMIUM_RANK_LQS .ad_layer").removeClass("on");
+			}
+		}
+	}
+	function sendFcdCode(type, index) {
+		var fcdCode = "";
+
+		if (menuName == "LP") {
+			switch (type) {
+				case "PP":
+					if (index == -1){
+						fcdCode = "703900001";
+					} else if (index == 0) {
+						fcdCode = "703900002";
+					} else if (index == 1) {
+						fcdCode = "703900003";
+					} else if (index == 2) {
+						fcdCode = "703900004";
+					} else if (index == 3) {
+						if ($("#PPListBoxDiv").attr("class") == "tab_box selected") {
+							fcdCode = "703900005";
+						} else {
+							fcdCode = "";
+						}
+					} else {
+						fcdCode = "";
+					}
+					break;
+				case "FILTER":
+					if (index == 0) {
+						fcdCode = "706500001";
+					} else if (index == 1) {
+						fcdCode = "706500002";
+					} else if (index == 2) {
+						fcdCode = "706500003";
+					} else if (index == 3) {
+						fcdCode = "706500004";
+					} else if (index == 4) {
+						fcdCode = "706500005";
+					} else {
+						fcdCode = "";
+					}
+					break;
+				case "ITEM":
+					if (index == 0) {
+						fcdCode = "706600001";
+					} else if (index == 1) {
+						fcdCode = "706600002";
+					} else if (index == 2) {
+						fcdCode = "706600003";
+					} else {
+						fcdCode = "";
+					}
+					break;
+				default:
+					break;
+			}
+		}
+		else if (menuName == "SRP") {
+			switch (type) {
+				case "PP":
+					if (index == -1){
+						fcdCode = "706700001";
+					} else if (index == 0) {
+						fcdCode = "706700002";
+					} else if (index == 1) {
+						fcdCode = "706700003";
+					} else if (index == 2) {
+						fcdCode = "706700004";
+					} else if (index == 3) {
+						if ($("#PPListBoxDiv").attr("class") == "tab_box selected") {
+							fcdCode = "706700005";
+						} else {
+							fcdCode = "";
+						}
+					} else {
+						fcdCode = "";
+					}
+					break;
+				case "FILTER":
+					if (index == 0) {
+						fcdCode = "706800001";
+					} else if (index == 1) {
+						fcdCode = "706800002";
+					} else if (index == 2) {
+						fcdCode = "706800003";
+					} else if (index == 3) {
+						fcdCode = "706800004";
+					} else if (index == 4) {
+						fcdCode = "706800005";
+					} else {
+						fcdCode = "";
+					}
+					break;
+				case "ITEM":
+					if (index == 0) {
+						fcdCode = "706900001";
+					} else if (index == 1) {
+						fcdCode = "706900002";
+					} else if (index == 2) {
+						fcdCode = "706900003";
+					} else {
+						fcdCode = "";
+					}
+					break;
+				default:
+					break;
+			}
+		}
+
+
+		if (fcdCode != undefined && fcdCode != null && fcdCode != "") {
+			$.get("http://sna.gmarket.co.kr/?fcd=" + fcdCode);
+		}
+	}
+
+	function goBizOnHome() {
+		location.href = "@Urls.MobileWebUrl/BizOn";
+	}
+
+	function search(bShowLoading) {
+		reqParams.pageNo = 1;
+		searchJson(bShowLoading);
+	}
+
+	function searchJson( bShowLoading, bScrollToTop )
+	{
+		try {
+			if ( bShowLoading ) {
+				startLoading();
+				if(bScrollToTop) {
+					$(window).scrollTop($("#itemLoading").position().top);
+				}
+			}
+
+			$.ajax({
+	    	type: 'POST',
+	 			dataType: 'json',
+	 			url: "/Search/SearchJson",
+	 			data: JSON.stringify(reqParams),
+				contentType: "application/json",
+				xhrFields: {
+					withCredentials: true
+				},
+	 			success: function (result) {
+					// 전역변수로 저장해둔다.
+	 				returnData = result;
+	 				// ajaxHistory.setSearchJsonResult(result);
+	 				if ( typeof returnData === 'undefined' || null === returnData ) return;
+
+	 				// 위치 옮김
+	 				if (bFirstLoading) {
+	 					result.OriginalTotalGoodsCount = returnData.TotalGoodsCount;
+	 				} else {
+	 					var searchHistory = ajaxHistory.getSearchJsonResult();
+	 					if (searchHistory && searchHistory.OriginalTotalGoodsCount) {
+	 						result.OriginalTotalGoodsCount = searchHistory.OriginalTotalGoodsCount;
+	 					}
+	 				}
+	 				ajaxHistory.setSearchJsonResult(result);
+
+					// 키워드 redirection. 지정한 키워드redirection
+					if ( typeof returnData.SrpRedirectionUrl != 'undefined' && 
+						returnData.SrpRedirectionUrl != null && returnData.SrpRedirectionUrl != '' )
+					{
+						document.location.href = returnData.SrpRedirectionUrl;
+						return;
+					}
+
+					if ( bShowLoading )
+						endedLoading();
+
+					// 결과 출력
+					displaySearchResult();
+					
+					ajaxHistory.saveState();
+
+					bFirstLoading = false;
+					reqParams.isBizOn = false;
+
+					if(bScrollToTop) {
+						setTimeout(function () {
+							$(window).scrollTop($(".kind_artwrap").position().top - 80);							
+						}, 100);
+						
+					}
+    			},
+	    		error: function (result) {
+					ajaxHistory.saveState();
+
+					if ( bShowLoading )
+						endedLoading();
+	    		}
+    		});
+			
+		}
+		catch (ex) {
+			alert(ex.Message);
+		}
+	}
+
+	function displaySearchResult()
+	{
+		if ( currentViewStyle == '' )
+		{
+			// view style 을 지정하지 않았을때. 기본 style 로 세팅한다.
+			currentViewStyle = returnData.ResultItemViewStyle;
+		}
+
+		// 바로가기 링크 출력.
+		displayDirectLink();
+
+		displaySmartFinder();
+
+		if (bPPUpdate) {
+			displayPPList(returnData);
+		}
+
+		bPPUpdate = true;
+
+		if (reqParams.pageNo == 1 && returnData.IsDetailSearch != undefined && !returnData.IsDetailSearch && $.isArray(returnData.Item) && returnData.Item.length > 0) {
+			veryFirstItemGroup = returnData.Item[0].ListingItemGroup;
+		}
+
+		// LP 의 경우 카테고리 hierarchy 를 보여준다.
+		displayCategoryInfo();
+
+		// PP 로고를 출력한다.
+		displayPPLogo();
+
+        // 키워드 배너를 출력한다.
+        displayKeywordBanner();
+
+		// 스마트 배송, 브랜트 필터 영역을 출력한다.
+		displaySmartBoxAndBrnadFilter();
+
+		// 검색결과를 출력한다.
+		displayItemList();
+
+		// 결과내 카테고리를 출력한다.
+		if(reqParams.menuName === 'SRP'){
+			//displaySmartBoxCategory();
+			toggleSearchOption();
+		}
+		else if(reqParams.menuName === 'LP'){
+			displayCategory(returnData);
+			displayBrandList(returnData.BrandFinderList);
+			toggleSearchOption();
+			displayLpNavFinder();
+			$('#divSmartBox').show();
+			// 퍼블리싱 코드 일부 호출
+			setLPFinderNav();
+		}
+
+		// 퍼블리싱 코드
+		//finderScrollFixTop();
+
+		//G9Box 상품을 출력한다.
+		displayG9Box();
+
+		// 스마트 클릭 결과를 출력한다.
+		//displaySmartClickAds();
+		!searchEx.isDepartmentStore && displayPowerClickAds();
+
+		displaySearchOrderInfo();
+
+		displayViewStyle();
+
+		forceTopMove();
+		// Impression 로그 
+		sendImpressionLog(returnData.TrackingUrlList);
+
+
+        @if(!string.IsNullOrEmpty(ViewBag.SponsorLinkChannel)){ //Search.csthml 사용 페이지 중 스폰서 링크를 거는 영역에 대해서만 호출
+            <text>
+            displaySponsorLinks("@ViewBag.SponsorLinkChannel", 5, "@ViewBag.primeKeyword", "@ViewBag.moreKeyword", "@ViewBag.lcId", "@ViewBag.mcId", "@ViewBag.scId");
+            </text>
+        }
+        //스폰서링크 영역 출력        
+        
+        if (reqParams.pageNo == 1 && returnData.IsDetailSearch != undefined && !returnData.IsDetailSearch && $.isArray(returnData.Item) && returnData.Item.length > 0) {
+            displaySrpLpFooterDaAd("@ViewBag.primeKeyword", "@ViewBag.lcId", "@ViewBag.mcId", "@ViewBag.scId");
+        }
+	}
+
+    //광고포함 정렬 방식 하위 안내 레이어 default 노출설정
+    function displayAdDetailLayer(){
+        $("#ACCURACY_LQS .ad_layer").removeClass("on");
+    }
+
+	// PP 리스트 Iscroll 적용.
+	var myScroll;
+	function loaded() {
+		myScroll = new iScroll('wrapper5', { hScrollbar: false, vScrollbar: true, checkDOMChanges: true });
+		setTimeout(function () {
+			myScroll.refresh();
+		}, 100);
+	}
+	//document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 200); }, false);
+
+	var setLPFinderNav = function () {
+		var finderNav = $('.recom_wrap .nav_finder');
+		if ($('.recom_wrap .nav_finder').length > 0) {
+			var navTop = $(finderNav).offset().top;
+			$(window).scroll(function(){
+				var sTop = $(document).scrollTop();
+				if(sTop > navTop){
+					finderNav.addClass('fixed');
+				}else{finderNav.removeClass('fixed');}
+			});
+		}
+	}
+
+	var openLpLayer = function (obj) {
+		var $this = $(obj);
+
+		var layr_id = $this.attr('href') || $this.attr('id')
+		if (layr_id == "#brand") {
+			$this.off("click");
+			if ($('.slide_lst.brand li').length > 0) {
+				callSlide(layr_id);
+			}
+		}
+		//var cate_layr_id = $this.attr('href') || $this.attr('id');
+		//callSlide(cate_layr_id);
+
+		//$("#divSmartBoxTab a").removeClass("selected");
+		//$this.addClass("selected");
+	}
+	
+	var eventBidingTestFunc = function () {
+		$('.cate_tab .tab_slide, .result_area .tab_slide').siblings().bind('click', function(){
+			if(!$(this).parent().is('.last')){
+				$(this).siblings('.tab_slide').css({'right' : '-300px' , 'display' : 'block'}).animate( { 'right' : '0' }, 300);
+				$(this).parent('li').siblings().children('.tab_slide').hide();
+				$('.dimmed').show();
+				$('body').bind('touchmove', function(e){e.preventDefault()});
+				var isid = $(this).siblings('.tab_slide').find('.slide_area').attr('id');
+				var isid_chk = $(this);
+				if(!isid_chk.hasClass('is_chk')){
+					isid_chk.addClass('is_chk');
+					loaded(isid);
+				}
+			}
+			$('.tab_slide .btn_close, .tab_slide .btn_area .btn_srh').click(function(){
+				alert('d');
+				$(this).parent('.tab_slide').hide();
+				$('.dimmed').hide();
+				$('body').unbind('touchmove');
+				var btnSrh = $('.tab_slide .btn_area .btn_srh');
+				btnSrh.parents('.cate_tab .tab_slide').hide();
+			});
+			return false;
+		});
+	}
+</script>
+
+
+
+@{
+	string css = "ctns";
+
+	if (PageAttr.IsIphone)
+	{
+		css = "ctns ios";
+	}
+	else
+	{
+		css = "ctns";
+	}
+}
+
+
+@if(ViewBag.isDepartmentStore == null)
+{
+	@Html.Raw("<div id='content' class='" + css + "'>");
+}
+
+	<div class="mw_wrap case">
+			<h2 class="kind_tit" id="directLink" style="display:none">
+				<a href="#">
+					<span class="cate_txt" id="directLinkText"></span>
+					<span class="mall_txt" id="directLinkDesc"></span>
+					<span class="mall_go">바로가기<span class="sp_mw"></span></span>
+				</a>
+			</h2>
+			<div class="recom_wrap" id="divSmartBox" style="display:none">
+			<div class="recom_artbx" id="divRecommedKeyword" style="display:none">
+				<div class="recom_arttit">
+					<h2 class="recom_tit">추천</h2>
+					<div class="scroll_inner">
+						<ul class="recom_lst comma">
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="recom_top_cont card" id="srpBrandDirectWrap" style="display:none"></div>
+			<div id="tire_banner" class="bnr_tireshop" style="display:none">
+				<div class="card">
+					<a id="tire_banner_link" href="#" onclick="javascript:sendPDSLogFromEliment(this)" ><img id="tire_banner_image" alt=""></a>
+				</div>
+			</div>
+				<div class="swiper_section" id="divSmartBoxSwipe">
+					@if ("LP".Equals(ViewBag.menuName) && (ViewBag.isDepartmentStore == null || ViewBag.isDepartmentStore == false))
+	 {
+					<div class="nav_finder simple_h">
+						<div class="nav_swiper" id="divSmartBoxTab">
+							<a id="lp_cate_layer" href="#cate" class="selected side_call" onclick="javascript:sendPDSLogBasic('200000078', 'Utility');openLpLayer(this)">카테고리</a>
+							<a id="lp_brand_layer" href="#brand" class="side_call" onclick="javascript:sendPDSLogBasic('200000079', 'Utility');openLpLayer(this)">브랜드</a>
+						</div>
+						@Html.Partial( "~/Views/Search/_SortArea.cshtml", Model, new ViewDataDictionary { 
+							{ "isDepartmentStore", ViewBag.isDepartmentStore },
+							{ "menuName", ViewBag.menuName },
+							{ "keyword", String.IsNullOrEmpty(ViewBag.primeKeyword) ? String.Empty : ViewBag.primeKeyword }, 
+							{ "categoryCode", String.IsNullOrEmpty(ViewBag.scId) ? (String.IsNullOrEmpty(ViewBag.mcId) ? String.Empty : ViewBag.mcId) :  ViewBag.scId}							
+						})								
+					</div>
+	 }
+				</div>
+				<div id="cate_wrap" class="cate_tab">
+					<div id="cate_path">
+                        <div id="cate" class="tab_slide" style="display:none">
+							<h3 class="brand_tit">카테고리</h3>
+                            <div class="slide_area2 cate_box" id="cate_slide">
+                                <div class="scroll_box" id="categoryDiv">
+									<ul class="cate_lst">
+									</ul>
+                                </div>
+                            </div>
+							<button type="button" class="btn_close" onclick="javascript:sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000068" : "200000131")', 'Utility');searchCategoryMore();">
+								<span class="sp_lpsrp">닫기</span>
+							</button>
+                        </div>
+                    </div>
+					<div id="brand_path" class="brand_wrap">
+						<div id="brand" class="tab_slide" style="display:none">
+							<h3 class="brand_tit">브랜드</h3>
+							<div class="indicator @Html.Raw(PageAttr.IsIphone ? "type2" : "")">
+							</div>
+							<div class="slide_area2 brand_box" id="brand_slide">
+								<div class="scroll_box" id="brandListDiv">
+									<ul class="slide_lst brand">
+									</ul>
+								</div>
+							</div>
+							<button type="button" class="btn_close" onclick="javascript:sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000065" : "200000128")', 'Utility');searchBrandMore();">
+								<span class="sp_lpsrp">닫기</span>
+							</button>
+						</div>
+					</div>
+					<div id="detail_path" class="detail_wrap">
+						<div id="detail" class="tab_slide" style="display: block; right: -300px;">
+							<h3>상세검색</h3>
+							<div class="slide_area search_box" id="wrapper4" style="overflow: hidden;">
+								<div class="scroll_box">
+									<form action="">
+										<fieldset>
+										<legend>결과 내 검색 영역</legend>
+											<label for="srh">결과 내 검색</label>
+											<span class="inp">
+												<input type="text" id="lp_moreKeyword" value="" placeholder="검색어를 입력해 주세요." class="placeholder">
+											</span>
+										</fieldset>
+										<fieldset>
+										<legend>가격대 검색 영역</legend>
+											<label for="srh2">가격대 검색</label>
+											<div class="compare">
+												<span class="inp"><input type="number" id="minPrice" title="최소 가격입력"></span>
+												<span class="arr">~</span>
+												<span class="inp"><input type="number" id="maxPrice" title="최대 가격입력"></span>
+											</div>
+										</fieldset>
+									</form>
+									<h4>배송 검색</h4>
+									<ul class="search_lst delivery_lst">
+										<li>
+											<label for="lp_free_delivery" class="tit">무료배송</label><input type="radio" name="del_type" id="lp_free_delivery" class="inp_rdo">
+										</li>
+										<li>
+											<label for="lp_smart_delivery" class="tit">스마트배송</label><input type="radio" name="del_type" id="lp_smart_delivery" class="inp_rdo">
+										</li>
+										<li>
+											<label for="delivery_none" class="tit">선택안함</label><input type="radio" name="del_type" id="delivery_none" class="inp_rdo" checked>
+										</li>
+									</ul>
+									<h4>혜택별 검색</h4>
+									<ul class="search_lst benefit_lst">
+									<li>
+										<input type="checkbox" id="mileage" class="inp_chk"><label for="mileage" class="tit">Smile Point</label>
+									</li>
+									<li>
+										<input type="checkbox" id="discount" class="inp_chk"><label for="discount" class="tit">상품할인</label>
+									</li>
+									<li>
+										<input type="checkbox" id="onlybrand" class="inp_chk"><label for="onlybrand" class="tit">브랜드 상품만 보기</label>
+									</li>
+									</ul>
+								</div>
+							</div>
+							<div class="btn_area">
+								<button type="reset" class="btn_reset" onclick="javascript:sendPDSLogBasic('200000134', 'Utility');resetDetailSearchOption();">초기화</button><button type="button" class="btn_srh" onclick="detailSearch(true);">적용</button>
+							</div>
+							<button type="button" id="closeBtnDetailLayer" class="btn_close" onclick="javascript:sendPDSLogBasic('200000133', 'Utility');"><span class="sp_lpsrp">닫기</span></button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="linebn_bizon card" style="display:none">
+				<a href="javascript:;" onclick="javascript:goBizOnHome();">
+					<span class="sp_lpsrp">BIZ ON</span>사업자 회원의 합리적인 선택
+				</a>
+			</div>
+
+			<h2 class="blind">쇼핑몰 선택</h2>
+
+			<!-- // mall 없을 경우 -->
+			<div class="tab_box" id="PPListBoxDiv" style="display:none">
+			</div>
+
+            <div class="pp_bnr" style="display:none">
+				<span class="logo"></span>
+        	    
+       		    <span class="rslt">
+					G마켓 내 
+					<img src="" id="pp_img" alt="" />
+					상품 검색 결과입니다.
+       		    </span>
+     	    </div>
+					
+			<div class="mw_contbx">
+                <!--
+				<div class="pp_bnr" style="display:none">
+					<span class="logo" id="pp_img">
+						<img src="" alt="">
+					</span>
+					<span class="rslt">G마켓 내 <em id="pp_name"></em> 상품 검색 결과입니다.</span>
+				</div>
+                -->
+				<div class="pp_bnr ad" id="promotionBanner">
+					<a href="#" class="logo">
+						<img src="" alt="">
+					</a>
+				</div>
+				<div class="dimmed" style="display: none; opacity: 1;"></div>
+
+				<div id="smart_finder_option" class="srp_result_txt card" style="display:none">
+					<em id="s_finder_colored_title"></em> <span id="s_finder_normal_title"></span>
+					<a href="#ly_tire" id="s_finder_layer" class="side_call">
+						<span class="link"><em id="s_finder_colored_desc"></em><span id="s_finder_size"></span></span>
+					</a>
+					<div class="result_area">
+						<div id="ly_tire" class="tab_slide" style="display: none;">
+							<h3 id="s_finder_option_name"></h3>
+							<div class="slide_area search_box" id="wrapper6">
+								<div class="scroll_box">
+									<ul class="search_lst tire_srp" id="s_finder_option_value_wrapper">
+									</ul>
+								</div>
+							</div>
+							<div class="btn_area">
+								<button type="reset" class="btn_reset" onclick="javascript:sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000075" : "200000137")', 'Utility');deselectSmartFinder();">초기화</button><button type="button" class="btn_srh" onclick="smartFinderSearch();">적용</button>
+							</div>
+							<button type="button" class="btn_close" onclick="javascript:sendPDSLogBasic('@("SRP".Equals(ViewBag.menuName) ? "200000074" : "200000136")', 'Utility');"><span class="sp_lpsrp">닫기</span></button>
+						</div>
+					</div>
+				</div>
+				
+                <div class="bnr_area" style="display:none">
+                    <a href="">
+ 					    <img src="" alt="" />
+                    </a>
+				</div>
+
+				<div class="mw_contbx" style="display:none" id="itemEmptyDiv">
+					<div class="mw_none type3 card">
+						<h4><strong class="sc_key">@TextUtil.CutString(String.IsNullOrEmpty(ViewBag.primeKeyword) ? "" : ViewBag.primeKeyword, 10, true)</strong> (으)로 검색된 상품이 없습니다.</h4>
+						<p class="det_info">입력하신 검색어를 다시 한번 확인해 주세요.</p>
+					</div>					
+				</div>
+
+				<div class="dept_srp_none" style="display:none" id="divDeptNoResult">
+					<div class="txt">"<strong>@ViewBag.primeKeyword</strong>"에 대한 검색결과가 없습니다.<p>상품명 단어가 정확한지<br/>한번 더 확인해 보세요.</p></div>
+				</div>
+
+				<div style="display:none" id="itemLoading" class="mw_none type3 card">
+					<h4>로딩중입니다.<br>잠시만 기다려 주십시오.</h4>
+				</div>					
+
+				<!-- 아이템 결과 리스트 -->
+				<div class="kind_artwrap">
+					
+				</div>
+				<!--// 아이템 결과 리스트 -->
+				
+				<!-- g9 배너 추가 -->
+				<div id="g9Box">				
+				</div>
+				<!--// g9 배너 추가 -->
+
+				<!-- 파워클릭 리스트 -->
+				<div class="best_tit" id="cpcBlockList">
+				</div>
+
+                <!-- 스폰서링크 영역 -->
+                <div class="sponsor_box" id="srpSponsorLinkList" style="display:none">
+                
+                </div>
+                <!-- Footer DA광고 -->
+                @if (ViewBag.isDepartmentStore == null)
+                {
+                <div class="banner_lpsrp_bot card" id="footerDaAd" style="display:none">
+			    </div>
+                }
+				
+			</div>
+		</div>
+		@if(!PageAttr.IsApp)
+		{
+		<a href="javascript:;" class="btn_top_bar">Top으로 이동</a>
+		}
+	@if(ViewBag.isDepartmentStore == null)
+	{
+	Html.Raw("</div>");
+	}
+
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/iscroll.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/lpsrp.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/swiper.min.js?v=1"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/jquery.lazyload.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/module/ebayModule/ebayModule-v0.0.5.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=20160728"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/page/LPSRPBiz.js?v=5"></script>
+<!--<script type="text/javascript" src="http://scriptmlocal.gmarket.co.kr/js/mobile/main/page/LPSRPBiz.js?v=5"></script>-->
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/ats_gmkt.js"></script>

@@ -1,0 +1,162 @@
+﻿@using GMKT.GMobile.Util;
+@using GMKT.GMobile.Constant;
+@using GMKT.GMobile.Web.Models;
+@model TodayModel
+@{
+    //ViewData["Title"] = "오늘만 특가";
+		bool isGoodSeries = false;
+
+		if ( Model.GoodSeries.Count > 0 )
+		{
+			isGoodSeries = true;
+		}
+}
+
+	<script type="text/javascript">
+
+		window.onload = function () {
+			setTimeout(function () {
+				displayLayer("progress_icon", "none");
+			}, 100);
+
+			Timer();
+		}
+
+		function Timer() {
+			var today = new Date();
+			var TYear = today.getFullYear().toString();
+			var TDay = today.getDate().toString();
+
+			//	var d_day = new Date("July " + (eval(TDay) + 1) + " " + TYear + " 00:00:00");
+			var d_day = new Date("July " + (eval(TDay)) + " " + TYear + " 00:00:00");
+			d_day.setDate(d_day.getDate() + 1);
+
+			var days = (d_day - today) / 1000 / 60 / 60 / 24;
+			var daysRound = Math.floor(days);
+			var hours = (d_day - today) / 1000 / 60 / 60 - (24 * daysRound);
+			var hoursRound = Math.floor(hours);
+			var minutes = (d_day - today) / 1000 / 60 - (24 * 60 * daysRound) - (60 * hoursRound);
+			var minutesRound = Math.floor(minutes);
+
+			var seconds = (d_day - today) / 1000 - (24 * 60 * 60 * daysRound) - (60 * 60 * hoursRound) - (60 * minutesRound);
+			var secondsRound = Math.round(seconds);
+
+			secondsRound = "0" + secondsRound.toString();
+			minutesRound = "0" + minutesRound.toString();
+			hoursRound = "0" + hoursRound.toString();
+
+			var secondsRoundLength = secondsRound.length;
+			var minutesRoundLength = minutesRound.length;
+			var hoursRoundLength = hoursRound.length;
+
+			var rightH = hoursRound.substring(hoursRoundLength - 2, hoursRoundLength);
+			var rightM = minutesRound.substring(minutesRoundLength - 2, minutesRoundLength);
+			var rightS = secondsRound.substring(secondsRoundLength - 2, secondsRoundLength);
+
+			var timelimit = rightH + ":" + rightM + ":" + rightS;
+
+			$("#time_h1").html(rightH.substring(0,1));
+			$("#time_h2").html(rightH.substring(1,2));
+			if (rightM == "60") rightM = "00";
+			$("#time_m1").html(rightM.substring(0,1));
+			$("#time_m2").html(rightM.substring(1,2));
+			if (rightS == "60") rightS = "00";
+			$("#time_s1").html(rightS.substring(0,1));
+			$("#time_s2").html(rightS.substring(1,2));
+
+			var newtime = window.setTimeout("Timer();", 1000);
+		} 
+	</script>
+	<hr />
+
+	<!-- CONTENT -->
+	<div id="content" class="ctns">
+		
+		<div class="today_wrap">
+
+			<!-- TAB -->
+			<div class="tab_today">
+@if( isGoodSeries )
+{
+				<ul>
+					<li class="on" id="tab_today0">
+						<a href="#" onclick="tabView(2, 'tab_today', 0, 'ctns_today');return false;">오늘만특가</a>
+					</li>
+					<li class="off" id="tab_today1">
+						<a href="#" onclick="tabView(2, 'tab_today', 1, 'ctns_today');return false;">오늘의슈퍼딜</a>
+					</li>
+				</ul>
+}
+else
+{
+				<p>오늘만특가</p>
+}
+			</div>
+
+			<!-- 오늘만 특가 -->
+			<div class="today" id="ctns_today0">
+				<h3 class="tit">
+					<img src="@Urls.MobileImageUrlV2/640/img_today_tit.png" alt="오늘만특가 TODAY SALE 매일매일 신나는 쇼핑찬스" />
+				</h3>
+				<div class="time">
+					<p>
+						<span class="day">@DateTime.Now.ToString(string.Format("M월 dd일 ddd요일"))</span>
+						<span class="num" id="time_h1"></span>
+						<span class="num" id="time_h2"></span>
+						<span class="colon">:</span>
+						<span class="num" id="time_m1"></span>
+						<span class="num" id="time_m2"></span>
+						<span class="colon">:</span>
+						<span class="num" id="time_s1"></span>
+						<span class="num" id="time_s2"></span>
+					</p>
+				</div>
+				<div class="prod">
+					<ul>
+@foreach(var special in Model.TodaySpecial )
+{
+						<li><a href="@Urls.MItemWebURL/Item?goodscode=@special.GdNo">
+							<img src="@special.SpecialTitle" alt="@special.GdNm" />
+							<!--img src="../../Images/640/img_277x317_1.gif" alt="@special.GdNm" /-->
+						</a></li>
+}
+					</ul>
+				</div>
+			</div>
+			<!-- //오늘만 특가 -->
+			<!-- 굿시리즈 -->
+			<div class="today" id="ctns_today1">
+				<h3 class="tit2">
+					<img src="@Urls.MobileImageUrlV2/640/img_gseries_tit.png" alt="GOOD 시리즈 1등 오픈마켓의 득템제안" />
+				</h3>
+				<div class="time2">
+					<p><span class="tm"><span>@DateTime.Now.ToString(string.Format("M월 dd일 (ddd)")) 오전 10:00</span></span></p>
+				</div>
+				<div class="prod">
+					<ul>
+@foreach(var good in Model.GoodSeries )
+{
+						<li><a href="@Urls.MItemWebURL/Item?goodscode=@good.MobileGdNo">
+							<img src="@good.ImageUrl1" alt="@good.Title" />
+						</a></li>
+}
+					</ul>
+				</div>
+			</div>
+			<!-- //굿시리즈 -->
+
+		</div>
+
+	</div>
+	<!-- //CONTENT -->
+
+@*
+2013-05-09 이윤호
+링크 만을 이용해 굿시리즈 탭으로 이동할 수 있도록 수정
+*@
+<script type="text/javascript">
+@if (Model.CurrentTabNo == 1)
+{
+@:tabView(2, 'tab_today', 1, 'ctns_today');
+}
+</script>

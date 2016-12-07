@@ -1,0 +1,201 @@
+﻿@using GMKT.GMobile.Data.SellerShop
+@{
+	string bookmarkImagePath = "";
+	if (ViewBag.Shop != null && ViewBag.Shop.DisplayInfo != null && ViewBag.Shop.DisplayInfo.BookmarkUseType == 2 && false == string.IsNullOrEmpty(ViewBag.Shop.DisplayInfo.BookmarkImagePath))
+	{
+		bookmarkImagePath = ViewBag.Shop.DisplayInfo.BookmarkImagePath;
+	}
+
+    long selectedMenuNo = 0;
+    char menuExposeYN = 'N';
+    char noticeExposeYN = 'N';
+    List<MenuT> menuList = null;
+    char shopLevel = Char.ToUpper(ViewBag.Shop.DisplayInfo.ShopLevel);
+    bool isMain = ViewBag.PageType != null && ViewBag.PageType == PageType.Main;
+    string menuFloatClass = "";
+    
+    if (isMain)
+    {
+        menuList = Model.MainDisplayInfo.MenuList;
+        menuExposeYN = Model.MainDisplayInfo.MenuExposeYN;
+        noticeExposeYN = Model.MainDisplayInfo.NoticeExposeYN;
+    }
+    else if (ViewBag.PageType != null && ViewBag.PageType == PageType.Menu)
+    {
+        menuList = Model;
+        menuExposeYN = 'Y';
+        selectedMenuNo = ViewBag.selectedMenuNo;
+
+        menuFloatClass = "menu-page";
+    }
+}
+    <!-- 샵 상단 -->
+	<div class="shop--header">
+		<!-- 검색 -->
+		<div class="shop--header_search"><!-- Android App(샵바로가기 기능) : <div class="shop--header_search has-shortuct"> -->
+			<button type="button" class="button button--category">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<form name="shopSearchForm" id="shopSearchForm" action="@Url.Action("Search", "SellerShop")" method="get" accept-charset="utf-8">
+				<div class="search-input">
+					<span class="ui_search-input">
+						<input type="text" class="ui_inputbox ui_inputbox--full" title="미니샵 상품 검색" value="" id="shopKeyword" name="keyword" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off">
+						<button type="button" class="ui_inputbox-icon-button ui_search-input__clear">
+							<span class="icon_search_reset">검색어 삭제</span>
+						</button>
+						<button type="submit" class="button button--search-submit"><span class="icon_search_submit">검색</span></button>
+					</span>
+                    
+                    @if (ViewBag.MenuName == "SRP")
+                    {
+					<div class="search-keyword">
+						<div class="keyword-block">
+							<ul class="keyword-list" id="ulSearchTextBox"></ul>
+						</div>
+
+						<button type="button" class="button-search-submit"><span class="icon_search_submit">검색어 다시입력</span></button>
+					</div>
+                    }
+                    
+				</div>
+			</form>
+			<!-- Android App(샵바로가기 기능) -->
+			<!--
+			<button type="button" class="button button--shortcut"><span class="icon_shortcut">바로가기 생성</span></button>
+			-->
+			<!-- //Android App(샵바로가기 기능) -->
+		</div>
+		<!-- //검색 -->
+
+		<!-- 카테고리 레이어 -->
+		<div class="shop--header_category">
+			<div class="shop-category">
+				<div class="category_header" id="hcatewrap"></div>
+				<ul class="category_list" id="catewrap"></ul>
+			</div>
+		</div>
+		<!-- //카테고리 레이어 -->
+        
+		@Html.Partial("_SellerShopHeaderShopIntroPartial")
+            
+        @if (shopLevel == 'P' && menuExposeYN == 'Y' && menuList != null && menuList.Count > 0)
+        {
+            <!-- 메뉴 -->
+		    <div class="shop--menu @menuFloatClass">
+			    <div class="shop--menu-horizontal" id="ShopHorizontalMenu">
+				    <ul>
+                    @selectedMenuNo
+                        @foreach (MenuT menu in menuList)
+                        {
+                            string strMenuHref = "";
+                            string activeClass = (menu.MenuNo == selectedMenuNo) ? "class='active'" : "";
+
+                            if (menu.MenuUseType == 4 || menu.MenuUseType == 6)
+                            {
+                                strMenuHref = menu.MenuLnkUrl;
+                            }
+                            else if (menu.MenuUseType == 1)
+                            {
+                                strMenuHref = Urls.MobileWebUrl + "/SellerShop/" + ViewBag.Alias;
+                            }
+                            else
+                            {
+                                strMenuHref = Url.Action("Menu", "SellerShop", new { menuNo = menu.MenuNo });
+                            }
+                            
+                            <li @Html.Raw(activeClass)><a href="@Html.Raw(strMenuHref)">@menu.MenuNm</a></li>	
+                        }
+				    </ul>
+			    </div>
+		    </div>
+		    <!-- //메뉴 -->
+        }
+
+        @if (isMain && shopLevel == 'P' && noticeExposeYN == 'Y' && Model.MainDisplayInfo.FirstNotice != null)
+        {
+            var firstNoticeUrl = string.Empty;
+            if (Model.MainDisplayInfo.MenuList != null && Model.MainDisplayInfo.MenuList.Count > 0)
+            {
+                foreach (GMKT.GMobile.Data.SellerShop.MenuT menu in Model.MainDisplayInfo.MenuList)
+                {
+                    if (menu.MenuUseType == 3) //공지사항
+                    {
+                        firstNoticeUrl = Url.Action("Menu", "SellerShop", new { menuNo = menu.MenuNo, directNoticeSeq = Model.MainDisplayInfo.FirstNotice.No });
+                    }
+                }
+            }
+
+            string postDate = Model.MainDisplayInfo.FirstNotice.PostDate.ToString(string.Format("yyyy.MM.dd"));
+		    <!-- 공지사항 -->
+		    <div class="shop--notice">
+			    <a href="@firstNoticeUrl">
+				    <span class="shop--notice__title">@Model.MainDisplayInfo.FirstNotice.Title</span>
+				    <span class="shop--notice__date">@postDate</span>
+			    </a>
+		    </div>
+		    <!-- //공지사항 -->
+        }
+        
+	</div>
+	<!-- //샵 상단 -->
+
+<script id="navi-category-header-template" type="text/x-handlebars-template">
+<span class="txt-name">{{CurrentNm}}</span>
+{{#if IsDisplayCount}}<em class="txt-count">({{TotalCount}})</em>{{/if}}
+<button type="button" class="button button--close"><span class="icon_category_close">닫기</span></button>
+</script>
+
+<script id="navi-category-template" type="text/x-handlebars-template">
+{{#each Children}}
+    <li>
+        <a href="javascript:void(0);" onclick="goToLP('{{../Alias}}', '{{CategoryId}}');">
+            <span class="txt-name">{{CategoryNm}}</span>
+            {{#if ../IsDisplayCount}} <em class="txt-count">({{CategoryCount}})</em>{{/if}}
+        </a>
+    </li>
+{{/each}}
+</script>
+
+<script id="navi-search-box-template" type="text/x-handlebars-template">
+{{#each this}}
+<li class="keyword-item">
+	<span class="button-group">
+		<button type="button" class="button-keyword">{{this}}</button>
+		<button type="button" class="button-keyword-delete">삭제</button>
+	</span>
+</li>
+{{/each}}
+<li class="keyword-item keyword-item--blank" style="width: 60px;"><button type="button" class="button-keyword-search" id="searchKeywordre">검색어 다시입력</button></li>
+</script>
+
+<script type="text/javascript">
+	var Const = {};
+	Const.ALIAS = "@ViewBag.Alias";
+	Const.MY_SHOP_URL = "@Url.Action("GetMyShoppingInfo", "SellerShop", new { alias = ViewBag.Alias })";
+	Const.ADD_SHOP_INTEREST = "@Url.Action("AddFavoriteShop", "SellerShop", new { alias = ViewBag.Alias })";
+	Const.DEL_SHOP_INTEREST = "@Url.Action("DelFavoriteShop", "SellerShop", new { alias = ViewBag.Alias })";
+	Const.SHOP_NAME = "@ViewBag.Shop.Title";
+	Const.LOGIN_URL = "@Urls.LoginUrl";
+	Const.SHOP_LEVEL = "@shopLevel";
+	Const.BOOKMARK_IMAGE_PATH = "@bookmarkImagePath";
+	Const.LPSRP_URL = '@Url.Action("List", "SellerShop")';
+	Const.IS_APP = "@PageAttr.IsApp" == "True";
+	Const.SHORTCUT_URL = "@Url.Action("Index", "SellerShop", new { alias = ViewBag.Alias }, Request.Url.Scheme)";
+</script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/shop/SellerShopController_v2.js?dummy=201600714"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/iscroll.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/grapnel.min.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/mobile/js/shop_v2.js"></script>
+<script type="text/javascript" src="@Urls.ScriptUrl/js/mobile/main/common/RecentItemsLayer.js?v=1"></script>
+<script type="text/javascript">
+    var sellershopController = new SellerShopController();
+
+    var navCtrl = new Navigation(Const.ALIAS, @((int)ViewBag.RootLevel));
+    $(document).ready(function() {
+	    registerNavigationHelpers();
+	    navCtrl.fetch();
+	    var historyCtrl = new SellerShopHistoryController(Const.ALIAS);	
+    });
+</script>

@@ -1,0 +1,85 @@
+﻿@using GMKT.GMobile.Data.SellerShop
+<div id="content" class="mshopCtns">
+    @Html.Partial("_SellerShopHeaderPartial")
+
+    <!-- 샵 바디 -->
+	<div class="shop--body">
+	    <!-- 공지사항 -->
+	    <div class="notice-list-view" id="noticeList_wrapper" style="display:none;"></div>
+	    <!-- //공지사항 -->
+
+	    <!-- 공지사항 상세 -->
+	    <div class="notice-view" id="noticeDetail_wrapper" style="display:none;"></div>
+	    <!-- //공지사항  상세-->
+
+	    <!-- 기획전이벤트-->
+	    <div class="shop-event" id="event_wrapper" style="display:none;">
+		    <!-- Html-->
+		    <div class="upload_html" id="eventHtml_wrapper" style="display:none;"></div>
+		    <!-- //Html-->
+
+		    <!-- 이미지-->
+		    <div class="upload_img" id="eventImageDiv" style="display:none;"><img src=""></div>
+		    <!-- //이미지-->
+	    </div>
+	    <!-- //기획전이벤트-->
+
+	    <!-- 상품전시영역 -->
+	    <div id="item_wrapper" class="shop--display" style="display:none;"></div>
+	    <!-- //상품전시영역 -->
+	</div>
+    
+@if (!PageAttr.IsApp)
+{
+    <div class="shop--overlay"></div>
+	<a href="#" class="btn_top_bar">Top으로 이동</a>
+	<div id="rviLayer" style="display:none;" class="recent_wrap"></div>
+}
+</div>
+<script type="text/javascript">
+
+	Const.MENU_CONTENT_URL = "@Url.Action("GetMenuContent", "SellerShop")";
+	Const.NOTICE_LIST_URL = "@Url.Action("GetMenuSellerNoticeList", "SellerShop")";
+	Const.NOTICE_DETAIL_URL = "@Url.Action("GetMenuSellerNoticeDetail", "SellerShop")";
+	Const.NOTICE_PAGENO = 1;
+	Const.NOTICE_PAGESIZE = 10;
+	Const.MENU_ITEMPARTIAL_URL = "@Urls.MobileWebUrl" + "/SellerShop/"+ "@ViewBag.Alias";
+
+	var menuPageController = new MenuPageController("@ViewBag.selectedMenuNo", "@ViewBag.selectedMenuUseType" ,"@ViewBag.Shop.SellerId", "@ViewBag.Shop.DisplayInfo.ShopDispNo", "@ViewBag.directNoticeSeq");
+</script>
+
+<script type="text/x-handlebars-template" id="noticeList_template">
+<div class="notice-title">
+	<h2 class="notice-title__name">공지사항</h2>
+</div>
+<ul class="notice-list">
+	{{#ifNoNotice List}}
+		<li class="notice-list__item nodata">등록된 공지사항이 없습니다.</li>
+	{{else}}
+
+	{{#each List}}
+		<li class="notice-list__item">
+			<a href="{{getNoticeDetailHref No}}">
+				<span class="notice-list__title">{{Title}}</span>
+				<span class="notice-list__date">{{PostDate}}</span>
+			</a>
+		</li>
+	{{/each}}
+	{{/ifNoNotice}}
+</ul>
+
+{{printPaging this.List this.TotalCount this.PageSize this.PageNo "menuPageController"}}
+</script>
+
+<script type="text/x-handlebars-template" id="noticeDetail_template">
+<div class="notice-view__title">
+	<h3 class="notice-view__subject">{{Title}}</h3>
+	<span class="notice-view__date">{{PostDate}}</span>
+</div>
+<div class="notice-view__desc">
+	{{{Content}}}
+</div>
+<div class="notice-list-back">
+	<a href="{{getNoticeListHref}}">목록으로</a>
+</div>
+</script>

@@ -1,0 +1,30 @@
+﻿<!-- CONTENTS -->
+<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/etc.css" />
+<div id="contents" class="cts">
+	<div class="login auth">
+		<div class="notice_adult">
+			<div class="adult">
+				<img src="@Urls.MobileImageUrl/480/adult_img_118.png" alt="19" />
+				<p class="txt">
+					본 상품은 청소년 유해매체물로서 19세 미만의 청소년이 이용할 수 없습니다. 이용을 원하시면 (청소년보호법에 따라) 나이 및 본인 여부를 확인해 주시기 바랍니다. 
+				</p>
+			</div>
+		</div>
+		<div class="conf_wrap">
+			<ul>
+				<li>
+					<img src="@Urls.MobileImageUrl/480/img_hp.gif" alt="휴대폰 인증" />
+					<a href="/SelfAuth/SelfAuthForAdult?mType=M&cType=@ViewBag.Ctype&fType=MAD&rtnurl=@HttpUtility.UrlEncode( ViewBag.rtnurl )" class="btn_blue"><span>확인하기</span></a> 
+				</li>
+				<li>
+					<img src="@Urls.MobileImageUrl/480/img_ipin.gif" alt="아이핀 인증" />
+					<a href="/IPinAuth/IPinAuthForAdult?mType=I&cType=@ViewBag.Ctype&fType=MAD&rtnurl=@HttpUtility.UrlEncode( ViewBag.rtnurl )" class="btn_blue"><span>확인하기</span></a> </li>
+			</ul>
+		</div>
+		<div class="at_txt">
+			<ul class="adult_desc">
+				<li>인증에 문제가 있을 경우, NICE평가정보㈜ 고객센터(1600-1522/callcenter@nice.co.kr)로 문의 바랍니다.</li>
+			</ul>
+		</div>
+	</div>
+</div>
