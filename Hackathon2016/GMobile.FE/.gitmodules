@@ -1,6 +1,0 @@
-[submodule "GMKT.Common"]
-	path = GMKT.Common
-	url = git@github.ebaykorea.com:org-ebaykorea/GMKT.Common.git
-[submodule "GMobile.Common"]
-	path = GMobile.Common
-	url = git@github.ebaykorea.com:org-ebaykorea/GMobile.Common.git
