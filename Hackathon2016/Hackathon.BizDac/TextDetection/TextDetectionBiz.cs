@@ -48,16 +48,10 @@ namespace Hackathon.BizDac
             VisionService vision, string imagePath)
         {
             Console.WriteLine("Detecting Text...");
-
 			MemoryStream stream = new MemoryStream();
-			Bitmap bitmap;
-			bitmap = new ImageFilteringWorkflow().DoWorkFlow(imagePath);
-			bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-			byte[] imageArray = stream.GetBuffer();
 			
 			// Convert image to Base64 encoded for JSON ASCII text based request   
-			//byte[] imageArray = System.IO.File.ReadAllBytes(imagePath);
+			byte[] imageArray = System.IO.File.ReadAllBytes(imagePath);
             string imageContent = Convert.ToBase64String(imageArray);
             // Post text detection request to the Vision API
             var responses = vision.Images.Annotate(
@@ -73,6 +67,34 @@ namespace Hackathon.BizDac
                 }).Execute();
             return responses.Responses;
         }
-		
-    }
+
+		public IList<AnnotateImageResponse> DetectTextByImgProcessing(
+		  VisionService vision, string imagePath)
+		{
+			Console.WriteLine("Detecting Text...");
+			
+			//이미지 전처리
+			MemoryStream stream = new MemoryStream();
+			Bitmap bitmap;
+			bitmap = new ImageFilteringWorkflow().DoWorkFlow(imagePath);
+			bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+			byte[] imageArray = stream.GetBuffer();
+
+			// Convert image to Base64 encoded for JSON ASCII text based request   
+			string imageContent = Convert.ToBase64String(imageArray);
+			// Post text detection request to the Vision API
+			var responses = vision.Images.Annotate(
+				new BatchAnnotateImagesRequest()
+				{
+					Requests = new[] {
+					new AnnotateImageRequest() {
+						Features = new [] { new Feature() { Type =
+						  "TEXT_DETECTION"}},
+						Image = new Google.Apis.Vision.v1.Data.Image() { Content = imageContent }
+					}
+			   }
+				}).Execute();
+			return responses.Responses;
+		}
+	}
 }

@@ -58,6 +58,9 @@ namespace Hackathon2016.Controllers
 
 				CardNumberList.Add(resizeImage2);
 			}
+
+			//유효 년도/년월 자르기
+
 			return Json(retText);
 		}
 
@@ -69,6 +72,7 @@ namespace Hackathon2016.Controllers
 
 			TextDetectionBiz biz = new TextDetectionBiz();
 			VisionService client = biz.CreateAuthorizedClient();
+			//IList<AnnotateImageResponse> response = biz.DetectTextByImgProcessing(client, filepath); //이미지프로세싱
 			IList<AnnotateImageResponse> response = biz.DetectText(client, filepath);
 
 			if (response != null && response[0].TextAnnotations != null && response[0].TextAnnotations[0].Description != null)
