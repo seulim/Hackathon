@@ -1,363 +1,0 @@
-﻿@using GMKT.GMobile.Data;
-
-<link rel="stylesheet" type="text/css" href="@Urls.StyleUrlV2/bizon.css" />
-
-<div class="bizon_head" onclick="javascript:goBizOnHome();">
-	<div class="logo_wrap">
-		<h2 class="logo">biz on</h2>
-		<p class="tx">사업자 회원의 합리적인 선택</p>
-	</div>
-</div><!-- CONTENT -->
-<div id="content">
-	<div class="biz_cont">
-		<ul class="lp_cate">
-			<li id="lcate_li">
-				<a href="#">@Model.LCategoryFirst.CategoryNm</a>
-			</li>
-			<li id="mcate_li" onclick="javascript:sendFcdCode('category','713000002')">
-				<a href="#">@Model.MCategoryFirst.CategoryNm</a>
-			</li>
-			<li id="scate_li" onclick="javascript:sendFcdCode('category','713000004')">
-				<a href="#">@Model.SCategoryFirst.CategoryNm</a>
-			</li>
-		</ul>
-		<!-- 갤러리 뷰 -->
-		<div class="kind_artwrap">
-			<div class="mw_none" style="display:none" id="itemLoading">
-				<h4>로딩중입니다....</h4>
-				<p>잠시만 기다려 주십시오.</p>
-				<span class="sp_mw">Gmarket</span>
-			</div>
-
-			<ul id="mileage_items" onclick="javascript:sendFcdCode('item','')" class="best_lst type">
-			</ul>
-			<ul id="normal_items" onclick="javascript:sendFcdCode('item','')" class="best_lst type">
-			</ul>
-
-			<div id="bizonPaging">
-			</div>
-		</div>
-	</div>
-</div>
-<!-- //CONTENT -->
-<hr /><script type="text/javascript">	
-	var returnData = null;
-
-	// 최초 로딩시 req param 정보들.(리셋할때 필요함)
-	var defaultReqParams = { 
-		pageNo :@ViewBag.pageNo, 
-		pageSize:@ViewBag.pageSize, 
-		bizOnCategoryCode :'@ViewBag.bizOnCategoryCode',
-		mainYN : "@ViewBag.mainYN",
-		getOnlyNormalItems : "N",
-		level : "@ViewBag.level",
-		name : "",
-		getSCategoryInfo : "N"
-	};
-
-	// 중간중간 검색 조건들을 변경할때, 변경 req param 정보를 유지하기 위함 값.
-	var reqParams = { 
-		pageNo :@ViewBag.pageNo, 
-		pageSize:@ViewBag.pageSize, 
-		bizOnCategoryCode :'@ViewBag.bizOnCategoryCode',
-		mainYN : "@ViewBag.mainYN",
-		getOnlyNormalItems : "N",
-		level : "@ViewBag.level",
-		name : "",
-		getSCategoryInfo : "N"
-	};
-
-	$(document).ready(function () {
-		if (typeof AndroidLocalStorage != "undefined" && AndroidLocalStorage) {
-			mobileLocalStorage = AndroidLocalStorage;
-		}
-		// 출력할 함수들을 등록한다.
-		registerBizOnHelpers();
-		search();
-	});
-
-	function goBizOnHome() {
-		sendFcdCode("home", "713000001");
-		location.href = "@Urls.MobileWebUrl/BizOn";
-	}
-
-	function registerBizOnHelpers() {
-		Handlebars.registerHelper('ifNotZero', ifNotZero);
-
-		Handlebars.registerHelper('addCategoryOnClick', addCategoryOnClick);
-		Handlebars.registerHelper('showCategoryInfo', showCategoryInfo);
-		Handlebars.registerHelper('printHeader', printHeader);
-
-		Handlebars.registerHelper('printSellerInfo', printSellerInfo);
-		Handlebars.registerHelper('printDeliveryInfo', printDeliveryInfo);
-	}
-
-	function selectCategory(level, code, name) {
-		if (code == reqParams.bizOnCategoryCode) {
-			return true;
-		}
-
-		reqParams.pageNo = 1;
-		reqParams.bizOnCategoryCode = code;
-		reqParams.level = level;
-		reqParams.name = name;
-		reqParams.getOnlyNormalItems = "N";
-		reqParams.mainYN = "N";
-		if (level == "M") {			reqParams.getSCategoryInfo = "Y";		} else {			reqParams.getSCategoryInfo = "N";		}		search();
-	}	function goPage(pageNo) {		$("#mileage_items").hide();		reqParams.pageNo = pageNo;		reqParams.getSCategoryInfo = "N";		reqParams.getOnlyNormalItems = "Y";		reqParams.mainYN = "N";		search();	}	function search() {		$("#normal_items").html("");		try {
-
-			$.ajax({
-	    		type: 'POST',
-	 			dataType: 'json',
-	 			url: "/BizOn/Search",
-	 			data: reqParams,
-				xhrFields: {
-					withCredentials: true
-				},
-	 			success: function (result) {
-					// 전역변수로 저장해둔다.
-					returnData = result;
-
-					if ( typeof returnData === 'undefined' || null === returnData ) return;
-
-					console.log(returnData);
-					// 결과 출력
-					displaySearchResult();
-    			},
-	    		error: function (result) {
-	    		}
-    		});
-			
-		}
-		catch (ex) {
-			alert(ex.Message);
-		}	}	// req param 를 초기 정보로 리셋
-	function initReqParams()
-	{
-		// clone
-		reqParams = jQuery.extend(true, {}, defaultReqParams);
-	}	// 응답 데이터를 갖고 있는 전역변수
-	var returnData = null;	var defaultImage = '@Urls.MobileImageUrlV2/640/img_none.jpg';
-	var adultDefaultImage = '@(Urls.MobileImageUrlV2 + GMKT.GMobile.Constant.Const.ADULT_IMAGE_210.Replace("images/", string.Empty))';	var bizOnLpUrl = '@Urls.MobileWebUrl/BizOn/List?bizOnCategoryCode=';
-	function displaySearchResult()
-	{
-		if (reqParams.getOnlyNormalItems != "Y") {
-			displayCategoryInfo();
-		}
-		displayItemList();
-		displayPaging();
-		saveToLocalStorage();
-		//$('html, body').animate({ scrollTop: 1 }, "fast");
-	}	function saveToLocalStorage() {		var url = "";		var mCategoryName = "";		var sCategoryName = "";		url = bizOnLpUrl + reqParams.bizOnCategoryCode;		mCategoryName = $("#mcate_li > a").text();		if (reqParams.level == "S") {			sCategoryName = $("#scate_li > a").text();		}		var NUMBER_OF_HISTORY = 3;		if (mobileLocalStorage) {
-			var bizonHistory = mobileLocalStorage.getItem("GMKTBizOnHistory");
-			if (bizonHistory != undefined && bizonHistory != null && bizonHistory != "") {
-				bizonHistory= JSON.parse(bizonHistory);
-			}
-
-			if (bizonHistory == undefined || bizonHistory == null) {
-				bizonHistory = [];
-			}
-		
-			var thisHistory ={
-				GdmcName: mCategoryName,
-				GdscName: sCategoryName,
-				Url : url
-			};
-
-			if (bizonHistory.length <= 0 || thisHistory.Url != bizonHistory[bizonHistory.length - 1].Url) {
-				bizonHistory.push(thisHistory);
-			}
-
-			if (bizonHistory.length > NUMBER_OF_HISTORY) {
-				var howMany = bizonHistory.length - NUMBER_OF_HISTORY;
-				bizonHistory.splice(0, howMany);
-			}
-
-			mobileLocalStorage.setItem("GMKTBizOnHistory", JSON.stringify(bizonHistory));
-		}	}	function displayCategoryInfo() {		if (reqParams.mainYN == "Y") {			displayCategoryAll();		}		else if (reqParams.level == 'M') {
-			$("#mcate_li > a").text(reqParams.name);
-			$("#mcate_li li").show();
-			$("#" + reqParams.bizOnCategoryCode).hide();
-			var source = $('#scategory_template').html();
-			var template = Handlebars.compile(source);			$("#scate_li").html(template(returnData));
-			$("#"+ returnData.SCategoryFirst.CategoryCd).hide();
-		}
-		else if (reqParams.level == 'S') {
-			$("#scate_li > a").text(reqParams.name);
-			$("#scate_li li").show();
-			$("#" + reqParams.bizOnCategoryCode).hide();
-		}	}	function displayCategoryAll() {		// 대		if (returnData.LCategoryFirst != "undefined" && returnData.LCategoryFirst != null) {			$("#lcate_li > a").text(returnData.LCategoryFirst.CategoryNm);		}		// 중 		if (returnData.MCategoryFirst != "undefined" && returnData.MCategoryFirst != null) {			var mSource = $('#mcategory_template').html();
-			var mTemplate = Handlebars.compile(mSource);			$("#mcate_li").html(mTemplate(returnData));			$("#"+ returnData.MCategoryFirst.CategoryCd).hide();			if (reqParams.level == "L") {				reqParams.bizOnCategoryCode = returnData.MCategoryFirst.CategoryCd;			}		}		// 소		if (returnData.SCategoryFirst != "undefined" && returnData.SCategoryFirst != null) {			var sSource = $('#scategory_template').html();
-			var sTemplate = Handlebars.compile(sSource);			$("#scate_li").html(sTemplate(returnData));			$("#"+ returnData.SCategoryFirst.CategoryCd).hide();		}		if (reqParams.level == "S") {			$("#mcate_li").removeClass("on");			$("#scate_li").addClass("on");		} else {			$("#mcate_li").addClass("on");			$("#scate_li").removeClass("on");		}	}	function displayItemList() {		console.log(returnData.BizOnItems);		if (reqParams.getOnlyNormalItems == "N") {
-			// 마일리지 상품
-			var mSource = $('#mileage_item_template').html();
-			var template = Handlebars.compile(mSource);
-			$("#mileage_items").html(template(returnData));
-			$("#mileage_items").show();
-		} else if (reqParams.pageNo == 1){
-			$("#mileage_items").show();
-		}
-		else {
-			$("#mileage_items").hide();
-		}
-
-
-		// 일반 상품
-		var mSource = $('#normal_item_template').html();
-		var template = Handlebars.compile(mSource);
-		$("#normal_items").html(template(returnData));	}	function displayPaging() {		$("#bizonPaging").html(printPaging(returnData));	}	function printPaging(result) {
-		var numOfPagesToShow = 5;
-
-		if (typeof result.Items === 'undefined' || result.Items == null || result.Items.length <= 0) return;
-
-		var totalPage = parseInt(result.TotalGoodsCount / result.PageSize);
-		if (result.TotalGoodsCount % result.pageSize != 0)
-			totalPage++;
-
-		// 화면 첫번재 보이는 페이지 수
-		var firstPage = result.PageNo;
-		while (firstPage % numOfPagesToShow != 1 && firstPage > 1)
-			firstPage--;
-
-		// 화면 마지막 페이지 수
-		var lastPage = result.PageNo;
-		while (lastPage % numOfPagesToShow != 0 && lastPage < totalPage)
-			lastPage++;
-
-		var pagingHTML = '<div class="paginate">';
-
-		// 이전 페이지 버튼
-		if (result.PageNo > numOfPagesToShow)
-			pagingHTML += '<a href="javascript:goPage(' + (firstPage - 1) + ')" class="prev selected"><span class="sp_mw">이전 상품리스트</span></a>';
-		else
-			pagingHTML += '<span class="prev"><span class="sp_mw">이전 상품리스트 없음</span></span>';
-
-		var count = totalPage > numOfPagesToShow ? numOfPagesToShow : totalPage;
-
-		for (var i = firstPage; i <= lastPage; i++) {
-			var css = '';
-			if (result.PageNo == i)
-				css = 'selected';
-			pagingHTML += '<a href="javascript:goPage(' + i + ');" class="' + css + '">' + i + '</a>'
-		}
-
-		// 이후 페이지 버튼
-		if (totalPage > lastPage)
-			pagingHTML += '<a href="javascript:goPage(' + (lastPage + 1) + ')" class="next selected"><span class="sp_mw">다음 상품리스트</span></a>';
-		else
-			pagingHTML += '<span class="next"><span class="sp_mw">다음 상품리스트 없음</span></span>';
-
-		pagingHTML += '</div>';
-
-		return pagingHTML;
-	}	function sendFcdCode(type, fcd) {		var fcdCode = fcd;		if (type != undefined && type != "" && type == "item") {			if ($("#scate_li").hasClass("on")) {				fcdCode = "713000005"			} else {				fcdCode = "713000003"			}		}		$.get("http://sna.gmarket.co.kr/?fcd=" + fcdCode);	}</script><!-- start of handlebar's helper region --><script type="text/javascript">
-	function addCategoryOnClick(categoryInfo, isMCategory) {
-		var html = "";
-		var categoryType = "";
-		if (isMCategory) {
-			categoryType = "M";
-		} else {
-			categoryType = "S";
-		}
-
-		html = "onclick=\"javascript:selectCategory('" + categoryType + "','" + categoryInfo.CategoryCd + "','" + categoryInfo.CategoryNm + "');\"";
-		return new Handlebars.SafeString(html);
-	}
-
-	function showCategoryInfo(selctedCategoryCode, currentCategoryCode) {
-		var html = "";
-
-		if (selectCategoryCode == currentCategoryCode) {
-			html = "style=\"display:none\"";
-		}
-
-		return new Handlebars.SafeString(html);
-	}
-	
-	function printHeader(index, isMileage) {
-		var html = "";
-		var title = "";
-		if (isMileage) {
-			title = "Smile Point + 0.3%";
-		} else {
-			title = "일반 상품";
-		}
-
-		if (index == 0) {
-			html = "<div class=\"best_tit\"><h3 class=\"mbest_stit\">" + title + "</h3></div>";
-		}
-		return new Handlebars.SafeString(html);
-	}
-
-	function ifNotZero(a, opts) {
-
-		if (typeof a === 'undefined' || a == null || a == '')
-			a = 0;
-
-		if (parseInt(a) != 0)
-			return opts.fn(this);
-		else
-			return opts.inverse(this);
-	}
-
-	function printSellerInfo(item) {
-		if (item.IsPurchasedSeller)
-			return new Handlebars.SafeString('<span class="opt_buy">구매매장</span>');
-	}
-
-	function printDeliveryInfo(deliveryInfo) {
-
-		if (deliveryInfo.DeliveryType == 'BLUE')
-			return new Handlebars.SafeString('<span class="opt_free">' + deliveryInfo.DeliveryText + '</span>');
-		else if (deliveryInfo.DeliveryType == 'SMART')
-			return new Handlebars.SafeString('<span class="opt_smart">' + deliveryInfo.DeliveryText + '</span>');
-		else if (deliveryInfo.DeliveryType == 'MOUNT')
-			return new Handlebars.SafeString('<span class="opt_tire">' + deliveryInfo.DeliveryText + '</span>');
-		else
-			return new Handlebars.SafeString('<span class="opt_type">' + deliveryInfo.DeliveryText + '</span>');
-	}
-</script><!-- end of handlebar's helper region --><!-- start of template region --><script id="mcategory_template" type="text/x-handlebars-template">	<a href="#" {{addCategoryOnClick MCategoryFirst true}}>{{MCategoryFirst.CategoryNm}}</a>
-	<ul class="lp_sub_cate">		{{#each MCategoryList}}		<li id="{{CategoryCd}}" {{addCategoryOnClick this true}}><a href="#">{{CategoryNm}}</a></li>		{{/each}}	</ul></script><script id="scategory_template" type="text/x-handlebars-template">	<a href="#" {{addCategoryOnClick SCategoryFirst false}}>{{SCategoryFirst.CategoryNm}}</a>
-	<ul class="lp_sub_cate">		{{#each SCategoryList}}		<li id="{{CategoryCd}}" {{addCategoryOnClick this false}}><a href="#">{{CategoryNm}}</a></li>		{{/each}}	</ul></script><script id="mileage_item_template" type="text/x-handlebars-template">{{#each BizOnItems}}	<li>		{{printHeader @@index true}}		<a href="{{LinkURL}}">
-			<span class="img_box">
-				<img src="{{ImageURL}}" alt="" class="thumbnail">
-			</span>
-			<span class="txt_box">
-				<strong class="prd_tit">{{GoodsName}}</strong>
-				<span class="price_box">
-					{{#ifNotZero DiscountRate}}
-					<strong class="per_price"><span class="blind">할인율</span>{{DiscountRate}}<span class="per">%</span></strong>
-					<span class="origin_price"><span class="blind">정가</span>{{OriginalPrice}}</span>
-					<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>
-					{{else}}
-					<span class="origin_price" ></span>
-					<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>						
-					{{/ifNotZero}}
-				</span>
-				<span class="option_bx">
-					{{printSellerInfo this}}
-					{{printDeliveryInfo Delivery}}
-				</span>
-			</span>
-		</a>	</li>{{/each}}</script><script id="normal_item_template" type="text/x-handlebars-template">{{#each Items}}	<li>		{{printHeader @@index false}}		<a href="{{LinkURL}}">
-			<span class="img_box">
-				<img src="{{ImageURL}}" alt="" class="thumbnail">
-			</span>
-			<span class="txt_box">
-				<strong class="prd_tit">{{GoodsName}}</strong>
-				<span class="price_box">
-					{{#ifNotZero DiscountRate}}
-					<strong class="per_price"><span class="blind">할인율</span>{{DiscountRate}}<span class="per">%</span></strong>
-					<span class="origin_price"><span class="blind">정가</span>{{OriginalPrice}}</span>
-					<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>
-					{{else}}
-					<span class="origin_price" ></span>
-					<strong class="sale_price"><span class="blind">할인가</span>{{SalePrice}}</strong>						
-					{{/ifNotZero}}
-				</span>
-				<span class="option_bx">
-					{{printSellerInfo this}}
-					{{printDeliveryInfo Delivery}}
-				</span>
-			</span>
-		</a>	</li>{{/each}}</script><!-- end of template region -->
